@@ -1,15 +1,89 @@
+import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
+import UserModel from '../models/user-model.js';
+import tokenService from '../services/token-service.js';
 
-const register = (req, res) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json(errors.array())
+const register = async (req, res) => {
+  try {
+    const { fullName, email, password, avatarUrl } = req.body
+
+    const userDb = await UserModel.findOne({ email })
+    if (userDb) {
+      return res.status(400).json({
+        message: 'This user already exists'
+      })
+    }
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json(errors.array())
+    }
+
+
+    const hashedPass = await bcrypt.hash(password, 5)
+
+    const user = new UserModel({
+      fullName,
+      email,
+      hashedPassword: hashedPass,
+      avatarUrl
+    })
+
+    await user.save()
+
+    const token = tokenService.generateToken({ _id: user._id })
+
+    const { hashedPassword, ...userData } = user._doc
+
+    res.json({
+      ...userData,
+      token
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when registering'
+    })
   }
-
-  res.json({
-    success: true
-  })
 }
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    const user = await UserModel.findOne({ email })
+    if (!user) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    const isPassValid = await bcrypt.compare(password, user.hashedPassword)
+    if (!isPassValid) {
+      return res.status(400).json({
+        message: 'Wrong login or password'
+      })
+    }
+
+    const token = tokenService.generateToken({ _id: user._id })
+
+    const { hashedPassword, ...userData } = user._doc
+
+    res.json({
+      ...userData,
+      token
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when logging in'
+    })
+  }
+}
+
 export default {
-  register
+  register,
+  login
 }

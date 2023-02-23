@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 import UserModel from '../models/user-model.js';
-import tokenService from '../services/token-service.js';
 
 const register = async (req, res) => {
   try {
@@ -30,13 +29,11 @@ const register = async (req, res) => {
 
     await user.save()
 
-    const token = tokenService.generateToken({ _id: user._id })
 
     const { hashedPassword, ...userData } = user._doc
 
     res.json({
       ...userData,
-      token
     })
 
   } catch (error) {
@@ -65,13 +62,11 @@ const login = async (req, res) => {
       })
     }
 
-    const token = tokenService.generateToken({ _id: user._id })
 
     const { hashedPassword, ...userData } = user._doc
 
     res.json({
       ...userData,
-      token
     })
 
   } catch (error) {
@@ -82,7 +77,31 @@ const login = async (req, res) => {
   }
 }
 
+const getUser = async (req, res) => {
+  try {
+    const { userId } = req.body
+
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    const { hashedPassword, ...userData } = user._doc
+
+    res.json(userData)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when fetching a user'
+    })
+  }
+}
+
 export default {
   register,
-  login
+  login,
+  getUser
 }

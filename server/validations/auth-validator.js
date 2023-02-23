@@ -6,3 +6,7 @@ export const registerValidator = [
   body('password', 'Password must be greater than 5 symbols').isLength({ min: 5 }),
   body('avatarUrl', 'Wrong avatar link').optional().isURL(),
 ]
+export const loginValidator = [
+  body('email', 'Invalid email format').isEmail(),
+  body('password', 'Password must be greater than 5 symbols').isLength({ min: 5 }),
+]

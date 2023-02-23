@@ -1,0 +1,20 @@
+@import './variables.scss';
+
+.button_colored {
+  padding: 10px 15px;
+  color: white;
+  background-color: $blue_dark;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.button_transparent {
+  padding: 10px 15px;
+  color: $blue_dark;
+  background-color: white;
+  border: 1px solid $blue_dark;
+  border-radius: 4px;
+  font-size: 14px;
+
+}

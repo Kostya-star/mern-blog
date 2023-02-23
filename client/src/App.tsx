@@ -1,26 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Register } from 'pages/Register';
+import { Navigation } from './components/UI/Navigation/Navigation';
+import './scss/all.scss';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div className="container">
+        <Navigation />
+      </div>
+      <div style={{ height: '100vh', backgroundColor: '#f1f3f9' }}>
+        <div className="container">
+          <Register />
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;

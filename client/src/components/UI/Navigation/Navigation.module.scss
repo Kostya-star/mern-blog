@@ -1,0 +1,20 @@
+.navigation {
+  width: 100%;
+  padding: 10px 0;
+  background-color: white;
+  &__content {
+    display: flex;
+    justify-content: space-between;
+  }
+  &__logo {
+    padding: 9px 10px;
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    text-transform: uppercase;
+  }
+  &__buttons {
+    display: flex;
+    gap: 15px;
+  }
+}

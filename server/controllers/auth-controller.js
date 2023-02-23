@@ -19,7 +19,6 @@ const register = async (req, res) => {
       return res.status(400).json(errors.array())
     }
 
-
     const hashedPass = await bcrypt.hash(password, 5)
 
     const user = new UserModel({

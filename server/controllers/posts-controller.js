@@ -102,9 +102,38 @@ const deletePost = async (req, res) => {
   }
 }
 
+const updatePost = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { title, text, tags, user, imageUrl } = req.body
+
+    await PostModel.updateOne({
+      _id: id
+    },
+      {
+        title,
+        text,
+        tags,
+        user,
+        imageUrl
+      })
+
+      res.json({
+        success: true
+      })
+  
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error when updating the post'
+    })
+  }
+}
+
 export default {
   createPost,
   getAllPosts,
   getOnePost,
-  deletePost
+  deletePost,
+  updatePost
 }

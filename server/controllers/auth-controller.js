@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 import UserModel from '../models/user-model.js';
+import tokenService from '../services/token-service.js'
 
 const register = async (req, res) => {
   try {
@@ -29,11 +30,13 @@ const register = async (req, res) => {
 
     await user.save()
 
+    const token = tokenService.generateToken({ _id: user._id })
 
     const { hashedPassword, ...userData } = user._doc
 
     res.json({
       ...userData,
+      token
     })
 
   } catch (error) {
@@ -62,11 +65,13 @@ const login = async (req, res) => {
       })
     }
 
+    const token = tokenService.generateToken({ _id: user._id })
 
     const { hashedPassword, ...userData } = user._doc
 
     res.json({
       ...userData,
+      token
     })
 
   } catch (error) {

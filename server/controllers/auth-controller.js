@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
-import { validationResult } from 'express-validator';
 import UserModel from '../models/user-model.js';
-import tokenService from '../services/token-service.js'
+import tokenService from '../services/token-service.js';
 
 const register = async (req, res) => {
   try {
@@ -12,11 +11,6 @@ const register = async (req, res) => {
       return res.status(400).json({
         message: 'This user already exists'
       })
-    }
-
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json(errors.array())
     }
 
     const hashedPass = await bcrypt.hash(password, 5)

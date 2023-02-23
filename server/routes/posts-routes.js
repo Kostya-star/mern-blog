@@ -5,11 +5,11 @@ import { postValidator } from './../validations/post-validator.js';
 
 const router = Router()
 
-// router.get('/:id', postsController.getOnePost)
-// router.get('/', postsController.getAllPosts) read
-router.post('/', checkAuth, postValidator, postsController.createPost) 
+router.get('/:id', postsController.getOnePost)
+router.get('', postsController.getAllPosts)
+router.post('', checkAuth, postValidator, postsController.createPost) 
 // router.patch('/', postsController.updatePost) update
-// router.delete('/', postsController.deletePost) delete
+router.delete('/:id', checkAuth, postsController.deletePost)
 
 
 export default router

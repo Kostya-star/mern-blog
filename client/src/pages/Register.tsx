@@ -14,7 +14,7 @@ export const Register = () => {
         <Input type='text' placeholder='Name'/>
         <Input type='email' placeholder='E-mail'/>
         <Input type='password' placeholder='Password'/>
-        <Button text='Sign up' className='button_colored' style={{width: '100%'}}/>
+        <Button text='Sign up' className='button button_colored' style={{width: '100%'}}/>
         </form>
       </div>
     </div>

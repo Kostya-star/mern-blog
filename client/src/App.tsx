@@ -11,7 +11,7 @@ const App = () => {
       <div className="container">
         <Navigation />
       </div>
-      <div style={{ height: '100vh', backgroundColor: '#f1f3f9' }}>
+      <div style={{ height: '100%', minHeight: '100vh', backgroundColor: '#f1f3f9' }}>
         <div className="container">
           {/* <Register /> */}
           {/* <Login/> */}

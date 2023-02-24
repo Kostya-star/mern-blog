@@ -1,7 +1,11 @@
 .navigation {
-  width: 100%;
-  padding: 10px 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  // width: 100%;
+  padding: 10px 20px;
   background-color: white;
+  z-index: 10;
   &__content {
     display: flex;
     justify-content: space-between;
@@ -16,5 +20,8 @@
   &__buttons {
     display: flex;
     gap: 15px;
+  }
+  &_fake {
+    height: 63px;
   }
 }

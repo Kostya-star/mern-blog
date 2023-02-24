@@ -1,6 +1,13 @@
-import React from 'react';
+import { Button } from 'components/UI/Button/Button';
+import { Input } from 'components/UI/Input/Input';
+import { FC } from 'react';
 import s from './Comments.module.scss';
-export const Comments = () => {
+
+interface ICommentsProps {
+  isCreatePost?: boolean;
+}
+
+export const Comments: FC<ICommentsProps> = ({ isCreatePost }) => {
   return (
     <div className={s.comments}>
       <h3>Comments</h3>
@@ -15,7 +22,16 @@ export const Comments = () => {
           </p>
         </div>
       </div>
-        <hr />
+      <hr />
+      {isCreatePost && (
+        <div className={s.comments__create}>
+          <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
+          <div>
+            <Input type="text" placeholder="Write comment..." />
+            <Button className="button button_colored" text="send" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

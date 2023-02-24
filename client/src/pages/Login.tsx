@@ -12,7 +12,7 @@ export const Login = () => {
           <Input type="password" placeholder="Password" />
           <Button
             text="Sign in"
-            className="button_colored"
+            className="button button_colored"
             style={{ width: '100%' }}
           />
         </form>

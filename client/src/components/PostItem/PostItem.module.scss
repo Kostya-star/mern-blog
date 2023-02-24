@@ -66,6 +66,10 @@
       padding-left: 65px;
       h2 {
         margin-bottom: 15px;
+        color: black;
+        &:hover {
+          color: $blue_light;
+        }
       }
       &__tags {
         margin-bottom: 25px;

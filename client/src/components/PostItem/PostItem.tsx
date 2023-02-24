@@ -5,6 +5,7 @@ import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import s from './PostItem.module.scss';
 import { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 interface IPostItemProps {
   isPostText?: boolean;
@@ -36,7 +37,10 @@ export const PostItem: FC<IPostItemProps> = ({
           </div>
         </div>
         <div className={s.post__content__body}>
+        <Link to='/posts/1'>
           <h2>Roast the code #1 | Rock paper Scissors</h2>
+        </Link>
+
           <div className={s.post__content__body__tags}>
             <span>#react</span>
             <span>#fun</span>

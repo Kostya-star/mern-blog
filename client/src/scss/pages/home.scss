@@ -8,7 +8,12 @@
   &__content {
     display: grid;
     grid-template-columns: 2.5fr 1fr;
-    grid-column-gap: 30px
+    grid-column-gap: 30px;
+    &__group {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
   }
 
   &__categories {
@@ -34,8 +39,4 @@
     height: 2px;
     width: 70px;
   }
-}
-
-.tags {
-  display: flex;
 }

@@ -11,10 +11,20 @@ export const Register = () => {
         <h1>Create an account</h1>
         <AvatarSVG />
         <form>
-        <Input type='text' placeholder='Name'/>
-        <Input type='email' placeholder='E-mail'/>
-        <Input type='password' placeholder='Password'/>
-        <Button text='Sign up' className='button button_colored' style={{width: '100%'}}/>
+          <div className="input">
+            <Input type="text" placeholder="Name" />
+          </div>
+          <div className="input">
+            <Input type="email" placeholder="E-mail" />
+          </div>
+          <div className="input">
+            <Input type="password" placeholder="Password" />
+          </div>
+          <Button
+            text="Sign up"
+            className="button button_colored"
+            style={{ width: '100%' }}
+          />
         </form>
       </div>
     </div>

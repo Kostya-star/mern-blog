@@ -1,0 +1,11 @@
+.textarea {
+  border: none;
+  outline: none;
+  resize: none;
+  width: 100%;
+  font-size: 45px;
+  font-weight: 800;
+  &::placeholder {
+    color: gray;
+  }
+}

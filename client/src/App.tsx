@@ -4,6 +4,7 @@ import { Login } from 'pages/Login';
 import { Register } from 'pages/Register';
 import { Navigation } from './components/UI/Navigation/Navigation';
 import './scss/all.scss';
+import { CreatePost } from 'pages/CreatePost';
 
 const App = () => {
   return (
@@ -11,12 +12,19 @@ const App = () => {
       <div className="container">
         <Navigation />
       </div>
-      <div style={{ height: '100%', minHeight: '100vh', backgroundColor: '#f1f3f9' }}>
+      <div
+        style={{
+          height: '100%',
+          minHeight: '100vh',
+          backgroundColor: '#f1f3f9',
+        }}
+      >
         <div className="container">
           {/* <Register /> */}
           {/* <Login/> */}
           {/* <Home /> */}
-          <FullPost/>
+          {/* <FullPost/> */}
+          <CreatePost/>
         </div>
       </div>
     </div>

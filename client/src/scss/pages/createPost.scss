@@ -1,0 +1,17 @@
+.createPost {
+  padding-top: 40px;
+  &__content {
+    border-radius: 10px;
+    background-color: white;
+    padding: 30px;
+    button {
+      margin-bottom: 30px;
+    }
+    input {
+      border: none;
+    }
+    hr {
+      border: 1px solid $blue_dark
+    }
+  }
+}

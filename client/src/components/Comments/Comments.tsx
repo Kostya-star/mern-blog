@@ -27,7 +27,10 @@ export const Comments: FC<ICommentsProps> = ({ isCreatePost }) => {
         <div className={s.comments__create}>
           <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
           <div>
-            <Input type="text" placeholder="Write comment..." />
+            <div className="input">
+              <Input type="text" placeholder="Write comment..." />
+            </div>
+
             <Button className="button button_colored" text="send" />
           </div>
         </div>

@@ -8,8 +8,13 @@ export const Login = () => {
       <div className="auth__content">
         <h1>Log into your account</h1>
         <form>
-          <Input type="email" placeholder="E-mail" />
-          <Input type="password" placeholder="Password" />
+          <div className="input">
+            <Input type="email" placeholder="E-mail" />
+          </div>
+          <div className="input">
+            <Input type="password" placeholder="Password" />
+          </div>
+
           <Button
             text="Sign in"
             className="button button_colored"

@@ -9,22 +9,14 @@ import { CreatePost } from 'pages/CreatePost';
 const App = () => {
   return (
     <div>
-      <div className="container">
         <Navigation />
-      </div>
-      <div
-        style={{
-          height: '100%',
-          minHeight: '100vh',
-          backgroundColor: '#f1f3f9',
-        }}
-      >
+      <div className='app-body' >
         <div className="container">
           {/* <Register /> */}
           {/* <Login/> */}
           {/* <Home /> */}
           {/* <FullPost/> */}
-          <CreatePost/>
+          {/* <CreatePost/> */}
         </div>
       </div>
     </div>

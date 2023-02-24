@@ -22,7 +22,7 @@ export const Home = () => {
         ))}
       </div>
       <div className="home__content">
-        <PostItem />
+        <PostItem isPopUpButtons={true}/>
         <div className="home__content__group">
           <Tags />
           <Comments />

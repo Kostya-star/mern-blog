@@ -25,6 +25,7 @@
   }
   }
   &__header {
+    text-align: center;
     padding: 70px 40px;
     font-size: 30px;
     text-transform: uppercase;
@@ -81,6 +82,10 @@
           align-items: center;
           margin-right: 20px;
         }
+      }
+      &__text {
+        margin-bottom: 20px;
+        font-size: 20px;
       }
     }
   }

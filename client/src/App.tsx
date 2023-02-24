@@ -1,3 +1,4 @@
+import { FullPost } from 'pages/FullPost';
 import { Home } from 'pages/Home';
 import { Login } from 'pages/Login';
 import { Register } from 'pages/Register';
@@ -14,7 +15,8 @@ const App = () => {
         <div className="container">
           {/* <Register /> */}
           {/* <Login/> */}
-          <Home/>
+          {/* <Home /> */}
+          <FullPost/>
         </div>
       </div>
     </div>

@@ -17,4 +17,17 @@
     background-color: white;
     border: 1px solid $blue_dark;
   }
+
+  &_cancel {
+    background-color: transparent;
+    border: 0;
+    text-decoration: underline $blue_dark 4px;
+    color: $blue_dark;
+  }
+
+  &_delete {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+  }
 }

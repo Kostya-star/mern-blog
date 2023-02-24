@@ -4,8 +4,8 @@ import React from 'react';
 
 export const Login = () => {
   return (
-    <div className="register">
-      <div className="register__content">
+    <div className="auth">
+      <div className="auth__content">
         <h1>Log into your account</h1>
         <form>
           <Input type="email" placeholder="E-mail" />

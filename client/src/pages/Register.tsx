@@ -6,8 +6,8 @@ import { Button } from 'components/UI/Button/Button';
 
 export const Register = () => {
   return (
-    <div className="register">
-      <div className="register__content">
+    <div className="auth">
+      <div className="auth__content">
         <h1>Create an account</h1>
         <AvatarSVG />
         <form>

@@ -1,3 +1,4 @@
+import { Home } from 'pages/Home';
 import { Login } from 'pages/Login';
 import { Register } from 'pages/Register';
 import { Navigation } from './components/UI/Navigation/Navigation';
@@ -12,7 +13,8 @@ const App = () => {
       <div style={{ height: '100vh', backgroundColor: '#f1f3f9' }}>
         <div className="container">
           {/* <Register /> */}
-          <Login/>
+          {/* <Login/> */}
+          <Home/>
         </div>
       </div>
     </div>

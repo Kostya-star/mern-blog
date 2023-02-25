@@ -18,6 +18,9 @@
 
 .input {
   margin-bottom: 20px;
+  &_error {
+    color: tomato;
+  }
 }
 
 .app-body {

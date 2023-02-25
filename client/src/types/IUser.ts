@@ -5,4 +5,5 @@ export interface IUser {
   fullName: string 
   updatedAt: string
   _id: string
+  token?: string
 }

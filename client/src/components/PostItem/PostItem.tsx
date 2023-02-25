@@ -6,15 +6,20 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import s from './PostItem.module.scss';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
+import { IPost } from 'types/IPost';
 
 interface IPostItemProps {
+  post: IPost;
   isPostText?: boolean;
   isPopUpButtons?: boolean;
+  isUser?: boolean;
 }
 
 export const PostItem: FC<IPostItemProps> = ({
+  post,
   isPostText,
   isPopUpButtons,
+  isUser,
 }) => {
   return (
     <div className={s.post}>
@@ -25,40 +30,34 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       )}
       <div className={s.post__header}>
-        <h1>Roast the code #1</h1>
-        <h2>TS Rock paper Scissors</h2>
+        {post.imageUrl && <img src={post.imageUrl} />}
+        {/* <img src='https://www.marujaenlacocina.es/wp-content/uploads/2015/11/header-img.png' /> */}
       </div>
-      <div className={s.post__content}>
+      <div className={`${s.post__content} ${!post.imageUrl && s.post__content_trimtop}`}>
         <div className={s.post__content__header}>
-          <img src={post_img} />
+          <img src={post_img} alt="avatar" />
           <div>
-            <span>Keff</span>
-            <span>12/46/1475</span>
+            {isUser && <span>{post.user.fullName}</span>}
+            <span>{post.createdAt}</span>
           </div>
         </div>
         <div className={s.post__content__body}>
-        <Link to='/posts/1'>
-          <h2>Roast the code #1 | Rock paper Scissors</h2>
-        </Link>
+          <Link to={`/posts/${post._id}`}>
+            <h2>{post.title}</h2>
+          </Link>
 
           <div className={s.post__content__body__tags}>
-            <span>#react</span>
-            <span>#fun</span>
-            <span>#typescript</span>
+            {post.tags?.map((tag, ind) => (
+              <span key={ind}>{tag}</span>
+            ))}
           </div>
           {isPostText && (
-            <div className={s.post__content__body__text}>
-              Hey there! 👋 I'm starting a new series called "Roast the Code",
-              where I will share some code, and let YOU roast and improve it.
-              There's not much more to it, just be polite and constructive, this
-              is an exercise so we can all learn together. Now then, head over
-              to the repo and roast as hard as you can!!
-            </div>
+            <div className={s.post__content__body__text}>{post.text}</div>
           )}
           <div className={s.post__content__body__statistics}>
             <div>
               <EyeSVG />
-              150
+              {post.viewCount}
             </div>
             <div>
               <CommentSVG />3

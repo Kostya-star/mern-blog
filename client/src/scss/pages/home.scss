@@ -9,7 +9,12 @@
     display: grid;
     grid-template-columns: 2.5fr 1fr;
     grid-column-gap: 30px;
-    &__group {
+    &__posts {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    &__sidebar {
       display: flex;
       flex-direction: column;
       gap: 30px;

@@ -1,12 +1,23 @@
+import { instance } from 'API/instance';
+import axios from 'axios';
 import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Tags } from 'components/Tags/Tags';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchPosts } from 'redux/slices/posts';
+import { useAppDispatch, useAppSelector } from './../redux/hooks';
 
 const categories = ['New', 'Popular'];
 
 export const Home = () => {
+  const dispatch = useAppDispatch();
+  const posts = useAppSelector(({ posts }) => posts.posts);
+
   const [activeCategory, setActiveCategory] = useState(0);
+
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, []);
 
   return (
     <div className="home__wrapper">
@@ -22,8 +33,12 @@ export const Home = () => {
         ))}
       </div>
       <div className="home__content">
-        <PostItem isPopUpButtons={true}/>
-        <div className="home__content__group">
+        <div className="home__content__posts">
+          {posts?.map((post) => (
+            <PostItem isPopUpButtons={true} />
+          ))}
+        </div>
+        <div className="home__content__sidebar">
           <Tags />
           <Comments />
         </div>

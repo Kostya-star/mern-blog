@@ -2,11 +2,11 @@ import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Formik, FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import { onLoginThunk } from 'redux/slices/auth';
+import { onLoginThunk, isAuthSelector } from 'redux/slices/auth';
 import { ILoginRequest } from 'types/ILoginRequest';
 import { IUser } from 'types/IUser';
 import * as Yup from 'yup';
-import { useAppDispatch } from './../redux/hooks';
+import { useAppDispatch, useAppSelector } from './../redux/hooks';
 
 const initialValues = { email: '', password: '' };
 
@@ -18,8 +18,10 @@ const validationSchema = Yup.object({
 });
 
 export const Login = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate()
+
+  const dispatch = useAppDispatch();
+  const isAuth = useAppSelector(isAuthSelector)
 
   // costya@mail.ru
   // test123
@@ -30,7 +32,7 @@ export const Login = () => {
     const resp = await dispatch(onLoginThunk(values)).unwrap();
 
     if(resp.token) {
-      window.localStorage.setItem('token', JSON.stringify(resp.token))
+      window.localStorage.setItem('token', resp.token)
       navigate('/')
     }
 

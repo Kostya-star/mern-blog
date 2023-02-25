@@ -70,7 +70,7 @@ const createPost = async (req, res) => {
     res.json(post)
 
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
       message: 'Error when creating the post'
     })

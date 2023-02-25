@@ -5,12 +5,19 @@ import { Login } from 'pages/Login';
 import { Register } from 'pages/Register';
 import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
-import { isAuthSelector } from 'redux/slices/auth';
+import { isAuthSelector, onAuthMeThunk } from 'redux/slices/auth';
 import { Navigation } from './components/UI/Navigation/Navigation';
 import './scss/all.scss';
+import { useAppDispatch } from './redux/hooks';
+import { useEffect } from 'react'
 
 const App = () => {
   const isAuth = useAppSelector(isAuthSelector);
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(onAuthMeThunk())
+  }, [])
 
   return (
     <div>

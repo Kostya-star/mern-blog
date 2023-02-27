@@ -1,15 +1,21 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { TextArea } from 'components/UI/TextArea/TextArea';
-import { useCallback, useState, useRef, ChangeEvent } from 'react';
+import { useCallback, useState, useRef, ChangeEvent, useEffect } from 'react';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import { instance } from 'API/instance';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useAppDispatch } from 'redux/hooks';
-import { createPost, uploadPostImage } from 'redux/slices/posts';
+import {
+  createPost,
+  fetchPost,
+  updatePost,
+  uploadPostImage,
+} from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
+import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 
 const options = {
   spellChecker: false,
@@ -27,40 +33,74 @@ const options = {
 
 interface INewPost extends Omit<INewPostRequest, 'tags' | 'imageUrl'> {
   tags: string;
-  imageUrl: File | null;
+  imageUrl: File | string;
 }
 
 export const CreatePost = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const { id } = useParams();
+
   const [newPost, setNewPost] = useState<INewPost>({
     title: '',
     tags: '',
     text: '',
-    imageUrl: null,
+    imageUrl: '',
   });
 
   const imageRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchPost(id))
+        .unwrap()
+        .then(({ title, text, tags, imageUrl }) => {
+          setNewPost({
+            title,
+            text,
+            tags: tags.join(' '),
+            imageUrl,
+          });
+        });
+    }
+  }, []);
+
+  const isEditing = Boolean(id);
+
   const onSubmitNewPost = async () => {
     try {
-      let imageUrl = ''
+      let imageUrl = '';
 
-      if(newPost.imageUrl) {
+      // if !isEditing then newPost.imageUrl === File. In this case we are creating a post.
+      // Otherwise if newPost.imageUrl is a string, then we are editing the post
+      // and we dont need to perform the operations in the if operator and can proceed right to the post request
+      if (typeof newPost.imageUrl !== 'string') {
         const formData = new FormData();
         formData.append('image', newPost.imageUrl as File);
         const { url } = await dispatch(uploadPostImage(formData)).unwrap();
-        imageUrl = url
+        imageUrl = url;
       }
 
       const _newPost = {
         ...newPost,
-        imageUrl,
+        imageUrl: imageUrl || (newPost.imageUrl as string),
         tags: newPost.tags.split(' '),
       };
-      const { data } = await dispatch(createPost(_newPost)).unwrap();
-      navigate(`/posts/${data._id}`);
+
+      if (isEditing) {
+        const resp = await dispatch(
+          updatePost({ id, updatedPost: _newPost } as IUpdatePostRequest),
+        ).unwrap();
+        navigate(`/posts/${id}`);
+
+        console.log('updatePost', resp);
+      } else {
+        const { data } = await dispatch(createPost(_newPost)).unwrap();
+        navigate(`/posts/${data._id}`);
+
+        console.log('createPost', data);
+      }
     } catch (error) {
       alert('Error when creating the article');
       console.log(error);
@@ -68,11 +108,16 @@ export const CreatePost = () => {
   };
 
   const onDeleteImage = () => {
-    setNewPost({ ...newPost, imageUrl: null });
+    setNewPost({ ...newPost, imageUrl: '' });
     if (imageRef.current) {
       imageRef.current.value = '';
     }
   };
+
+  const imgSrc =
+    typeof newPost.imageUrl !== 'string'
+      ? URL.createObjectURL(newPost.imageUrl)
+      : `http://localhost:5000${newPost.imageUrl}`;
 
   return (
     <div className="createPost">
@@ -86,7 +131,7 @@ export const CreatePost = () => {
             />
             <img
               className="createPost__content__img"
-              src={URL.createObjectURL(newPost.imageUrl)}
+              src={imgSrc}
               alt="Uploaded"
             />
           </>
@@ -126,7 +171,7 @@ export const CreatePost = () => {
       />
       <div className="createPost__content__buttons">
         <Button
-          text="Publish"
+          text={isEditing ? 'Edit' : 'Publish'}
           className="button button_colored"
           onClick={onSubmitNewPost}
         />

@@ -10,7 +10,9 @@ import { isAuthSelector } from 'redux/slices/auth';
 export const AppRouter = () => {
   const isAuth = useAppSelector(isAuthSelector);
 
-  const token = window.localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  console.log(token);
+  
 
   return (
     <div className="app-body">
@@ -19,16 +21,17 @@ export const AppRouter = () => {
           <Route path="/" element={<Home />} />
           <Route path="/posts/:id" element={<FullPost />} />
 
-          {(!token) && (
+          {(!isAuth) && (
             <>
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
             </>
           )}
 
-          {(token) && (
+          {(isAuth) && (
             <>
               <Route path="/add-post" element={<CreatePost />} />
+              <Route path="/posts/:id/edit" element={<CreatePost />} />
             </>
           )}
 

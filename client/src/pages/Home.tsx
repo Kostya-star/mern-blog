@@ -6,10 +6,12 @@ import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
 import { deletePost } from './../redux/slices/posts';
+import { useNavigate } from 'react-router-dom';
 
 const categories = ['New', 'Popular'];
 
 export const Home = () => {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch();
   const { posts, tags, postsStatus, tagsStatus, currentUserId } =
     useAppSelector(({ posts, tags, auth }) => ({

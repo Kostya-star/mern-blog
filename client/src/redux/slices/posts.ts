@@ -3,6 +3,7 @@ import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { INewPostRequest } from 'types/INewPostRequest';
 import { IPost } from 'types/IPost';
+import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 import { IUploadImgResp } from 'types/IUploadImgResp';
 
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
@@ -29,6 +30,15 @@ export const createPost = createAsyncThunk(
   'posts/createPost',
   async (newPost: INewPostRequest) =>
     await instance.post<IPost>('/posts', newPost),
+);
+
+export const updatePost = createAsyncThunk(
+  'posts/updatePost',
+  async ({id, updatedPost}: IUpdatePostRequest) => {
+    console.log('REDUX PARAMETERS', id, updatedPost);
+    
+    return await instance.patch(`/posts/${id}`, updatedPost)
+  }
 );
 
 export const deletePost = createAsyncThunk(

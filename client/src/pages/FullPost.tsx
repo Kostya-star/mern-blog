@@ -34,6 +34,7 @@ export const FullPost = () => {
   if (error) {
     return <div>ERROR</div>;
   }
+  
 
   return (
     <div className="fullPost">

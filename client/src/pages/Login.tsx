@@ -2,9 +2,8 @@ import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import { onLoginThunk, isAuthSelector } from 'redux/slices/auth';
+import { isAuthSelector, onLoginThunk } from 'redux/slices/auth';
 import { ILoginRequest } from 'types/ILoginRequest';
-import { IUser } from 'types/IUser';
 import * as Yup from 'yup';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
 

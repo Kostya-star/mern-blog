@@ -1,6 +1,6 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
-import { ErrorMessage, Formik, FormikHelpers } from 'formik';
+import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { onLoginThunk, isAuthSelector } from 'redux/slices/auth';
 import { ILoginRequest } from 'types/ILoginRequest';
@@ -18,26 +18,28 @@ const validationSchema = Yup.object({
 });
 
 export const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
-  const isAuth = useAppSelector(isAuthSelector)
+  const isAuth = useAppSelector(isAuthSelector);
 
-  // costya@mail.ru
-  // test123
   const onLoginSubmit = async (
     values: ILoginRequest,
     actions: FormikHelpers<ILoginRequest>,
   ) => {
     const resp = await dispatch(onLoginThunk(values)).unwrap();
 
-    if(resp.token) {
-      window.localStorage.setItem('token', resp.token)
-      navigate('/')
+    if (resp.token) {
+      window.localStorage.setItem('token', resp.token);
+      navigate('/');
     }
 
     // actions.setSubmitting(true)
   };
+
+  // if(isAuth) {
+  //   return navigate('/')
+  // }
 
   return (
     <div className="auth">
@@ -50,12 +52,13 @@ export const Login = () => {
         >
           {({
             values,
+            isValid,
             handleChange,
             handleBlur,
             handleSubmit,
             isSubmitting,
           }) => (
-            <form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit}>
               <div className="input">
                 <Input
                   type="email"
@@ -91,9 +94,9 @@ export const Login = () => {
                 text="Sign in"
                 className="button button_colored"
                 style={{ width: '100%' }}
-                disabled={isSubmitting}
+                disabled={!isValid || isSubmitting}
               />
-            </form>
+            </Form>
           )}
         </Formik>
       </div>

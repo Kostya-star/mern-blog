@@ -16,7 +16,9 @@ const App = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(onAuthMeThunk())
+    if(localStorage.getItem('token')) {
+      dispatch(onAuthMeThunk())
+    }
   }, [])
 
   return (

@@ -10,14 +10,14 @@ const categories = ['New', 'Popular'];
 
 export const Home = () => {
   const dispatch = useAppDispatch();
-  const { posts, tags, postsStatus, tagsStatus } = useAppSelector(
-    ({ posts, tags }) => ({
-      posts: posts.posts,
-      postsStatus: posts.status,
-      tagsStatus: tags.status,
-      tags: tags.tags,
-    }),
-  );
+  const { posts, tags, postsStatus, tagsStatus, currentUserId } =
+    useAppSelector(({ posts, tags, auth }) => ({
+      posts: posts?.posts,
+      postsStatus: posts?.status,
+      tagsStatus: tags?.status,
+      tags: tags?.tags,
+      currentUserId: auth?.data?._id,
+    }));
 
   const [activeCategory, setActiveCategory] = useState(0);
 
@@ -41,7 +41,6 @@ export const Home = () => {
       </div>
       <div className="home__content">
         <div className="home__content__posts">
-
           {postsStatus === 'loading' && <div>Loading...</div>}
           {postsStatus === 'error' && <div>ERROR</div>}
           {postsStatus === 'success' &&
@@ -49,14 +48,13 @@ export const Home = () => {
               <PostItem
                 key={post._id}
                 post={post}
+                isCurrentUser={currentUserId === post.user._id}
                 isPopUpButtons={true}
                 isUser={true}
               />
             ))}
-
         </div>
         <div className="home__content__sidebar">
-          
           {tagsStatus === 'loading' && <div>Loading...</div>}
           {tagsStatus === 'error' && <div>ERROR</div>}
           {tagsStatus === 'success' && <Tags tags={tags} />}

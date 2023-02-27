@@ -10,6 +10,7 @@ import { IPost } from 'types/IPost';
 
 interface IPostItemProps {
   post: IPost;
+  isCurrentUser?: boolean;
   isPostText?: boolean;
   isPopUpButtons?: boolean;
   isUser?: boolean;
@@ -17,23 +18,28 @@ interface IPostItemProps {
 
 export const PostItem: FC<IPostItemProps> = ({
   post,
+  isCurrentUser,
   isPostText,
   isPopUpButtons,
   isUser,
 }) => {
   return (
     <div className={s.post}>
-      {isPopUpButtons && (
+      {isPopUpButtons && isCurrentUser ? (
         <div className={s.post__popupButtons}>
           <EditSVG />
           <CloseSVG />
         </div>
-      )}
+      ) : null}
       <div className={s.post__header}>
         {post.imageUrl && <img src={post.imageUrl} />}
         {/* <img src='https://www.marujaenlacocina.es/wp-content/uploads/2015/11/header-img.png' /> */}
       </div>
-      <div className={`${s.post__content} ${!post.imageUrl && s.post__content_trimtop}`}>
+      <div
+        className={`${s.post__content} ${
+          !post.imageUrl && s.post__content_trimtop
+        }`}
+      >
         <div className={s.post__content__header}>
           <img src={post_img} alt="avatar" />
           <div>

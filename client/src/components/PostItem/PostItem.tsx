@@ -1,12 +1,13 @@
-import post_img from 'assets/post-img.webp';
-import { ReactComponent as EyeSVG } from 'assets/eye.svg';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as CommentSVG } from 'assets/comment.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
-import { ReactComponent as CloseSVG } from 'assets/close.svg';
-import s from './PostItem.module.scss';
+import { ReactComponent as EyeSVG } from 'assets/eye.svg';
+import post_img from 'assets/post-img.webp';
 import { FC } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { IPost } from 'types/IPost';
+import s from './PostItem.module.scss';
 
 interface IPostItemProps {
   post: IPost;
@@ -21,7 +22,6 @@ export const PostItem: FC<IPostItemProps> = ({
   isPostText,
   isPopUpButtons,
 }) => {
-  
   return (
     <div className={s.post}>
       {isPopUpButtons && isCurrentUser ? (
@@ -31,7 +31,9 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       ) : null}
       <div className={s.post__header}>
-        {post.imageUrl && <img src={`http://localhost:5000${post.imageUrl}`} alt='post img'/>}
+        {post.imageUrl && (
+          <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" />
+        )}
       </div>
       <div
         className={`${s.post__content} ${
@@ -56,7 +58,9 @@ export const PostItem: FC<IPostItemProps> = ({
             ))}
           </div>
           {isPostText && (
-            <div className={s.post__content__body__text}>{post.text}</div>
+            <div className={s.post__content__body__text}>
+              <ReactMarkdown children={post.text} />
+            </div>
           )}
           <div className={s.post__content__body__statistics}>
             <div>

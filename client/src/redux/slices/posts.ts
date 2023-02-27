@@ -9,10 +9,13 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   const resp = await instance.get<IPost[]>('/posts');
   return resp.data;
 });
-export const fetchPost = createAsyncThunk('posts/fetchPost', async (id: string) => {
-  const resp = await instance.get<IPost>(`/posts/${id}`);
-  return resp.data;
-});
+export const fetchPost = createAsyncThunk(
+  'posts/fetchPost',
+  async (id: string) => {
+    const resp = await instance.get<IPost>(`/posts/${id}`);
+    return resp.data;
+  },
+);
 
 export const uploadPostImage = createAsyncThunk(
   'posts/uploadPostImage',
@@ -24,9 +27,13 @@ export const uploadPostImage = createAsyncThunk(
 
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async (newPost: INewPostRequest) => {
-    return await instance.post<IPost>('/posts', newPost);
-  },
+  async (newPost: INewPostRequest) =>
+    await instance.post<IPost>('/posts', newPost),
+);
+
+export const deletePost = createAsyncThunk(
+  'posts/deletePost',
+  async (id: string) => await instance.delete(`/posts/${id}`),
 );
 
 export interface PostsState {
@@ -45,6 +52,7 @@ export const postsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // FETCHING ALL POSTS
       .addCase(fetchPosts.pending, (state) => {
         state.posts = [];
         state.status = 'loading';
@@ -59,6 +67,13 @@ export const postsSlice = createSlice({
       .addCase(fetchPosts.rejected, (state) => {
         state.status = 'error';
         state.posts = [];
+      })
+
+      // DELETING A POST
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.posts = state.posts.filter(
+          (post) => post._id !== action.meta.arg,
+        );
       });
   },
 });

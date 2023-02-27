@@ -11,23 +11,23 @@ import s from './PostItem.module.scss';
 
 interface IPostItemProps {
   post: IPost;
+  deletePost?: (id: string) => void
   isCurrentUser?: boolean;
   isPostText?: boolean;
-  isPopUpButtons?: boolean;
 }
 
 export const PostItem: FC<IPostItemProps> = ({
   post,
+  deletePost,
   isCurrentUser,
   isPostText,
-  isPopUpButtons,
 }) => {
   return (
     <div className={s.post}>
-      {isPopUpButtons && isCurrentUser ? (
+      {(isCurrentUser && deletePost) ? (
         <div className={s.post__popupButtons}>
           <EditSVG />
-          <CloseSVG />
+          <CloseSVG onClick={() => deletePost(post._id)}/>
         </div>
       ) : null}
       <div className={s.post__header}>

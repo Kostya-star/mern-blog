@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
+import { deletePost } from './../redux/slices/posts';
 
 const categories = ['New', 'Popular'];
 
@@ -25,6 +26,10 @@ export const Home = () => {
     dispatch(fetchPosts());
     dispatch(fetchTags());
   }, []);
+
+  const removePost = (id: string) => {
+    dispatch(deletePost(id))
+  }
 
   return (
     <div className="home__wrapper">
@@ -49,7 +54,7 @@ export const Home = () => {
                 key={post._id}
                 post={post}
                 isCurrentUser={currentUserId === post.user._id}
-                isPopUpButtons={true}
+                deletePost={removePost}
               />
             ))}
         </div>

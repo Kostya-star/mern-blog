@@ -6,6 +6,10 @@ import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import { instance } from 'API/instance';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useAppDispatch } from 'redux/hooks';
+import { createPost, uploadPostImage } from 'redux/slices/posts';
+import { INewPostRequest } from 'types/INewPostRequest';
 
 const options = {
   spellChecker: false,
@@ -21,36 +25,41 @@ const options = {
   },
 };
 
+interface INewPost extends Omit<INewPostRequest, 'tags' | 'imageUrl'> {
+  tags: string;
+  imageUrl: File | null;
+}
+
 export const CreatePost = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const [newPost, setNewPost] = useState({
+  const [newPost, setNewPost] = useState<INewPost>({
     title: '',
     tags: '',
     text: '',
-    imageUrl: '',
+    imageUrl: null,
   });
 
   const imageRef = useRef<HTMLInputElement | null>(null);
 
-  const onUploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    try {
-      const formData = new FormData();
-      const file = e.target.files?.[0];
-      formData.append('image', file as File);
-
-      const resp = await instance.post('/upload', formData);
-      setNewPost({ ...newPost, imageUrl: resp.data.url });
-    } catch (error) {
-      alert('Error when uploading the image');
-      console.log(error);
-    }
-  };
-
   const onSubmitNewPost = async () => {
     try {
-      const payload = { ...newPost, tags: newPost.tags.split(' ') };
-      const { data } = await instance.post('/posts', payload);
+      let imageUrl = ''
+
+      if(newPost.imageUrl) {
+        const formData = new FormData();
+        formData.append('image', newPost.imageUrl as File);
+        const { url } = await dispatch(uploadPostImage(formData)).unwrap();
+        imageUrl = url
+      }
+
+      const _newPost = {
+        ...newPost,
+        imageUrl,
+        tags: newPost.tags.split(' '),
+      };
+      const { data } = await dispatch(createPost(_newPost)).unwrap();
       navigate(`/posts/${data._id}`);
     } catch (error) {
       alert('Error when creating the article');
@@ -58,20 +67,26 @@ export const CreatePost = () => {
     }
   };
 
+  const onDeleteImage = () => {
+    setNewPost({ ...newPost, imageUrl: null });
+    if (imageRef.current) {
+      imageRef.current.value = '';
+    }
+  };
+
   return (
     <div className="createPost">
       <div className="createPost__content">
-        <input ref={imageRef} type="file" onChange={onUploadFile} hidden />
         {newPost.imageUrl ? (
           <>
             <Button
               text="Delete"
               className="button button_delete"
-              onClick={() => setNewPost({ ...newPost, imageUrl: '' })}
+              onClick={onDeleteImage}
             />
             <img
               className="createPost__content__img"
-              src={`http://localhost:5000${newPost.imageUrl}`}
+              src={URL.createObjectURL(newPost.imageUrl)}
               alt="Uploaded"
             />
           </>
@@ -82,6 +97,14 @@ export const CreatePost = () => {
             className="button button_transparent"
           />
         )}
+        <input
+          ref={imageRef}
+          type="file"
+          onChange={(e) =>
+            setNewPost({ ...newPost, imageUrl: e.target.files?.[0] as File })
+          }
+          hidden
+        />
         <TextArea
           placeholder="Post title..."
           value={newPost.title}

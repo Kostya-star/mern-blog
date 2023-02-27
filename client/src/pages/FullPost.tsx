@@ -2,11 +2,12 @@ import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { instance } from './../API/instance';
 import { IPost } from './../types/IPost';
-import { useAppSelector } from 'redux/hooks';
+import { useAppDispatch } from 'redux/hooks';
+import { fetchPost } from 'redux/slices/posts';
 
 export const FullPost = () => {
+  const dispatch = useAppDispatch();
   const { id } = useParams();
 
   const [post, setPost] = useState<IPost>({} as IPost);
@@ -14,18 +15,17 @@ export const FullPost = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPost = async () => {
+    (async () => {
       try {
         setLoading(true);
-        const resp = await instance.get(`/posts/${id}`);
-        setPost(resp.data);
+        const post = await dispatch(fetchPost(id as string)).unwrap();
+        setPost(post);
       } catch (error) {
         setError(error as any);
       } finally {
         setLoading(false);
       }
-    };
-    fetchPost();
+    })();
   }, []);
 
   if (loading) {

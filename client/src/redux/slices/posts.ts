@@ -9,6 +9,10 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   const resp = await instance.get<IPost[]>('/posts');
   return resp.data;
 });
+export const fetchPost = createAsyncThunk('posts/fetchPost', async (id: string) => {
+  const resp = await instance.get<IPost>(`/posts/${id}`);
+  return resp.data;
+});
 
 export const uploadPostImage = createAsyncThunk(
   'posts/uploadPostImage',

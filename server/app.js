@@ -22,7 +22,7 @@ app.use(cors())
 app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
 app.use('/tags', tagsRouters)
-app.use('/uploads', upload.single('image'), imageRoutes)
+app.use('/upload', upload.single('image'), imageRoutes)
 app.use('/uploads', express.static('uploads'))
 
 const PORT = process.env.PORT || 5000

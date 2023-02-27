@@ -13,7 +13,6 @@ interface IPostItemProps {
   isCurrentUser?: boolean;
   isPostText?: boolean;
   isPopUpButtons?: boolean;
-  isUser?: boolean;
 }
 
 export const PostItem: FC<IPostItemProps> = ({
@@ -21,8 +20,8 @@ export const PostItem: FC<IPostItemProps> = ({
   isCurrentUser,
   isPostText,
   isPopUpButtons,
-  isUser,
 }) => {
+  
   return (
     <div className={s.post}>
       {isPopUpButtons && isCurrentUser ? (
@@ -32,8 +31,7 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       ) : null}
       <div className={s.post__header}>
-        {post.imageUrl && <img src={post.imageUrl} />}
-        {/* <img src='https://www.marujaenlacocina.es/wp-content/uploads/2015/11/header-img.png' /> */}
+        {post.imageUrl && <img src={`http://localhost:5000${post.imageUrl}`} alt='post img'/>}
       </div>
       <div
         className={`${s.post__content} ${
@@ -43,7 +41,7 @@ export const PostItem: FC<IPostItemProps> = ({
         <div className={s.post__content__header}>
           <img src={post_img} alt="avatar" />
           <div>
-            {isUser && <span>{post.user.fullName}</span>}
+            <span>{post.user?.fullName}</span>
             <span>{post.createdAt}</span>
           </div>
         </div>

@@ -50,7 +50,6 @@ export const Home = () => {
                 post={post}
                 isCurrentUser={currentUserId === post.user._id}
                 isPopUpButtons={true}
-                isUser={true}
               />
             ))}
         </div>

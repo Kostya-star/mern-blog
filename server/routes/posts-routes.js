@@ -8,7 +8,7 @@ const router = Router()
 
 router.get('/:id', postsController.getOnePost)
 router.get('', postsController.getAllPosts)
-router.post('', checkAuth, postValidator, checkValidationErrors, postsController.createPost)
+router.post('', checkAuth, postsController.createPost)
 router.patch('/:id', checkAuth, postValidator, checkValidationErrors, postsController.updatePost)
 router.delete('/:id', checkAuth, postsController.deletePost)
 

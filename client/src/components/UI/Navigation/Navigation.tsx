@@ -14,6 +14,8 @@ export const Navigation = () => {
     window.localStorage.removeItem('token');
     dispatch(logout());
   };
+
+  const token = window.localStorage.getItem('token');
   return (
     <>
       <div className={s.navigation}>
@@ -22,7 +24,7 @@ export const Navigation = () => {
             <div className={s.navigation__logo}>Constantin Blog</div>
           </Link>
           <div className={s.navigation__buttons}>
-            {!isAuth ? (
+            {!isAuth && !token ? (
               <>
                 <Link to="/login">
                   <Button text="Log in" className="button button_transparent" />

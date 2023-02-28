@@ -1,5 +1,18 @@
 .tags {
   padding-top: 40px;
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 30px;
+    font-size: 20px;
+
+    span {
+      color: $blue_dark;
+      font-size: 40px;
+      text-decoration: underline;
+    }
+  }
 
   &__post {
     margin-bottom: 30px;

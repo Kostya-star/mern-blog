@@ -7,7 +7,7 @@ const getAllPosts = async (req, res) => {
 
     let tag = {};
     if (tagProperty) {
-      tag.tags = [tagProperty];
+      tag.tags ={$all: [tagProperty]}
     }
 
     const posts = await PostModel.find(tag).sort({ [sortProperty]: -1 }).populate('user').exec()

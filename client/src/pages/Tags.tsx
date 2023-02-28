@@ -21,6 +21,10 @@ export const Tags = () => {
 
   return (
     <div className="tags">
+      <div className="tags__heading">
+        <h1>List of posts with tag:</h1>
+        <span>#{tag}</span>
+      </div>
       {postsStatus === 'loading' && <div>Loading...</div>}
       {postsStatus === 'error' && <div>ERROR</div>}
       {postsStatus === 'success' &&

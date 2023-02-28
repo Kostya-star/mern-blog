@@ -6,8 +6,8 @@ import { IPost } from 'types/IPost';
 import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 import { IUploadImgResp } from 'types/IUploadImgResp';
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
-  const resp = await instance.get<IPost[]>('/posts');
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (sort: string) => {
+  const resp = await instance.get<IPost[]>(`/posts?sortBy=${sort}`);
   return resp.data;
 });
 export const fetchPost = createAsyncThunk(

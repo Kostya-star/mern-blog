@@ -118,7 +118,7 @@ export const CreatePost = () => {
     typeof newPost.imageUrl !== 'string'
       ? URL.createObjectURL(newPost.imageUrl)
       : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
-
+// 
   return (
     <div className="createPost">
       <div className="createPost__content">

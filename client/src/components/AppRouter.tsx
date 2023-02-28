@@ -14,7 +14,6 @@ export const AppRouter = () => {
   let token = localStorage.getItem('token')
 
   useEffect(() => {
-    // token = localStorage.getItem('token')
     console.log(token);
     
   }, [token])

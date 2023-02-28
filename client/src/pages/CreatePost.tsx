@@ -117,7 +117,8 @@ export const CreatePost = () => {
   const imgSrc =
     typeof newPost.imageUrl !== 'string'
       ? URL.createObjectURL(newPost.imageUrl)
-      : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
+      // : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
+      : `http://localhost:5000${newPost.imageUrl}`;
 // 
   return (
     <div className="createPost">

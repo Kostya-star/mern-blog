@@ -13,7 +13,7 @@ interface IPostItemProps {
   post: IPost;
   isCurrentUser?: boolean;
   isPostText?: boolean;
-  deletePost?: (id: string) => void
+  deletePost?: (id: string) => void;
 }
 
 const setTimeSince = (date: Date) => {
@@ -21,28 +21,28 @@ const setTimeSince = (date: Date) => {
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
   let interval = Math.floor(seconds / 31536000);
-  
+
   if (interval >= 1) {
-    return interval + "year ago";
+    return interval + 'year ago';
   }
   interval = Math.floor(seconds / 2592000);
   if (interval >= 1) {
-    return interval + "month ago";
+    return interval + 'month ago';
   }
   interval = Math.floor(seconds / 86400);
   if (interval >= 1) {
-    return interval + "day ago";
+    return interval + 'd ago';
   }
   interval = Math.floor(seconds / 3600);
   if (interval >= 1) {
-    return interval + "hour ago";
+    return interval + 'hr ago';
   }
   interval = Math.floor(seconds / 60);
   if (interval >= 1) {
-    return interval + "min ago";
+    return interval + 'min ago';
   }
-  return Math.floor(seconds) + "sec ago";
-}
+  return Math.floor(seconds) + 'sec ago';
+};
 
 export const PostItem: FC<IPostItemProps> = ({
   post,
@@ -52,16 +52,16 @@ export const PostItem: FC<IPostItemProps> = ({
 }) => {
   const timestamp = new Date(post.createdAt);
 
-  const time = setTimeSince(timestamp)
+  const time = setTimeSince(timestamp);
   return (
     <div className={s.post}>
-      {(isCurrentUser && deletePost) ? (
+      {isCurrentUser && deletePost ? (
         <div className={s.post__popupButtons}>
           <Link to={`/posts/${post._id}/edit`}>
-            <EditSVG/>
+            <EditSVG />
           </Link>
 
-          <CloseSVG onClick={() => deletePost(post._id)}/>
+          <CloseSVG onClick={() => deletePost(post._id)} />
         </div>
       ) : null}
       <div className={s.post__header}>
@@ -84,7 +84,9 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
         <div className={s.post__content__body}>
           <Link to={`/posts/${post._id}`}>
-            <h2>{post.title}</h2>
+            <div className={s.post__content__body__heading}>
+              <h2>{post.title}</h2>
+            </div>
           </Link>
 
           <div className={s.post__content__body__tags}>

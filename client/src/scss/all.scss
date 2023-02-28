@@ -2,6 +2,7 @@
 @import './pages/home.scss';
 @import './pages/fullPost.scss';
 @import './pages/createPost.scss';
+@import './pages/tags.scss';
 
 * {
   padding: 0;
@@ -9,6 +10,10 @@
   box-sizing: border-box;
   text-decoration: none;
   font-family: Roboto, Helvetica, Arial, sans-serif;
+
+  a {
+    color: inherit;
+  }
 }
 
 .container {
@@ -18,6 +23,7 @@
 
 .input {
   margin-bottom: 20px;
+
   &_error {
     color: tomato;
   }

@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import { useEffect } from 'react'
+import { Tags } from 'pages/Tags';
 
 export const AppRouter = () => {
   const isAuth = useAppSelector(isAuthSelector);
@@ -25,6 +26,7 @@ export const AppRouter = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/posts/:id" element={<FullPost />} />
+          <Route path="/tags/:tag" element={<Tags />} />
 
           {(!isAuth) && (
             <>

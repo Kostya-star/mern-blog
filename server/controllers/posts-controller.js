@@ -3,8 +3,14 @@ import PostModel from "../models/post-model.js"
 const getAllPosts = async (req, res) => {
   try {
     const sortProperty = req.query.sortBy;
+    const tagProperty = req.query.tag;
 
-    const posts = await PostModel.find().sort({ [sortProperty]: -1 }).populate('user').exec()
+    let tag = {};
+    if (tagProperty) {
+      tag.tags = [tagProperty];
+    }
+
+    const posts = await PostModel.find(tag).sort({ [sortProperty]: -1 }).populate('user').exec()
 
     res.json(posts)
 

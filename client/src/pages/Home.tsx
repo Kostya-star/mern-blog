@@ -1,16 +1,14 @@
+import { Categories } from 'components/Categories/Categories';
 import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Tags } from 'components/Tags/Tags';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
 import { deletePost } from './../redux/slices/posts';
-import { useNavigate } from 'react-router-dom';
-import { Categories } from 'components/Categories/Categories';
 
 export const Home = () => {
-  const navigate = useNavigate()
   const dispatch = useAppDispatch();
   const { posts, tags, postsStatus, tagsStatus, currentUserId } =
     useAppSelector(({ posts, tags, auth }) => ({
@@ -21,24 +19,23 @@ export const Home = () => {
       currentUserId: auth?.data?._id,
     }));
 
-
   useEffect(() => {
-    dispatch(fetchPosts('createdAt'));
+    dispatch(fetchPosts({sortedCat: 'createdAt'}));
     dispatch(fetchTags());
   }, []);
-  
+
   const onSortPosts = (sortedCat: string) => {
-    dispatch(fetchPosts(sortedCat));
-  }
+    dispatch(fetchPosts({sortedCat}));
+  };
 
   const removePost = (id: string) => {
-    dispatch(deletePost(id))
-  }
+    dispatch(deletePost(id));
+  };
 
   return (
     <div className="home__wrapper">
       <div className="home__categories">
-        <Categories sortPosts={onSortPosts}/>
+        <Categories sortPosts={onSortPosts} />
       </div>
       <div className="home__content">
         <div className="home__content__posts">

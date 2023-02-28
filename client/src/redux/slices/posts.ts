@@ -1,15 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
+import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
 import { INewPostRequest } from 'types/INewPostRequest';
 import { IPost } from 'types/IPost';
 import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 import { IUploadImgResp } from 'types/IUploadImgResp';
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (sort: string) => {
-  const resp = await instance.get<IPost[]>(`/posts?sortBy=${sort}`);
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async ({sortedCat, tag}: IFetchPostsQueryParams) => {
+  const resp = await instance.get<IPost[]>(`/posts`, {
+    
+    params: {
+      sortBy: sortedCat,
+      tag
+    }
+  });
   return resp.data;
 });
+
 export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async (id: string) => {

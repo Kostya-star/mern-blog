@@ -16,12 +16,43 @@ interface IPostItemProps {
   deletePost?: (id: string) => void
 }
 
+const setTimeSince = (date: Date) => {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  let interval = Math.floor(seconds / 31536000);
+  
+  if (interval >= 1) {
+    return interval + "year ago";
+  }
+  interval = Math.floor(seconds / 2592000);
+  if (interval >= 1) {
+    return interval + "month ago";
+  }
+  interval = Math.floor(seconds / 86400);
+  if (interval >= 1) {
+    return interval + "day ago";
+  }
+  interval = Math.floor(seconds / 3600);
+  if (interval >= 1) {
+    return interval + "hour ago";
+  }
+  interval = Math.floor(seconds / 60);
+  if (interval >= 1) {
+    return interval + "min ago";
+  }
+  return Math.floor(seconds) + "sec ago";
+}
+
 export const PostItem: FC<IPostItemProps> = ({
   post,
   isCurrentUser,
   isPostText,
   deletePost,
 }) => {
+  const timestamp = new Date(post.createdAt);
+
+  const time = setTimeSince(timestamp)
   return (
     <div className={s.post}>
       {(isCurrentUser && deletePost) ? (
@@ -47,8 +78,8 @@ export const PostItem: FC<IPostItemProps> = ({
         <div className={s.post__content__header}>
           <img src={post_img} alt="avatar" />
           <div>
-            <span>{post.user?.fullName}</span>
-            <span>{post.createdAt}</span>
+            <span className={s.fullName}>{post.user?.fullName}</span>
+            <span className={s.time}>{time}</span>
           </div>
         </div>
         <div className={s.post__content__body}>
@@ -58,7 +89,7 @@ export const PostItem: FC<IPostItemProps> = ({
 
           <div className={s.post__content__body__tags}>
             {post.tags?.map((tag, ind) => (
-              <span key={ind}>{tag}</span>
+              <span key={ind}>#{tag}</span>
             ))}
           </div>
           {isPostText && (

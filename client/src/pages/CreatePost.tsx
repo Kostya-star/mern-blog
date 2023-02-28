@@ -1,12 +1,10 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { TextArea } from 'components/UI/TextArea/TextArea';
-import { useCallback, useState, useRef, ChangeEvent, useEffect } from 'react';
-import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
-import { instance } from 'API/instance';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import SimpleMDE from 'react-simplemde-editor';
 import { useAppDispatch } from 'redux/hooks';
 import {
   createPost,
@@ -15,7 +13,6 @@ import {
   uploadPostImage,
 } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
-import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 
 const options = {
   spellChecker: false,

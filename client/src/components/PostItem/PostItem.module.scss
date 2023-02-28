@@ -67,6 +67,13 @@
 
         span {
           display: block;
+          &.fullName {
+            font-weight: 600;
+          }
+          &.time {
+            color: gray;
+            font-size: 15px;
+          }
         }
       }
     }
@@ -76,6 +83,7 @@
 
       h2 {
         margin-bottom: 15px;
+        font-size: 35px;
         color: black;
 
         &:hover {

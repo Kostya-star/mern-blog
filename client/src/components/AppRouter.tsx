@@ -6,12 +6,18 @@ import { Register } from 'pages/Register';
 import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
+import { useEffect } from 'react'
 
 export const AppRouter = () => {
   const isAuth = useAppSelector(isAuthSelector);
 
-  const token = localStorage.getItem('token');
-  console.log(token);
+  let token = localStorage.getItem('token')
+
+  useEffect(() => {
+    // token = localStorage.getItem('token')
+    console.log(token);
+    
+  }, [token])
   
 
   return (

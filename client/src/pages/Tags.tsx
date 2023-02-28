@@ -1,12 +1,12 @@
 import { PostItem } from 'components/PostItem/PostItem';
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { fetchPosts } from 'redux/slices/posts';
-import { useParams } from 'react-router-dom';
 
 export const Tags = () => {
   const dispatch = useAppDispatch();
-  const { tag } = useParams()
+  const { tag } = useParams();
 
   const { posts, postsStatus } = useAppSelector(({ posts }) => ({
     posts: posts?.posts,
@@ -14,8 +14,8 @@ export const Tags = () => {
   }));
 
   useEffect(() => {
-    if(tag) {
-      dispatch(fetchPosts({tag}));
+    if (tag) {
+      dispatch(fetchPosts({ tag }));
     }
   }, []);
 

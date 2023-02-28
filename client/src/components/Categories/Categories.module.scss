@@ -1,0 +1,22 @@
+@import 'scss/variables.scss';
+.button {
+  border: 0;
+  font-size: 16px;
+  margin-right: 40px;
+  cursor: pointer;
+
+  &__active {
+    color: $blue_dark;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: -10px;
+      background-color: $blue_dark;
+      height: 2px;
+      width: 70px;
+    }
+  }
+}

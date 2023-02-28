@@ -35,7 +35,6 @@ export const createPost = createAsyncThunk(
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
   async ({id, updatedPost}: IUpdatePostRequest) => {
-    console.log('REDUX PARAMETERS', id, updatedPost);
     
     return await instance.patch(`/posts/${id}`, updatedPost)
   }

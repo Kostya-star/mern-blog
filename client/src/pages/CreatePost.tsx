@@ -68,38 +68,36 @@ export const CreatePost = () => {
 
   const isEditing = Boolean(id);
 
+  // if !isEditing then newPost.imageUrl === File. In this case we are creating a post.
+  // Otherwise if newPost.imageUrl is a string, then we are editing the post
+  // and we dont need to perform the operations in the if operator and can proceed right to the post request
+  const onCreatePostUploadImage = async () => {
+    if (typeof newPost.imageUrl !== 'string') {
+      const formData = new FormData();
+      formData.append('image', newPost.imageUrl as File);
+      const { url } = await dispatch(uploadPostImage(formData)).unwrap();
+      return url;
+    }
+  };
+
   const onSubmitNewPost = async () => {
     try {
-      let imageUrl = '';
-
-      // if !isEditing then newPost.imageUrl === File. In this case we are creating a post.
-      // Otherwise if newPost.imageUrl is a string, then we are editing the post
-      // and we dont need to perform the operations in the if operator and can proceed right to the post request
-      if (typeof newPost.imageUrl !== 'string') {
-        const formData = new FormData();
-        formData.append('image', newPost.imageUrl as File);
-        const { url } = await dispatch(uploadPostImage(formData)).unwrap();
-        imageUrl = url;
-      }
+      let uploadedImgUrl = await onCreatePostUploadImage();
 
       const _newPost = {
         ...newPost,
-        imageUrl: imageUrl || (newPost.imageUrl as string),
+        imageUrl: uploadedImgUrl || (newPost.imageUrl as string),
         tags: newPost.tags.split(' '),
       };
 
       if (isEditing) {
-        const resp = await dispatch(
-          updatePost({ id, updatedPost: _newPost } as IUpdatePostRequest),
+        await dispatch(
+          updatePost({ id: id as string, updatedPost: _newPost }),
         ).unwrap();
         navigate(`/posts/${id}`);
-
-        console.log('updatePost', resp);
       } else {
         const { data } = await dispatch(createPost(_newPost)).unwrap();
         navigate(`/posts/${data._id}`);
-
-        console.log('createPost', data);
       }
     } catch (error) {
       alert('Error when creating the article');
@@ -117,9 +115,9 @@ export const CreatePost = () => {
   const imgSrc =
     typeof newPost.imageUrl !== 'string'
       ? URL.createObjectURL(newPost.imageUrl)
-      // : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
-      : `http://localhost:5000${newPost.imageUrl}`;
-// 
+      : // : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
+        `http://localhost:5000${newPost.imageUrl}`;
+  //
   return (
     <div className="createPost">
       <div className="createPost__content">

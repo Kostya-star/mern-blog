@@ -3,6 +3,7 @@ import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Tags } from 'components/Tags/Tags';
 import { useEffect } from 'react';
+import { fetchComments } from 'redux/slices/comments';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
@@ -10,22 +11,33 @@ import { deletePost } from './../redux/slices/posts';
 
 export const Home = () => {
   const dispatch = useAppDispatch();
-  const { posts, tags, postsStatus, tagsStatus, currentUserId } =
-    useAppSelector(({ posts, tags, auth }) => ({
-      posts: posts?.posts,
-      postsStatus: posts?.status,
-      tagsStatus: tags?.status,
-      tags: tags?.tags,
-      currentUserId: auth?.data?._id,
-    }));
+
+  const {
+    posts,
+    tags,
+    comments,
+    postsStatus,
+    tagsStatus,
+    commentStatus,
+    currentUserId,
+  } = useAppSelector(({ posts, tags, auth, comments }) => ({
+    posts: posts?.posts,
+    postsStatus: posts?.status,
+    tagsStatus: tags?.status,
+    tags: tags?.tags,
+    comments: comments?.comments,
+    commentStatus: comments?.status,
+    currentUserId: auth?.data?._id,
+  }));
 
   useEffect(() => {
-    dispatch(fetchPosts({sortedCat: 'createdAt'}));
+    dispatch(fetchPosts({ sortedCat: 'createdAt' }));
     dispatch(fetchTags());
+    dispatch(fetchComments());
   }, []);
 
   const onSortPosts = (sortedCat: string) => {
-    dispatch(fetchPosts({sortedCat}));
+    dispatch(fetchPosts({ sortedCat }));
   };
 
   const removePost = (id: string) => {
@@ -56,7 +68,9 @@ export const Home = () => {
           {tagsStatus === 'error' && <div>ERROR</div>}
           {tagsStatus === 'success' && <Tags tags={tags} />}
 
-          <Comments />
+          {commentStatus === 'loading' && <div>Loading...</div>}
+          {commentStatus === 'error' && <div>ERROR</div>}
+          {commentStatus === 'success' && <Comments comments={comments} />}
         </div>
       </div>
     </div>

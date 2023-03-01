@@ -7,6 +7,7 @@ import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { IPost } from 'types/IPost';
+import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
 
 interface IPostItemProps {
@@ -16,34 +17,6 @@ interface IPostItemProps {
   deletePost?: (id: string) => void;
 }
 
-const setTimeSince = (date: Date) => {
-  const now = new Date();
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  let interval = Math.floor(seconds / 31536000);
-
-  if (interval >= 1) {
-    return interval + 'year ago';
-  }
-  interval = Math.floor(seconds / 2592000);
-  if (interval >= 1) {
-    return interval + 'month ago';
-  }
-  interval = Math.floor(seconds / 86400);
-  if (interval >= 1) {
-    return interval + 'd ago';
-  }
-  interval = Math.floor(seconds / 3600);
-  if (interval >= 1) {
-    return interval + 'hr ago';
-  }
-  interval = Math.floor(seconds / 60);
-  if (interval >= 1) {
-    return interval + 'min ago';
-  }
-  return Math.floor(seconds) + 'sec ago';
-};
-
 export const PostItem: FC<IPostItemProps> = ({
   post,
   isCurrentUser,
@@ -52,7 +25,7 @@ export const PostItem: FC<IPostItemProps> = ({
 }) => {
   const timestamp = new Date(post.createdAt);
 
-  const time = setTimeSince(timestamp);
+  const time = createTimeSince(timestamp);
   return (
     <div className={s.post}>
       {isCurrentUser && deletePost ? (
@@ -91,8 +64,8 @@ export const PostItem: FC<IPostItemProps> = ({
 
           <div className={s.post__content__body__tags}>
             {post.tags?.map((tag, ind) => (
-              <Link to={`/tags/${tag}`}>
-                <span key={ind}>#{tag}</span>
+              <Link to={`/tags/${tag}`} key={ind}>
+                <span >#{tag}</span>
               </Link>
             ))}
           </div>

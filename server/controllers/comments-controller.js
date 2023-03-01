@@ -1,5 +1,18 @@
 import CommentModel from "../models/comments-model.js"
 
+const getAllComments = async (req, res) => {
+  try {
+    const comments = await CommentModel.find().limit(5).populate('user')
+
+    res.json(comments)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when fetching the comments'
+    })
+  }
+}
+
 const createComment = async (req, res) => {
   try {
     const { postId, text, userId } = req.body
@@ -24,28 +37,29 @@ const createComment = async (req, res) => {
 
 export default {
   createComment,
+  getAllComments
 }
 
-const createPost = async (req, res) => {
-  try {
-    const { title, text, tags, imageUrl } = req.body
+// const createPost = async (req, res) => {
+//   try {
+//     const { title, text, tags, imageUrl } = req.body
 
-    const post = new PostModel({
-      title,
-      text,
-      tags,
-      user: req.body.userId,
-      imageUrl
-    })
+//     const post = new PostModel({
+//       title,
+//       text,
+//       tags,
+//       user: req.body.userId,
+//       imageUrl
+//     })
 
-    await post.save()
+//     await post.save()
 
-    res.json(post)
+//     res.json(post)
 
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({
-      message: 'Error when creating the post'
-    })
-  }
-}
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({
+//       message: 'Error when creating the post'
+//     })
+//   }
+// }

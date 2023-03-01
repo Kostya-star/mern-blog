@@ -7,7 +7,7 @@ import { checkAuth } from '../utils/checkAuth.js';
 const router = Router()
 
 // router.get('/:id', commentsController.getOneComment)
-// router.get('', commentsController.getAllComments)
+router.get('', commentsController.getAllComments)
 router.post('', checkAuth, commentsController.createComment)
 // router.patch('/:id', checkAuth, postsController.updatePost)
 // router.delete('/:id', checkAuth, commentsController.deleteComment)

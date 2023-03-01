@@ -1,4 +1,5 @@
 import CommentModel from "../models/comments-model.js"
+import PostModel from '../models/post-model.js'
 
 const getComments = async (req, res) => {
   try {
@@ -34,6 +35,45 @@ const getCommentsByPostId = async (req, res) => {
   }
 }
 
+// const getOnePost = async (req, res) => {
+//   try {
+//     const { id } = req.params
+
+//     PostModel.findOneAndUpdate({
+//       _id: id
+//     },
+//       {
+//         $inc: { viewCount: 1 }
+//       },
+//       {
+//         returnDocument: 'after'
+//       },
+//       (error, doc) => {
+//         if (error) {
+//           console.log(error);
+//           return res.status(500).json({
+//             message: 'Error when fetching the post'
+//           })
+//         }
+
+//         if (!doc) {
+//           console.log(error);
+//           return res.status(404).json({
+//             message: 'The post is not found'
+//           })
+//         }
+//         res.json(doc)
+//       }
+//     ).populate('user')
+
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       message: 'Error when fetching the post'
+//     })
+//   }
+// }
+
 const createComment = async (req, res) => {
   try {
     const { postId, text, userId } = req.body
@@ -46,7 +86,34 @@ const createComment = async (req, res) => {
 
     await comment.save()
 
-    res.json(comment)
+        PostModel.findOneAndUpdate({
+      _id: postId
+    },
+      {
+        $inc: { commentCount: 1 }
+      },
+      {
+        returnDocument: 'after'
+      },
+      (error, doc) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).json({
+            message: 'Error when creating the comment'
+          })
+        }
+
+        if (!doc) {
+          console.log(error);
+          return res.status(404).json({
+            message: 'The post is not found'
+          })
+        }
+        // res.json(doc)
+        res.json({comment, updatedPost: doc})
+      }
+    )
+
 
   } catch (error) {
     console.log(error)

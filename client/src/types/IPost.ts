@@ -9,5 +9,6 @@ export interface IPost {
   title: string
   updatedAt: string
   viewCount: number
+  commentCount: number
   user: IUser
 }

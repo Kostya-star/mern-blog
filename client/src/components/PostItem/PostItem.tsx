@@ -65,7 +65,7 @@ export const PostItem: FC<IPostItemProps> = ({
           <div className={s.post__content__body__tags}>
             {post.tags?.map((tag, ind) => (
               <Link to={`/tags/${tag}`} key={ind}>
-                <span >#{tag}</span>
+                <span>#{tag}</span>
               </Link>
             ))}
           </div>
@@ -80,7 +80,8 @@ export const PostItem: FC<IPostItemProps> = ({
               {post.viewCount}
             </div>
             <div>
-              <CommentSVG />3
+              <CommentSVG />
+              {post.commentCount}
             </div>
           </div>
         </div>

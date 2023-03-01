@@ -1,10 +1,31 @@
 import CommentModel from "../models/comments-model.js"
 
-const getAllComments = async (req, res) => {
+const getComments = async (req, res) => {
   try {
     const comments = await CommentModel.find().limit(5).populate('user')
 
     res.json(comments)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when fetching the comments'
+    })
+  }
+}
+
+const getCommentsByPostId = async (req, res) => {
+  try {
+    const { postId } = req.params
+
+    const commentsParams = {}
+    if (postId) {
+      commentsParams.post = postId
+    }
+    const comments = await CommentModel.find(commentsParams).populate('user')
+
+    res.json(comments)
+
   } catch (error) {
     console.log(error)
     res.status(500).json({
@@ -36,8 +57,9 @@ const createComment = async (req, res) => {
 }
 
 export default {
-  createComment,
-  getAllComments
+  getComments,
+  getCommentsByPostId,
+  createComment
 }
 
 // const createPost = async (req, res) => {

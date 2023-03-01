@@ -19,7 +19,7 @@ export const Comments: FC<ICommentsProps> = ({
   return (
     <div className={s.comments}>
       <h3>Comments</h3>
-      {/* {comments.map((comment) => {
+      {comments.map((comment) => {
         const timestamp = new Date(comment.createdAt);
         const creationTime = createTimeSince(timestamp);
 
@@ -39,7 +39,7 @@ export const Comments: FC<ICommentsProps> = ({
             <hr />
           </Fragment>
         );
-      })} */}
+      })}
 
       {children}
     </div>

@@ -7,6 +7,16 @@ export const fetchComments = createAsyncThunk(
   'comments/fetchComments',
   async () => {
     const resp = await instance.get<IComment[]>('/comments');
+
+    return resp.data;
+  },
+);
+
+export const fetchCommentsByPostId = createAsyncThunk(
+  'comments/fetchCommentsByPostId',
+  async (postId: string) => {
+    const resp = await instance.get<IComment[]>(`/comments/${postId}`);
+
     return resp.data;
   },
 );
@@ -14,10 +24,8 @@ export const fetchComments = createAsyncThunk(
 export const createComment = createAsyncThunk(
   'comments/createComment',
   async (newComment: ICreateCommentRequest) => {
-    const resp = await instance.post('/comments', newComment);
-    console.log(resp);
-    
-  }
+    const resp = await instance.post<IComment>('/comments', newComment);
+  },
 );
 
 // export const updatePost = createAsyncThunk(

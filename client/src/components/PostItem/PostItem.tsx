@@ -91,7 +91,9 @@ export const PostItem: FC<IPostItemProps> = ({
 
           <div className={s.post__content__body__tags}>
             {post.tags?.map((tag, ind) => (
-              <span key={ind}>#{tag}</span>
+              <Link to={`/tags/${tag}`}>
+                <span key={ind}>#{tag}</span>
+              </Link>
             ))}
           </div>
           {isPostText && (

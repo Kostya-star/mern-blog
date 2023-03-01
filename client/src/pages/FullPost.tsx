@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { IPost } from './../types/IPost';
 import { useAppDispatch } from 'redux/hooks';
 import { fetchPost } from 'redux/slices/posts';
+import { instance } from 'API/instance';
 
 export const FullPost = () => {
   const dispatch = useAppDispatch();
@@ -34,14 +35,13 @@ export const FullPost = () => {
   if (error) {
     return <div>ERROR</div>;
   }
-  
 
   return (
     <div className="fullPost">
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments isCreatePost={true} />
+      <Comments isCreatePost={true} postId={id as string} />
     </div>
   );
 };

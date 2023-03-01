@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import authRouters from './routes/auth-routes.js'
 import tagsRouters from './routes/tags-routes.js'
 import postsRouters from './routes/posts-routes.js'
+import commentsRouters from './routes/comments-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
 import { imageStorageCreator } from './utils/imageStorageCreator.js'
@@ -21,6 +22,7 @@ export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
 app.use(cors())
 app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
+app.use('/comments', commentsRouters)
 app.use('/tags', tagsRouters)
 app.use('/upload', upload.single('image'), imageRoutes)
 app.use('/uploads', express.static('uploads'))

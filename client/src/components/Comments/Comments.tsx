@@ -1,3 +1,4 @@
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { FC, Fragment, ReactNode } from 'react';
 import { createTimeSince } from 'utils/createTimeSince';
 import { IComment } from '../../types/IComment';
@@ -8,6 +9,7 @@ interface ICommentsProps {
   children?: ReactNode;
   isCreatePost?: boolean;
   postId?: string;
+  onDelete?: (id: string) => void;
 }
 
 export const Comments: FC<ICommentsProps> = ({
@@ -15,6 +17,7 @@ export const Comments: FC<ICommentsProps> = ({
   children,
   isCreatePost,
   postId,
+  onDelete,
 }) => {
   return (
     <div className={s.comments}>
@@ -26,6 +29,15 @@ export const Comments: FC<ICommentsProps> = ({
         return (
           <Fragment key={comment._id}>
             <div className={s.comment}>
+              {onDelete && (
+                <div
+                  onClick={() => onDelete(comment._id)}
+                  className={s.comment_deleteSvg}
+                >
+                  <CloseSVG />
+                </div>
+              )}
+
               <img
                 src="https://mui.com/static/images/avatar/1.jpg"
                 alt="userIMG"

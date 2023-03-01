@@ -86,7 +86,7 @@ const createComment = async (req, res) => {
 
     await comment.save()
 
-        PostModel.findOneAndUpdate({
+    PostModel.findOneAndUpdate({
       _id: postId
     },
       {
@@ -109,8 +109,7 @@ const createComment = async (req, res) => {
             message: 'The post is not found'
           })
         }
-        // res.json(doc)
-        res.json({comment, updatedPost: doc})
+        res.json({ comment, updatedPost: doc })
       }
     )
 
@@ -123,10 +122,60 @@ const createComment = async (req, res) => {
   }
 }
 
+const deleteComment = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const comment = await CommentModel.findById(id)
+
+    if (!comment) {
+      return res.status(404).json({
+        message: 'The comment is not found'
+      })
+    }
+
+    await comment.delete()
+
+    PostModel.findByIdAndUpdate({
+      _id: comment.post
+    },
+      {
+        $inc: { commentCount: -1 }
+      },
+      {
+        returnDocument: 'after'
+      },
+      (error, doc) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).json({
+            message: 'Error when creating the comment'
+          })
+        }
+
+        if (!doc) {
+          console.log(error);
+          return res.status(404).json({
+            message: 'The post is not found'
+          })
+        }
+        res.json({id: comment._id, updatedPost: doc})
+      }
+    )
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when creating the comment'
+    })
+  }
+}
+
 export default {
   getComments,
   getCommentsByPostId,
-  createComment
+  createComment,
+  deleteComment
 }
 
 // const createPost = async (req, res) => {

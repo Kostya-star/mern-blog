@@ -11,7 +11,7 @@ router.get('', commentsController.getComments)
 router.get('/:postId', commentsController.getCommentsByPostId)
 router.post('', checkAuth, commentsController.createComment)
 // router.patch('/:id', checkAuth, postsController.updatePost)
-// router.delete('/:id', checkAuth, commentsController.deleteComment)
+router.delete('/:id', checkAuth, commentsController.deleteComment)
 
 
 export default router

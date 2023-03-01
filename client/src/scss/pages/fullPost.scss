@@ -1,5 +1,7 @@
 .fullPost {
   padding-top: 40px;
+  padding-bottom: 50px;
+
   .post {
     margin-bottom: 30px;
   }
@@ -7,6 +9,12 @@
 .comments {
   &__create {
     display: flex;
+    position: sticky;
+    bottom: 0; 
+    right: 0;
+    left: 0;
+    background-color: rgb(227, 249, 247);
+    border-radius: 10px;
 
     img {
       width: 50px;

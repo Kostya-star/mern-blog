@@ -3,7 +3,6 @@ import { instance } from 'API/instance';
 import { IComment } from 'types/IComment';
 import { ICreateCommentRequest } from 'types/ICreateCommentRequest';
 import { ICreateCommentResponse } from 'types/ICreateCommentResponse';
-import { IPost } from 'types/IPost';
 
 export const fetchComments = createAsyncThunk(
   'comments/fetchComments',
@@ -26,9 +25,12 @@ export const fetchCommentsByPostId = createAsyncThunk(
 export const createComment = createAsyncThunk(
   'comments/createComment',
   async (newComment: ICreateCommentRequest) => {
-    const resp = await instance.post<ICreateCommentResponse>('/comments', newComment);
+    const resp = await instance.post<ICreateCommentResponse>(
+      '/comments',
+      newComment,
+    );
 
-    return resp.data
+    return resp.data;
   },
 );
 
@@ -40,10 +42,14 @@ export const createComment = createAsyncThunk(
 //   }
 // );
 
-// export const deletePost = createAsyncThunk(
-//   'posts/deletePost',
-//   async (id: string) => await instance.delete(`/posts/${id}`),
-// );
+export const deleteComment = createAsyncThunk(
+  'comments/deleteComment',
+  async (id: string) => {
+    const resp = await instance.delete(`/comments/${id}`)
+
+    return resp.data
+  }
+);
 
 export interface CommentsState {
   comments: IComment[];

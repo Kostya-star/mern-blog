@@ -5,15 +5,15 @@ import { Input } from 'components/UI/Input/Input';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { isAuthSelector } from 'redux/slices/auth';
 import {
   createComment,
-  fetchComments,
+  deleteComment,
   fetchCommentsByPostId,
 } from 'redux/slices/comments';
 import { fetchPost } from 'redux/slices/posts';
-import { IPost } from './../types/IPost';
 import { IComment } from './../types/IComment';
-import { isAuthSelector } from 'redux/slices/auth';
+import { IPost } from './../types/IPost';
 
 export const FullPost = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +26,7 @@ export const FullPost = () => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [commentText, setCommentText] = useState('');
 
-  const isAuth = useAppSelector(isAuthSelector)
+  const isAuth = useAppSelector(isAuthSelector);
 
   useEffect(() => {
     (async () => {
@@ -55,6 +55,12 @@ export const FullPost = () => {
     setCommentText('');
   };
 
+  const onDeleteComment = async (commId: string) => {
+    const { id, updatedPost } = await dispatch(deleteComment(commId)).unwrap();
+    setComments(comments.filter((comm) => comm._id !== id));
+    setPost(updatedPost);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -67,7 +73,7 @@ export const FullPost = () => {
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments comments={comments}>
+      <Comments comments={comments} onDelete={onDeleteComment}>
         <div className="comments__create">
           <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
           <div>
@@ -78,9 +84,9 @@ export const FullPost = () => {
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
               />
-              {
-                commentText && !isAuth && <div className='input_error'> you are not authenticated!</div>
-              }
+              {commentText && !isAuth && (
+                <div className="input_error"> you are not authenticated!</div>
+              )}
             </div>
 
             <Button

@@ -108,7 +108,7 @@ export const FullPost = () => {
                 value={commentText.text }
                 onChange={(e) => setCommentText({ ...commentText, text: e.target.value })}
               />
-              {commentText && !isAuth && (
+              {commentText.text && !isAuth && (
                 <div className="input_error"> you are not authenticated!</div>
               )}
             </div>

@@ -10,7 +10,7 @@ interface ITagsProps {
 export const Tags: FC<ITagsProps> = ({ tags }) => {
   return (
     <div className={s.tags}>
-      <h3>Tags</h3>
+      <h3>Random tags</h3>
       <ul>
         {tags?.map((tag, ind) => (
           <Link to={`/tags/${tag}`} key={ind}>

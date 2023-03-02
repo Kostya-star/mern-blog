@@ -56,9 +56,11 @@
       display: flex;
       margin-bottom: 20px;
 
-      img {
+      img, svg {
         border-radius: 50%;
         margin-right: 20px;
+        width: 50px;
+        height: 50px;
       }
 
       div {

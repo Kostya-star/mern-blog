@@ -2,7 +2,7 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as CommentSVG } from 'assets/comment.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
-import post_img from 'assets/post-img.webp';
+import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -49,7 +49,13 @@ export const PostItem: FC<IPostItemProps> = ({
         }`}
       >
         <div className={s.post__content__header}>
-          <img src={post_img} alt="avatar" />
+          {
+            post.user.avatarUrl 
+            ?
+            <img src={`http://localhost:5000${post.user.avatarUrl}`} alt="avatar" />
+            :
+            <AvatarDefaultSVG/>
+          }
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>
             <span className={s.time}>{time}</span>

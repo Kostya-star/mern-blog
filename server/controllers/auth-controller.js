@@ -5,7 +5,7 @@ import tokenService from '../services/token-service.js';
 const register = async (req, res) => {
   try {
     const { fullName, email, password, avatarUrl } = req.body
-
+console.log(fullName, email, password, avatarUrl);
     const userDb = await UserModel.findOne({ email })
     if (userDb) {
       return res.status(400).json({

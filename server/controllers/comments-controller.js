@@ -90,7 +90,6 @@ const updateComment = async (req, res) => {
     const { id } = req.params
     const { text } = req.body
 
-    console.log(id, text);
     await CommentModel.updateOne({
       _id: id
     },

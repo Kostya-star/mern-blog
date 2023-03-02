@@ -108,6 +108,7 @@ export const CreatePost = () => {
       imageRef.current.value = '';
     }
   };
+console.log(newPost.imageUrl);
 
   const imgSrc =
     typeof newPost.imageUrl !== 'string'

@@ -2,6 +2,36 @@
   display: flex;
   justify-content: center;
 
+  &__avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: gray;
+    cursor: pointer;
+    &:hover {
+      color: black;
+      svg {
+        path {
+          fill: black;
+        }
+      }
+    }
+    svg {
+      width: 136px;
+      path {
+        fill: gray
+      }
+    }
+    img {
+      width: 250px;
+      height: 250px;
+      border-radius: 40px;
+    }
+  }
+
   &__content {
     display: flex;
     flex-direction: column;

@@ -89,11 +89,8 @@ export const Register = () => {
                   className="auth__avatar"
                   onClick={() => fileRef.current?.click()}
                 >
-                  {values.avatarUrl && typeof values.avatarUrl !== 'string' ? (
-                    <img
-                      src={URL.createObjectURL(values.avatarUrl)}
-                      alt="avatar"
-                    />
+                  {values.avatarUrl ? (
+                    <img src={`http://localhost:5000${values.avatarUrl}`} alt="avatar" />
                   ) : (
                     <AvatarPlusSVG />
                   )}

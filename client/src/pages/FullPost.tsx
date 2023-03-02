@@ -1,3 +1,4 @@
+import { Avatar } from 'components/Avatar/Avatar';
 import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Button } from 'components/UI/Button/Button';
@@ -29,7 +30,10 @@ export const FullPost = () => {
   // const [commentToUpdate, setCommentToUpdate] = useState<IComment | null>(null);
 
   const isAuth = useAppSelector(isAuthSelector);
-  const currentUserId = useAppSelector(({ auth }) => auth.data?._id)
+  const { currentUserId, currentUserPhoto } = useAppSelector(({ auth }) => ({
+    currentUserId: auth.data?._id,
+    currentUserPhoto: auth.data?.avatarUrl
+  }))
 
   useEffect(() => {
     (async () => {
@@ -99,8 +103,9 @@ export const FullPost = () => {
         currentUserId={currentUserId}
       >
         <div className="comments__create">
-          <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
-          <div>
+          {/* <img src="https://mui.com/static/images/avatar/2.jpg" alt="" /> */}
+          <Avatar avatar={currentUserPhoto as string}/>
+          <div className="comments__create__group">
             <div className="input">
               <Input
                 type="text"

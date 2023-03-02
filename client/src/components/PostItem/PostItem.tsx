@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { IPost } from 'types/IPost';
 import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
+import { Avatar } from 'components/Avatar/Avatar';
 
 interface IPostItemProps {
   post: IPost;
@@ -49,13 +50,7 @@ export const PostItem: FC<IPostItemProps> = ({
         }`}
       >
         <div className={s.post__content__header}>
-          {
-            post.user.avatarUrl 
-            ?
-            <img src={`http://localhost:5000${post.user.avatarUrl}`} alt="avatar" />
-            :
-            <AvatarDefaultSVG/>
-          }
+          <Avatar avatar={post.user?.avatarUrl as string}/>
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>
             <span className={s.time}>{time}</span>

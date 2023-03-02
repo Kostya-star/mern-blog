@@ -4,7 +4,7 @@ import { checkAuth } from '../utils/checkAuth.js'
 
 const router = Router()
 
-// router.post('', checkAuth, imageController.uploadImage)
-router.post('', imageController.uploadImage)
+router.post('/postImg', checkAuth, imageController.uploadImage)
+router.post('/userPhoto', imageController.uploadImage)
 
 export default router

@@ -6,11 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import SimpleMDE from 'react-simplemde-editor';
 import { useAppDispatch } from 'redux/hooks';
+import { uploadPostImage } from 'redux/slices/image';
 import {
   createPost,
   fetchPost,
   updatePost,
-  uploadPostImage,
 } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
 

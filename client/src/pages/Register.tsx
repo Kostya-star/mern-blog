@@ -2,15 +2,16 @@ import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik } from 'formik';
+import { ChangeEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { onRegisterThunk } from 'redux/slices/auth';
+import { uploadUserPhoto } from 'redux/slices/image';
 import 'scss/all.scss';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
-import { useRef } from 'react';
-import { instance } from 'API/instance';
-import { IUploadImgResp } from 'types/IUploadImgResp';
+
+type setFieldValue = (fieldName: string, val: string) => void;
 
 const initialValues = { fullName: '', email: '', password: '', avatarUrl: '' };
 
@@ -32,19 +33,28 @@ export const Register = () => {
 
   const onRegisterSubmit = async (values: IRegisterRequest) => {
     try {
-        const formData = new FormData();
-        formData.append('image', values.avatarUrl as unknown as File);
-        const imgResp = await instance.post<IUploadImgResp>('/upload', formData);
-        console.log({ ...values, avatarUrl: imgResp.data.url });
+      const resp = await dispatch(onRegisterThunk(values)).unwrap();
 
-      const registerResp = await dispatch(onRegisterThunk({ ...values, avatarUrl: imgResp.data.url })).unwrap();
-  
-      if (registerResp.token) {
-        window.localStorage.setItem('token', registerResp.token);
+      if (resp.token) {
+        window.localStorage.setItem('token', resp.token);
         navigate('/');
       }
     } catch (error) {
-      
+      console.log(error);
+    }
+  };
+
+  const onUploadUserPhoto = async (
+    e: ChangeEvent<HTMLInputElement>,
+    setFieldValue: setFieldValue,
+  ) => {
+    const photo = e.target.files?.[0];
+
+    if (photo) {
+      const formData = new FormData();
+      formData.append('image', photo);
+      const { url } = await dispatch(uploadUserPhoto(formData)).unwrap();
+      setFieldValue('avatarUrl', url);
     }
   };
 
@@ -71,7 +81,7 @@ export const Register = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            // console.log(values);
+            console.log(values);
 
             return (
               <Form onSubmit={handleSubmit}>
@@ -80,7 +90,10 @@ export const Register = () => {
                   onClick={() => fileRef.current?.click()}
                 >
                   {values.avatarUrl && typeof values.avatarUrl !== 'string' ? (
-                    <img src={URL.createObjectURL(values.avatarUrl)} alt="avatar" />
+                    <img
+                      src={URL.createObjectURL(values.avatarUrl)}
+                      alt="avatar"
+                    />
                   ) : (
                     <AvatarPlusSVG />
                   )}
@@ -89,7 +102,7 @@ export const Register = () => {
                     ref={fileRef}
                     type="file"
                     name="avatarUrl"
-                    onChange={(e) => setFieldValue('avatarUrl', e.target.files?.[0])}
+                    onChange={(e) => onUploadUserPhoto(e, setFieldValue)}
                     // onBlur={handleBlur}
                     hidden
                   />

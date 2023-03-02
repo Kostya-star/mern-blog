@@ -1,35 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
 import { INewPostRequest } from 'types/INewPostRequest';
 import { IPost } from 'types/IPost';
 import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
-import { IUploadImgResp } from 'types/IUploadImgResp';
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async ({sortedCat, tag}: IFetchPostsQueryParams) => {
-  const resp = await instance.get<IPost[]>(`/posts`, {
-    
-    params: {
-      sortBy: sortedCat,
-      tag
-    }
-  });
-  return resp.data;
-});
+export const fetchPosts = createAsyncThunk(
+  'posts/fetchPosts',
+  async ({ sortedCat, tag }: IFetchPostsQueryParams) => {
+    const resp = await instance.get<IPost[]>(`/posts`, {
+      params: {
+        sortBy: sortedCat,
+        tag,
+      },
+    });
+    return resp.data;
+  },
+);
 
 export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async (id: string) => {
     const resp = await instance.get<IPost>(`/posts/${id}`);
-    return resp.data;
-  },
-);
-
-export const uploadPostImage = createAsyncThunk(
-  'posts/uploadPostImage',
-  async (formData: FormData) => {
-    const resp = await instance.post<IUploadImgResp>('/upload', formData);
     return resp.data;
   },
 );
@@ -42,10 +34,9 @@ export const createPost = createAsyncThunk(
 
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
-  async ({id, updatedPost}: IUpdatePostRequest) => {
-    
-    return await instance.patch(`/posts/${id}`, updatedPost)
-  }
+  async ({ id, updatedPost }: IUpdatePostRequest) => {
+    return await instance.patch(`/posts/${id}`, updatedPost);
+  },
 );
 
 export const deletePost = createAsyncThunk(

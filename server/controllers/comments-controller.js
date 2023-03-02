@@ -35,45 +35,6 @@ const getCommentsByPostId = async (req, res) => {
   }
 }
 
-// const getOnePost = async (req, res) => {
-//   try {
-//     const { id } = req.params
-
-//     PostModel.findOneAndUpdate({
-//       _id: id
-//     },
-//       {
-//         $inc: { viewCount: 1 }
-//       },
-//       {
-//         returnDocument: 'after'
-//       },
-//       (error, doc) => {
-//         if (error) {
-//           console.log(error);
-//           return res.status(500).json({
-//             message: 'Error when fetching the post'
-//           })
-//         }
-
-//         if (!doc) {
-//           console.log(error);
-//           return res.status(404).json({
-//             message: 'The post is not found'
-//           })
-//         }
-//         res.json(doc)
-//       }
-//     ).populate('user')
-
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       message: 'Error when fetching the post'
-//     })
-//   }
-// }
-
 const createComment = async (req, res) => {
   try {
     const { postId, text, userId } = req.body
@@ -110,6 +71,7 @@ const createComment = async (req, res) => {
           })
         }
         await comment.populate('user')
+        await doc.populate('user')
         res.json({ comment, updatedPost: doc })
       },
     )
@@ -119,6 +81,31 @@ const createComment = async (req, res) => {
     console.log(error)
     res.status(500).json({
       message: 'Error when creating the comment'
+    })
+  }
+}
+
+const updateComment = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { text } = req.body
+
+    console.log(id, text);
+    await CommentModel.updateOne({
+      _id: id
+    },
+    {
+      text
+    })
+
+    res.json({
+      success: true
+    })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when updating the comment'
     })
   }
 }
@@ -146,7 +133,7 @@ const deleteComment = async (req, res) => {
       {
         returnDocument: 'after'
       },
-      (error, doc) => {
+      async (error, doc) => {
         if (error) {
           console.log(error);
           return res.status(500).json({
@@ -160,6 +147,7 @@ const deleteComment = async (req, res) => {
             message: 'The post is not found'
           })
         }
+        await doc.populate('user')
         res.json({id: comment._id, updatedPost: doc})
       }
     )
@@ -176,29 +164,6 @@ export default {
   getComments,
   getCommentsByPostId,
   createComment,
+  updateComment,
   deleteComment
 }
-
-// const createPost = async (req, res) => {
-//   try {
-//     const { title, text, tags, imageUrl } = req.body
-
-//     const post = new PostModel({
-//       title,
-//       text,
-//       tags,
-//       user: req.body.userId,
-//       imageUrl
-//     })
-
-//     await post.save()
-
-//     res.json(post)
-
-//   } catch (error) {
-//     console.log(error)
-//     res.status(500).json({
-//       message: 'Error when creating the post'
-//     })
-//   }
-// }

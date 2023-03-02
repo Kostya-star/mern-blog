@@ -10,6 +10,7 @@ import {
   createComment,
   deleteComment,
   fetchCommentsByPostId,
+  updateComment,
 } from 'redux/slices/comments';
 import { fetchPost } from 'redux/slices/posts';
 import { IComment } from './../types/IComment';
@@ -24,7 +25,8 @@ export const FullPost = () => {
   const [error, setError] = useState(null);
 
   const [comments, setComments] = useState<IComment[]>([]);
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState({ id: '', text: '' });
+  // const [commentToUpdate, setCommentToUpdate] = useState<IComment | null>(null);
 
   const isAuth = useAppSelector(isAuthSelector);
   const currentUserId = useAppSelector(({ auth }) => auth.data?._id)
@@ -47,15 +49,28 @@ export const FullPost = () => {
     })();
   }, []);
 
-  const onCreateComment = async () => {
+  const onSubmitComment = async () => {
+    if(commentText.id && commentText.text) {
+      const updatedComment = { id: commentText.id, text: commentText.text }
+      dispatch(updateComment(updatedComment))
+      setComments(comments.map(comm => {
+        if(comm._id === commentText.id) {
+          return { ...comm, text: commentText.text }
+        }
+        return comm
+      }));
+      setCommentText({id: '', text: ''})
+      return;
+    }
     const { comment, updatedPost } = await dispatch(
-      createComment({ postId: id as string, text: commentText }),
-    ).unwrap();
-    console.log(comment);
-    
-    setComments(() => [...comments, comment]);
-    setPost(updatedPost);
-    setCommentText('');
+      createComment({ postId: id as string, text: commentText.text }),
+      ).unwrap();
+      console.log('comment', comment);
+      console.log('updatedPost', updatedPost);
+      
+      setComments(() => [...comments, comment]);
+      setPost(updatedPost);
+      setCommentText({id: '', text: ''})
   };
 
   const onDeleteComment = async (commId: string) => {
@@ -76,7 +91,13 @@ export const FullPost = () => {
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments comments={comments} onDelete={onDeleteComment} currentUserId={currentUserId}>
+      <Comments
+        comments={comments}
+        onDelete={onDeleteComment}
+        // onEditComment={onEditComment}
+        onEditComment={(comm) => setCommentText({ id: comm._id, text: comm.text })}
+        currentUserId={currentUserId}
+      >
         <div className="comments__create">
           <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
           <div>
@@ -84,8 +105,8 @@ export const FullPost = () => {
               <Input
                 type="text"
                 placeholder="Write comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
+                value={commentText.text }
+                onChange={(e) => setCommentText({ ...commentText, text: e.target.value })}
               />
               {commentText && !isAuth && (
                 <div className="input_error"> you are not authenticated!</div>
@@ -94,9 +115,9 @@ export const FullPost = () => {
 
             <Button
               className="button button_colored"
-              text="send"
-              onClick={onCreateComment}
-              disabled={!commentText || !isAuth}
+              text={commentText.text && commentText.id ? 'Update' : 'Comment'}
+              onClick={onSubmitComment}
+              disabled={!commentText.text || !isAuth}
             />
           </div>
         </div>

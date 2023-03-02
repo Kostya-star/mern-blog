@@ -20,17 +20,18 @@
       margin-right: 20px;
     }
 
-    &_deleteSvg {
+    &__edit_delete {
+      display: flex;
+      gap: 20px;
       position: absolute;
       right: 0;
       top: 0;
-      cursor: pointer;
-      padding: 2px;
-      padding-top: 2px;
-      padding-bottom: 1px;
-      &:hover {
-        background-color: gray;
-        border-radius: 10px;
+      svg {
+        cursor: pointer;
+        &:hover {
+          background-color: rgb(181, 179, 179);
+          border-radius: 10px;
+        }
       }
     }
 

@@ -34,13 +34,13 @@ export const createComment = createAsyncThunk(
   },
 );
 
-// export const updatePost = createAsyncThunk(
-//   'posts/updatePost',
-//   async ({id, updatedPost}: IUpdatePostRequest) => {
+export const updateComment = createAsyncThunk(
+  'comments/updateComment',
+  async (updatedComment: { id: string, text: string }) => {
 
-//     return await instance.patch(`/posts/${id}`, updatedPost)
-//   }
-// );
+    return await instance.patch(`/comments/${updatedComment.id}`, {text: updatedComment.text})
+  }
+);
 
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',

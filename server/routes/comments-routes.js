@@ -10,7 +10,7 @@ const router = Router()
 router.get('', commentsController.getComments)
 router.get('/:postId', commentsController.getCommentsByPostId)
 router.post('', checkAuth, commentsController.createComment)
-// router.patch('/:id', checkAuth, postsController.updatePost)
+router.patch('/:id', checkAuth, commentsController.updateComment)
 router.delete('/:id', checkAuth, commentsController.deleteComment)
 
 

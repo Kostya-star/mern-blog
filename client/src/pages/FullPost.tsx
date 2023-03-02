@@ -27,6 +27,7 @@ export const FullPost = () => {
   const [commentText, setCommentText] = useState('');
 
   const isAuth = useAppSelector(isAuthSelector);
+  const currentUserId = useAppSelector(({ auth }) => auth.data?._id)
 
   useEffect(() => {
     (async () => {
@@ -50,6 +51,8 @@ export const FullPost = () => {
     const { comment, updatedPost } = await dispatch(
       createComment({ postId: id as string, text: commentText }),
     ).unwrap();
+    console.log(comment);
+    
     setComments(() => [...comments, comment]);
     setPost(updatedPost);
     setCommentText('');
@@ -73,7 +76,7 @@ export const FullPost = () => {
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments comments={comments} onDelete={onDeleteComment}>
+      <Comments comments={comments} onDelete={onDeleteComment} currentUserId={currentUserId}>
         <div className="comments__create">
           <img src="https://mui.com/static/images/avatar/2.jpg" alt="" />
           <div>

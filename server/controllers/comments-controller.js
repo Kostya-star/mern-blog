@@ -95,7 +95,7 @@ const createComment = async (req, res) => {
       {
         returnDocument: 'after'
       },
-      (error, doc) => {
+      async (error, doc) => {
         if (error) {
           console.log(error);
           return res.status(500).json({
@@ -109,8 +109,9 @@ const createComment = async (req, res) => {
             message: 'The post is not found'
           })
         }
+        await comment.populate('user')
         res.json({ comment, updatedPost: doc })
-      }
+      },
     )
 
 

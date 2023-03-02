@@ -9,6 +9,7 @@ interface ICommentsProps {
   children?: ReactNode;
   isCreatePost?: boolean;
   postId?: string;
+  currentUserId?: string
   onDelete?: (id: string) => void;
 }
 
@@ -16,6 +17,7 @@ export const Comments: FC<ICommentsProps> = ({
   comments,
   children,
   isCreatePost,
+  currentUserId,
   postId,
   onDelete,
 }) => {
@@ -25,11 +27,12 @@ export const Comments: FC<ICommentsProps> = ({
       {comments.map((comment) => {
         const timestamp = new Date(comment.createdAt);
         const creationTime = createTimeSince(timestamp);
-
+        console.log();
+        
         return (
           <Fragment key={comment._id}>
             <div className={s.comment}>
-              {onDelete && (
+              {onDelete && (currentUserId === comment.user._id) && (
                 <div
                   onClick={() => onDelete(comment._id)}
                   className={s.comment_deleteSvg}
@@ -43,7 +46,7 @@ export const Comments: FC<ICommentsProps> = ({
                 alt="userIMG"
               />
               <div className={s.comment__body}>
-                <p>{comment.user.fullName}</p>
+                <p>{comment?.user.fullName}</p>
                 <p>{comment.text}</p>
               </div>
             </div>

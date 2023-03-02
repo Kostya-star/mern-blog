@@ -105,7 +105,10 @@
 
         span {
           margin-right: 20px;
-          color: gray;
+          color: rgb(166, 161, 161);
+          &:hover {
+            color: black;
+          }
         }
       }
 

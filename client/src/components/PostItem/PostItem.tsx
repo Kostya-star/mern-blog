@@ -79,9 +79,11 @@ export const PostItem: FC<IPostItemProps> = ({
               <EyeSVG />
               {post.viewCount}
             </div>
-            <div>
+            <div className={s.comments}>
+            <Link to={`/posts/${post._id}`}>
               <CommentSVG />
               {post.commentCount}
+            </Link>
             </div>
           </div>
         </div>

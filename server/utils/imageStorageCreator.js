@@ -10,7 +10,7 @@ export const imageStorageCreator = (multer) => {
     },
     filename: (_, file, cb) => {
       cb(null, file.originalname)
-    },
+    }
   })
 
   return {

@@ -7,9 +7,9 @@ import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { IPost } from 'types/IPost';
-import { createTimeSince } from 'utils/createTimeSince';
+import { createTimeSince } from 'utils/createTimeSince'
 import s from './PostItem.module.scss';
-import { Avatar } from 'components/Avatar/Avatar';
+import { Avatar } from 'components/Avatar/Avatar'
 
 interface IPostItemProps {
   post: IPost;

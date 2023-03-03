@@ -12,9 +12,9 @@ const App = () => {
 
   useEffect(() => {
     // setLoading(true)
-    if (window.localStorage.getItem('token')) {
+    // if (window.localStorage.getItem('token')) {
       dispatch(onAuthMeThunk()).unwrap().then(() => setLoading(false));
-    }
+    // }
   }, []);
 
   if(loading) {

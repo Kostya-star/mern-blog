@@ -13,7 +13,15 @@ const App = () => {
   useEffect(() => {
     // setLoading(true)
     // if (window.localStorage.getItem('token')) {
-      dispatch(onAuthMeThunk()).unwrap().then(() => setLoading(false));
+      (async () => {
+        try {
+          await dispatch(onAuthMeThunk())
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false)
+        }
+      })()
     // }
   }, []);
 

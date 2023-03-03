@@ -39,11 +39,11 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       ) : null}
       <div className={s.post__header}>
-        {post.imageUrl && (
-          // <img src={`${process.env.REACT_APP_API_URL}${post.imageUrl}`} alt="post img" />
-          // <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" />
-          <img src={`${process.env.REACT_APP_API_URL}${post.imageUrl}`} alt="post img" />
-        )}
+        {post.imageUrl && 
+          // {/* <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" /> */}
+          <img src={post.imageUrl} alt="post img" />
+          // {/* <img src={`${process.env.REACT_APP_API_URL}${post.imageUrl}`} alt="post img" /> */}
+        }
       </div>
       <div
         className={`${s.post__content} ${

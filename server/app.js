@@ -15,6 +15,7 @@ dotenv.config()
 const app = express()
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 
 export const upload = multer(imageStorageCreator(multer)) // multer({ storage })

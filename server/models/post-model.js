@@ -28,6 +28,10 @@ const PostSchema = new mongoose.Schema({
     required: true,
   },
   imageUrl: String
+  // imageUrl: {
+  //   data: Buffer,
+  //   contentType: String
+  // }
 }, {
   timestamps: true
 })

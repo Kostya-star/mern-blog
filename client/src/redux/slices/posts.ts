@@ -28,8 +28,12 @@ export const fetchPost = createAsyncThunk(
 
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async (newPost: INewPostRequest) =>
-    await instance.post<IPost>('/posts', newPost),
+  async (newPost: INewPostRequest) => {
+    const resp = await instance.post<IPost>('/posts', newPost)
+
+    console.log(resp);
+    return resp
+  }
 );
 
 export const updatePost = createAsyncThunk(

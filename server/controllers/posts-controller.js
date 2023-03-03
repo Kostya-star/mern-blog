@@ -1,4 +1,5 @@
 import PostModel from "../models/post-model.js"
+import fs from 'fs'
 
 const getAllPosts = async (req, res) => {
   try {
@@ -63,13 +64,21 @@ const getOnePost = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { title, text, tags, imageUrl } = req.body
-
+    const { title, text, tags, userId } = req.body
+    const image = req.file
+    
+    const buffer = {
+      data: fs.readFileSync(image.path),
+      contentType: image.mimetype
+    }
+    const base64Image = Buffer.from(buffer.data).toString('base64');
+    const imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
+    
     const post = new PostModel({
       title,
       text,
       tags,
-      user: req.body.userId,
+      user: userId,
       imageUrl
     })
 

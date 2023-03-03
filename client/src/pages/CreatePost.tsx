@@ -65,36 +65,56 @@ export const CreatePost = () => {
 
   const isEditing = Boolean(id);
 
+  // const[imgString64, setImgString64] = useState()
+
   // if !isEditing then newPost.imageUrl === File. In this case we are creating a post.
   // Otherwise if newPost.imageUrl is a string, then we are editing the post
   // and we dont need to perform the operations in the if operator and can proceed right to the post request
-  const onCreatePostUploadImage = async () => {
-    if (typeof newPost.imageUrl !== 'string') {
-      const formData = new FormData();
-      formData.append('image', newPost.imageUrl as File);
-      const { url } = await dispatch(uploadPostImage(formData)).unwrap();
-      return url;
-    }
-  };
+  // const onCreatePostUploadImage = async () => {
+  //   if (typeof newPost.imageUrl !== 'string') {
+  //     const formData = new FormData();
+  //     formData.append('image', newPost.imageUrl as File);
+  //     const resp = await dispatch(uploadPostImage(formData)).unwrap();
+  //     setImgString64(resp.imageUrl)
+  //     console.log(resp);
+      
+  //     // return url;
+  //   }
+  // };
 
   const onSubmitNewPost = async () => {
     try {
-      let uploadedImgUrl = await onCreatePostUploadImage();
+      // let uploadedImgUrl = await onCreatePostUploadImage();
+
+      const formData = new FormData();
+      formData.append('title', newPost.title);
+      formData.append('text', newPost.text);
+      formData.append('tags', newPost.tags);
+      formData.append('image', newPost.imageUrl as File);
+      // console.log(formData);
 
       const _newPost = {
         ...newPost,
-        imageUrl: uploadedImgUrl || (newPost.imageUrl as string),
+        // imageUrl: formData,
         tags: newPost.tags.split(' '),
       };
 
+      // const { data } = await dispatch(createPost(_newPost)).unwrap();
+      // @ts-expect-error
+      const { data } = await dispatch(createPost(formData)).unwrap();
+      navigate(`/`);
+      return
       if (isEditing) {
         await dispatch(
+          // @ts-expect-error
           updatePost({ id: id as string, updatedPost: _newPost }),
-        ).unwrap();
-        navigate(`/posts/${id}`);
-      } else {
+          ).unwrap();
+          // navigate(`/posts/${id}`);
+        } else {
+          
+          // @ts-expect-error
         const { data } = await dispatch(createPost(_newPost)).unwrap();
-        navigate(`/posts/${data._id}`);
+        // navigate(`/posts/${data._id}`);
       }
     } catch (error) {
       alert('Error when creating the article');
@@ -108,13 +128,12 @@ export const CreatePost = () => {
       imageRef.current.value = '';
     }
   };
-console.log(newPost.imageUrl);
 
   const imgSrc =
     typeof newPost.imageUrl !== 'string'
-      ? URL.createObjectURL(newPost.imageUrl)
-       : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
-        // `http://localhost:5000${newPost.imageUrl}`;
+      ? URL.createObjectURL(newPost.imageUrl) :
+      //  : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
+        `http://localhost:5000${newPost.imageUrl}`;
   //
   return (
     <div className="createPost">

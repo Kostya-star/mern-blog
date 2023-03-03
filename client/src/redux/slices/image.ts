@@ -11,7 +11,11 @@ import { IUploadImgResp } from 'types/IUploadImgResp';
 export const uploadPostImage = createAsyncThunk(
   'images/uploadPostImage',
   async (formData: FormData) => {
-    const resp = await instance.post<IUploadImgResp>('/upload/postImg', formData);
+    const resp = await instance.post<IUploadImgResp>('/upload/postImg', formData, {
+      // headers: {
+      //   'Content-Type': 'multipart/form-data'
+      // }
+    });
     return resp.data;
   },
 );

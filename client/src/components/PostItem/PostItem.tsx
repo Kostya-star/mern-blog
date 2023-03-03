@@ -4,9 +4,9 @@ import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
 import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { FC } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
-import { IPost } from 'types/IPost';
+import ReactMarkdown from 'react-markdown'
+import { Link } from 'react-router-dom'
+import { IPost } from 'types/IPost'
 import { createTimeSince } from 'utils/createTimeSince'
 import s from './PostItem.module.scss';
 import { Avatar } from 'components/Avatar/Avatar'

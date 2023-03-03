@@ -10,7 +10,8 @@ export const Avatar: FC<IAvatarProps> = ({ avatar }) => {
   return (
     <div className={s.avatar}>
       {avatar ? (
-        <img src={`http://localhost:5000${avatar}`} alt="avatar" />
+        // <img src={`http://localhost:5000${avatar}`} alt="avatar" />
+        <img src={`${process.env.REACT_APP_API_URL}${avatar}`} alt="avatar" />
       ) : (
         <AvatarDefaultSVG />
       )}

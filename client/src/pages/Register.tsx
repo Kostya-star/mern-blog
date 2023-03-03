@@ -90,7 +90,8 @@ export const Register = () => {
                   onClick={() => fileRef.current?.click()}
                 >
                   {values.avatarUrl ? (
-                    <img src={`http://localhost:5000${values.avatarUrl}`} alt="avatar" />
+                    // <img src={`http://localhost:5000${values.avatarUrl}`} alt="avatar" />
+                    <img src={`${process.env.REACT_APP_API_URL}${values.avatarUrl}`} alt="avatar" />
                   ) : (
                     <AvatarPlusSVG />
                   )}

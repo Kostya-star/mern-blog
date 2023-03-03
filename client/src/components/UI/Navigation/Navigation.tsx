@@ -23,6 +23,7 @@ export const Navigation = () => {
           <Link to="/">
             <div className={s.navigation__logo}>Constantin Blog</div>
           </Link>
+          IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP IS STILL IN DEVELOPMENT MODE!
           <div className={s.navigation__buttons}>
             {!isAuth && !token ? (
               <>

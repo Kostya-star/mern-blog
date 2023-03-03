@@ -6,19 +6,11 @@ import { Register } from 'pages/Register';
 import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 import { Tags } from 'pages/Tags';
 
 export const AppRouter = () => {
   const isAuth = useAppSelector(isAuthSelector);
-
-  let token = localStorage.getItem('token')
-
-  useEffect(() => {
-    // console.log(token);
-    
-  }, [token])
-  
 
   return (
     <div className="app-body">
@@ -28,14 +20,14 @@ export const AppRouter = () => {
           <Route path="/posts/:id" element={<FullPost />} />
           <Route path="/tags/:tag" element={<Tags />} />
 
-          {(!isAuth) && (
+          {!isAuth && (
             <>
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
             </>
           )}
 
-          {(isAuth) && (
+          {isAuth && (
             <>
               <Route path="/add-post" element={<CreatePost />} />
               <Route path="/posts/:id/edit" element={<CreatePost />} />

@@ -8,11 +8,18 @@ import './scss/all.scss';
 const App = () => {
   const dispatch = useAppDispatch();
 
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
+    // setLoading(true)
     if (window.localStorage.getItem('token')) {
-      dispatch(onAuthMeThunk());
+      dispatch(onAuthMeThunk()).unwrap().then(() => setLoading(false));
     }
   }, []);
+
+  if(loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div>

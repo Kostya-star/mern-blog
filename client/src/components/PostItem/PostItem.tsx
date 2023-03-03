@@ -2,7 +2,7 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as CommentSVG } from 'assets/comment.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
-import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
+import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg'
 import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';

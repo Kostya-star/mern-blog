@@ -89,7 +89,7 @@ export const CreatePost = () => {
   const onDeleteImage = () => {
     setNewPost({ ...newPost, image: null });
     if (imageRef.current) {
-      imageRef.current.value = '';
+      imageRef.current.value = ''
     }
   };
 

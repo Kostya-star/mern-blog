@@ -22,24 +22,24 @@ export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async (id: string) => {
     const resp = await instance.get<IPost>(`/posts/${id}`);
+    
     return resp.data;
   },
 );
 
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async (newPost: INewPostRequest) => {
+  async (newPost: FormData) => {
     const resp = await instance.post<IPost>('/posts', newPost)
 
-    console.log(resp);
     return resp
   }
 );
 
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
-  async ({ id, updatedPost }: IUpdatePostRequest) => {
-    return await instance.patch(`/posts/${id}`, updatedPost);
+  async (formData: FormData) => {
+    return await instance.patch(`/posts/edit`, formData);
   },
 );
 

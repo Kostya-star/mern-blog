@@ -6,13 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import SimpleMDE from 'react-simplemde-editor';
 import { useAppDispatch } from 'redux/hooks';
-import { uploadPostImage } from 'redux/slices/image';
-import {
-  createPost,
-  fetchPost,
-  updatePost,
-} from 'redux/slices/posts';
+import { createPost, fetchPost, updatePost } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
+import { base64ToFile } from 'utils/base64ToFile';
 
 const options = {
   spellChecker: false,
@@ -30,7 +26,7 @@ const options = {
 
 interface INewPost extends Omit<INewPostRequest, 'tags' | 'imageUrl'> {
   tags: string;
-  imageUrl: File | string;
+  image: null | File;
 }
 
 export const CreatePost = () => {
@@ -43,7 +39,7 @@ export const CreatePost = () => {
     title: '',
     tags: '',
     text: '',
-    imageUrl: '',
+    image: null,
   });
 
   const imageRef = useRef<HTMLInputElement | null>(null);
@@ -53,68 +49,36 @@ export const CreatePost = () => {
       dispatch(fetchPost(id))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
+          const file = base64ToFile(imageUrl);
+
           setNewPost({
             title,
             text,
             tags: tags.join(' '),
-            imageUrl,
+            image: file as File,
           });
         });
     }
   }, []);
+  // console.log(newPost);
 
   const isEditing = Boolean(id);
 
-  // const[imgString64, setImgString64] = useState()
-
-  // if !isEditing then newPost.imageUrl === File. In this case we are creating a post.
-  // Otherwise if newPost.imageUrl is a string, then we are editing the post
-  // and we dont need to perform the operations in the if operator and can proceed right to the post request
-  // const onCreatePostUploadImage = async () => {
-  //   if (typeof newPost.imageUrl !== 'string') {
-  //     const formData = new FormData();
-  //     formData.append('image', newPost.imageUrl as File);
-  //     const resp = await dispatch(uploadPostImage(formData)).unwrap();
-  //     setImgString64(resp.imageUrl)
-  //     console.log(resp);
-      
-  //     // return url;
-  //   }
-  // };
-
   const onSubmitNewPost = async () => {
     try {
-      // let uploadedImgUrl = await onCreatePostUploadImage();
-
       const formData = new FormData();
       formData.append('title', newPost.title);
-      formData.append('text', newPost.text);
       formData.append('tags', newPost.tags);
-      formData.append('image', newPost.imageUrl as File);
-      // console.log(formData);
+      formData.append('text', newPost.text);
+      formData.append('image', newPost.image || '');
+      formData.append('postId', id as string);
 
-      const _newPost = {
-        ...newPost,
-        // imageUrl: formData,
-        tags: newPost.tags.split(' '),
-      };
-
-      // const { data } = await dispatch(createPost(_newPost)).unwrap();
-      // @ts-expect-error
-      const { data } = await dispatch(createPost(formData)).unwrap();
-      navigate(`/`);
-      return
       if (isEditing) {
-        await dispatch(
-          // @ts-expect-error
-          updatePost({ id: id as string, updatedPost: _newPost }),
-          ).unwrap();
-          // navigate(`/posts/${id}`);
-        } else {
-          
-          // @ts-expect-error
-        const { data } = await dispatch(createPost(_newPost)).unwrap();
-        // navigate(`/posts/${data._id}`);
+        await dispatch(updatePost(formData)).unwrap();
+        navigate(`/`);
+      } else {
+        await dispatch(createPost(formData)).unwrap();
+        navigate(`/`);
       }
     } catch (error) {
       alert('Error when creating the article');
@@ -123,22 +87,16 @@ export const CreatePost = () => {
   };
 
   const onDeleteImage = () => {
-    setNewPost({ ...newPost, imageUrl: '' });
+    setNewPost({ ...newPost, image: null });
     if (imageRef.current) {
       imageRef.current.value = '';
     }
   };
 
-  const imgSrc =
-    typeof newPost.imageUrl !== 'string'
-      ? URL.createObjectURL(newPost.imageUrl) :
-      //  : `${process.env.REACT_APP_API_URL}${newPost.imageUrl}`;
-        `http://localhost:5000${newPost.imageUrl}`;
-  //
   return (
     <div className="createPost">
       <div className="createPost__content">
-        {newPost.imageUrl ? (
+        {newPost.image ? (
           <>
             <Button
               text="Delete"
@@ -147,7 +105,7 @@ export const CreatePost = () => {
             />
             <img
               className="createPost__content__img"
-              src={imgSrc}
+              src={URL.createObjectURL(newPost.image)}
               alt="Uploaded"
             />
           </>
@@ -162,7 +120,7 @@ export const CreatePost = () => {
           ref={imageRef}
           type="file"
           onChange={(e) =>
-            setNewPost({ ...newPost, imageUrl: e.target.files?.[0] as File })
+            setNewPost({ ...newPost, image: e.target.files?.[0] as File })
           }
           hidden
         />

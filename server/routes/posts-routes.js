@@ -8,12 +8,12 @@ import { imageStorageCreator } from '../utils/imageStorageCreator.js';
 
 const router = Router()
 
-export const upload = multer({ dest: 'uploads/' }) // multer({ storage })
+export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
 
 router.get('/:id', postsController.getOnePost)
 router.get('', postsController.getAllPosts)
 router.post('', upload.single('image'), checkAuth, postsController.createPost)
-router.patch('/:id', checkAuth, postsController.updatePost)
+router.patch('/edit', upload.single('image'), checkAuth, postsController.updatePost)
 router.delete('/:id', checkAuth, postsController.deletePost)
 
 

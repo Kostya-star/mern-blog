@@ -66,18 +66,21 @@ const createPost = async (req, res) => {
   try {
     const { title, text, tags, userId } = req.body
     const image = req.file
-    
-    const buffer = {
-      data: fs.readFileSync(image.path),
-      contentType: image.mimetype
+    let imageUrl = ''
+
+    if(image) {
+      const buffer = {
+        data: fs.readFileSync(image.path),
+        contentType: image.mimetype
+      }
+      const base64Image = Buffer.from(buffer.data).toString('base64');
+      imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
     }
-    const base64Image = Buffer.from(buffer.data).toString('base64');
-    const imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
     
     const post = new PostModel({
       title,
       text,
-      tags,
+      tags: tags.split(' '),
       user: userId,
       imageUrl
     })
@@ -90,6 +93,45 @@ const createPost = async (req, res) => {
     console.log(error)
     res.status(500).json({
       message: 'Error when creating the post'
+    })
+  }
+}
+
+const updatePost = async (req, res) => {
+  try {
+    const { title, text, tags, postId, userId } = req.body
+    const image = req.file
+
+    let imageUrl = ''
+
+    if(image) {
+      const buffer = {
+        data: fs.readFileSync(image.path),
+        contentType: image.mimetype
+      }
+      const base64Image = Buffer.from(buffer.data).toString('base64');
+      imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
+    }
+
+    await PostModel.updateOne({
+      _id: postId
+    },
+      {
+        title,
+        text,
+        tags: tags.split(' '),
+        user: userId,
+        imageUrl
+      })
+
+      res.json({
+        success: true
+      })
+  
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error when updating the post'
     })
   }
 }
@@ -119,33 +161,6 @@ const deletePost = async (req, res) => {
   }
 }
 
-const updatePost = async (req, res) => {
-  try {
-    const { id } = req.params
-    const { title, text, tags, user, imageUrl } = req.body
-
-    await PostModel.updateOne({
-      _id: id
-    },
-      {
-        title,
-        text,
-        tags,
-        user,
-        imageUrl
-      })
-
-      res.json({
-        success: true
-      })
-  
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'Error when updating the post'
-    })
-  }
-}
 
 export default {
   createPost,

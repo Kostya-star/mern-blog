@@ -20,8 +20,8 @@ export const Navigation = () => {
     <>
       <div className={s.navigation}>
         <div className={s.navigation__content}>
-          <Link to="/">
-            <div className={s.navigation__logo}>Constantin Blog</div>
+          <Link to="/" className={s.navigation__logo}>
+            <div>Constantin Blog</div>
           </Link>
           <h3 style={{ color: 'tomato', textDecoration: 'underline' }}>
             IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP

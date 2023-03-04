@@ -145,7 +145,14 @@ export const CreatePost = () => {
           type="text"
           placeholder="# t a g s"
           value={newPost.tags}
-          onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
+          pattern="^[^,#]+$"
+          required
+          onChange={(e) =>
+            setNewPost({
+              ...newPost,
+              tags: e.target.value.replace(/[,#.]/g, ''),
+            })
+          }
         />
         <hr />
         {!newPost.tags && (

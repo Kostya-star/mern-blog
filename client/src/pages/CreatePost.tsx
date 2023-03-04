@@ -60,7 +60,6 @@ export const CreatePost = () => {
         });
     }
   }, []);
-  // console.log(newPost);
 
   const isEditing = Boolean(id);
 

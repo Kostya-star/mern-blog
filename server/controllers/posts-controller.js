@@ -1,5 +1,6 @@
 import PostModel from "../models/post-model.js"
 import fs from 'fs'
+import { getBase64 } from './../utils/getBase64.js';
 
 const getAllPosts = async (req, res) => {
   try {
@@ -66,15 +67,11 @@ const createPost = async (req, res) => {
   try {
     const { title, text, tags, userId } = req.body
     const image = req.file
+
     let imageUrl = ''
 
     if(image) {
-      const buffer = {
-        data: fs.readFileSync(image.path),
-        contentType: image.mimetype
-      }
-      const base64Image = Buffer.from(buffer.data).toString('base64');
-      imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
+      imageUrl = getBase64(image)
     }
     
     const post = new PostModel({
@@ -105,12 +102,7 @@ const updatePost = async (req, res) => {
     let imageUrl = ''
 
     if(image) {
-      const buffer = {
-        data: fs.readFileSync(image.path),
-        contentType: image.mimetype
-      }
-      const base64Image = Buffer.from(buffer.data).toString('base64');
-      imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
+      imageUrl = getBase64(image)
     }
 
     await PostModel.updateOne({

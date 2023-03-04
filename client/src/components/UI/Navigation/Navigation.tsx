@@ -23,7 +23,10 @@ export const Navigation = () => {
           <Link to="/">
             <div className={s.navigation__logo}>Constantin Blog</div>
           </Link>
-          IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP IS STILL IN DEVELOPMENT MODE!
+          <h3 style={{color: 'tomato', textDecoration: 'underline'}}>
+            IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP
+            IS STILL IN DEVELOPMENT MODE!
+          </h3>
           <div className={s.navigation__buttons}>
             {!isAuth && !token ? (
               <>
@@ -38,21 +41,13 @@ export const Navigation = () => {
                 </Link>
               </>
             ) : (
-              <>
-                <Link to="/add-post">
-                  <Button
-                    text="Create post"
-                    className="button button_colored"
-                  />
-                </Link>
-                <Link to="/login">
-                  <Button
-                    text="Log out"
-                    className="button button_delete"
-                    onClick={onLogoutHandle}
-                  />
-                </Link>
-              </>
+              <Link to="/login">
+                <Button
+                  text="Log out"
+                  className="button button_delete"
+                  onClick={onLogoutHandle}
+                />
+              </Link>
             )}
           </div>
         </div>

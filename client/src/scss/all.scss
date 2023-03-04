@@ -33,7 +33,9 @@
 .app-body {
   height: 100%;
   min-height: calc(100vh - 63px);
-  background-color: #f1f3f9;
+  // background-color: #dee0e5;
+  background: rgb(232,208,219);
+  background: radial-gradient(circle, rgba(232,208,219,1) 0%, rgba(226,247,244,1) 100%);
   padding-top: 40px;
   padding-bottom: 50px;
 }

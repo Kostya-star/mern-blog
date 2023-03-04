@@ -8,6 +8,9 @@ import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
 import { deletePost } from './../redux/slices/posts';
+import { Link } from 'react-router-dom';
+import { Button } from 'components/UI/Button/Button';
+import { isAuthSelector } from 'redux/slices/auth';
 
 export const Home = () => {
   const dispatch = useAppDispatch();
@@ -30,6 +33,8 @@ export const Home = () => {
     currentUserId: auth?.data?._id,
   }));
 
+  const isAuth = useAppSelector(isAuthSelector);
+
   useEffect(() => {
     dispatch(fetchPosts({ sortedCat: 'createdAt' }));
     dispatch(fetchTags());
@@ -46,8 +51,13 @@ export const Home = () => {
 
   return (
     <div className="home__wrapper">
-      <div className="home__categories">
+      <div className="home__navbar">
         <Categories sortPosts={onSortPosts} />
+        {isAuth && (
+          <Link to="/add-post">
+            <Button text="Create post" className="button button_colored" />
+          </Link>
+        )}
       </div>
       <div className="home__content">
         <div className="home__content__posts">

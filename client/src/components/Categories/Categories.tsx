@@ -19,7 +19,7 @@ export const Categories: FC<ICategoriesProps> = ({ sortPosts }) => {
   };
 
   return (
-    <>
+    <div>
       {categories.map((cat, ind) => (
         <button
           key={ind}
@@ -32,6 +32,6 @@ export const Categories: FC<ICategoriesProps> = ({ sortPosts }) => {
           {cat.value}
         </button>
       ))}
-    </>
+    </div>
   );
 };

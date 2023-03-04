@@ -150,7 +150,7 @@ export const CreatePost = () => {
           onChange={(e) =>
             setNewPost({
               ...newPost,
-              tags: e.target.value.replace(/[,#.]/g, ''),
+              tags: e.target.value.replace(/[,#.]/g, '').replace(/\s{2,}/g, ' '),
             })
           }
         />

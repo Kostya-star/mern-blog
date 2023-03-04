@@ -1,9 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
-import { INewPostRequest } from 'types/INewPostRequest';
 import { IPost } from 'types/IPost';
-import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
@@ -22,20 +20,24 @@ export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async (id: string) => {
     const resp = await instance.get<IPost>(`/posts/${id}`);
+
     return resp.data;
   },
 );
 
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async (newPost: INewPostRequest) =>
-    await instance.post<IPost>('/posts', newPost),
+  async (newPost: FormData) => {
+    const resp = await instance.post<IPost>('/posts', newPost);
+
+    return resp;
+  },
 );
 
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
-  async ({ id, updatedPost }: IUpdatePostRequest) => {
-    return await instance.patch(`/posts/${id}`, updatedPost);
+  async (formData: FormData) => {
+    return await instance.patch(`/posts/edit`, formData);
   },
 );
 

@@ -1,12 +1,15 @@
 import bcrypt from 'bcrypt';
 import UserModel from '../models/user-model.js';
 import tokenService from '../services/token-service.js';
+import { getBase64 } from '../utils/getBase64.js';
 
 const register = async (req, res) => {
   try {
-    const { fullName, email, password, avatarUrl } = req.body
-console.log(fullName, email, password, avatarUrl);
+    const { fullName, email, password } = req.body
+    const image = req.file
+
     const userDb = await UserModel.findOne({ email })
+    
     if (userDb) {
       return res.status(400).json({
         message: 'This user already exists'
@@ -14,6 +17,12 @@ console.log(fullName, email, password, avatarUrl);
     }
 
     const hashedPass = await bcrypt.hash(password, 5)
+
+    let avatarUrl = ''
+    
+    if(image) {
+      avatarUrl = getBase64(image)
+    }
 
     const user = new UserModel({
       fullName,

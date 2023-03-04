@@ -79,7 +79,7 @@ const createPost = async (req, res) => {
       text,
       tags: tags.split(' '),
       user: userId,
-      imageUrl
+      imageUrl,
     })
 
     await post.save()

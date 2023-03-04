@@ -1,11 +1,10 @@
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
-import { FC, Fragment, ReactNode } from 'react';
-import { createTimeSince } from 'utils/createTimeSince';
-import { IComment } from 'types/IComment';
-import s from './Comments.module.scss';
-import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { Avatar } from 'components/Avatar/Avatar';
+import { FC, Fragment, ReactNode } from 'react';
+import { IComment } from 'types/IComment';
+import { createTimeSince } from 'utils/createTimeSince';
+import s from './Comments.module.scss';
 
 interface ICommentsProps {
   comments: IComment[];

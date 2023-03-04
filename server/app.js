@@ -15,7 +15,7 @@ dotenv.config()
 const app = express()
 
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 
 export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
@@ -25,8 +25,8 @@ app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
 app.use('/comments', commentsRouters)
 app.use('/tags', tagsRouters)
-app.use('/upload', upload.single('image'), imageRoutes)
-app.use('/uploads', express.static('uploads'))
+// app.use('/upload', upload.single('image'), imageRoutes)
+// app.use('/uploads', express.static('uploads'))
 
 const PORT = process.env.PORT || 5000
 

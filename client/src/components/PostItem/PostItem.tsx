@@ -2,14 +2,13 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as CommentSVG } from 'assets/comment.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
-import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
+import { Avatar } from 'components/Avatar/Avatar';
 import { FC } from 'react';
-import ReactMarkdown from 'react-markdown'
-import { Link } from 'react-router-dom'
-import { IPost } from 'types/IPost'
-import { createTimeSince } from 'utils/createTimeSince'
+import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
+import { IPost } from 'types/IPost';
+import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
-import { Avatar } from 'components/Avatar/Avatar'
 
 interface IPostItemProps {
   post: IPost;
@@ -39,9 +38,11 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       ) : null}
       <div className={s.post__header}>
-        {post.imageUrl && 
-          // {/* <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" /> */}
-          <img src={post.imageUrl} alt="post img" />
+        {
+          post.imageUrl && (
+            // {/* <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" /> */}
+            <img src={post.imageUrl} alt="post img" />
+          )
           // {/* <img src={`${process.env.REACT_APP_API_URL}${post.imageUrl}`} alt="post img" /> */}
         }
       </div>
@@ -51,7 +52,7 @@ export const PostItem: FC<IPostItemProps> = ({
         }`}
       >
         <div className={s.post__content__header}>
-          <Avatar avatar={post.user?.avatarUrl as string}/>
+          <Avatar avatar={post.user?.avatarUrl as string} />
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>
             <span className={s.time}>{time}</span>
@@ -82,10 +83,10 @@ export const PostItem: FC<IPostItemProps> = ({
               {post.viewCount}
             </div>
             <Link to={`/posts/${post._id}`}>
-            <div className={s.comments}>
-              <CommentSVG />
-              {post.commentCount}
-            </div>
+              <div className={s.comments}>
+                <CommentSVG />
+                {post.commentCount}
+              </div>
             </Link>
           </div>
         </div>

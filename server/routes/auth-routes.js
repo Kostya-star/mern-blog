@@ -3,10 +3,14 @@ import authController from '../controllers/auth-controller.js'
 import { checkAuth } from '../utils/checkAuth.js'
 import { checkValidationErrors } from '../utils/checkValidationErrors.js'
 import { registerValidator, loginValidator } from '../validations/auth-validator.js'
+import multer from 'multer'
+import { imageStorageCreator } from '../utils/imageStorageCreator.js';
 
 const router = Router()
 
-router.post('/register', registerValidator, checkValidationErrors, authController.register)
+const upload = multer(imageStorageCreator(multer)) // multer({ storage })
+
+router.post('/register', upload.single('image'), registerValidator, checkValidationErrors, authController.register)
 router.post('/login', loginValidator, checkValidationErrors, authController.login)
 router.get('/me', checkAuth, authController.getUser)
 

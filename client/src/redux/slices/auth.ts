@@ -14,10 +14,10 @@ export const onLoginThunk = createAsyncThunk(
   },
 );
 
-export const onRegisterThunk = createAsyncThunk(
-  'auth/onRegisterThunk',
-  async (params: IRegisterRequest) => {
-    const resp = await instance.post<IUser>('/auth/register', params);
+export const onRegister = createAsyncThunk(
+  'auth/onRegister',
+  async (formData: FormData) => {
+    const resp = await instance.post<IUser>('/auth/register', formData);
     return resp.data;
   },
 );
@@ -69,19 +69,19 @@ export const authSlice = createSlice({
         state.data = null;
       })
       
-      // onRegisterThunk
-      .addCase(onRegisterThunk.pending, (state) => {
+      // onRegister
+      .addCase(onRegister.pending, (state) => {
         state.data = null;
         state.status = 'loading';
       })
       .addCase(
-        onRegisterThunk.fulfilled,
+        onRegister.fulfilled,
         (state, action: PayloadAction<IUser>) => {
           state.status = 'success';
           state.data = action.payload;
         },
       )
-      .addCase(onRegisterThunk.rejected, (state) => {
+      .addCase(onRegister.rejected, (state) => {
         state.status = 'error';
         state.data = null;
       })

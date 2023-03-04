@@ -4,16 +4,16 @@ import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik } from 'formik';
 import { ChangeEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { onRegisterThunk } from 'redux/slices/auth';
+import { onRegister } from 'redux/slices/auth';
 import { uploadUserPhoto } from 'redux/slices/image';
 import 'scss/all.scss';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
 
-type setFieldValue = (fieldName: string, val: string) => void;
+type setFieldValue = (fieldName: string, val: File) => void;
 
-const initialValues = { fullName: '', email: '', password: '', avatarUrl: '' };
+const initialValues = { fullName: '', email: '', password: '', avatar: null as null | File };
 
 const validationSchema = Yup.object({
   fullName: Yup.string()
@@ -33,7 +33,14 @@ export const Register = () => {
 
   const onRegisterSubmit = async (values: IRegisterRequest) => {
     try {
-      const resp = await dispatch(onRegisterThunk(values)).unwrap();
+      const formData = new FormData();
+      formData.append('image', values.avatar || '');
+      formData.append('email', values.email);
+      formData.append('fullName', values.fullName);
+      formData.append('password', values.password);
+
+      
+      const resp = await dispatch(onRegister(formData)).unwrap();
 
       if (resp.token) {
         window.localStorage.setItem('token', resp.token);
@@ -44,19 +51,21 @@ export const Register = () => {
     }
   };
 
-  const onUploadUserPhoto = async (
-    e: ChangeEvent<HTMLInputElement>,
-    setFieldValue: setFieldValue,
-  ) => {
-    const photo = e.target.files?.[0];
+  // const onUploadUserPhoto = async (
+  //   e: ChangeEvent<HTMLInputElement>,
+  //   setFieldValue: setFieldValue,
+  // ) => {
+  //   const photo = e.target.files?.[0];
 
-    if (photo) {
-      const formData = new FormData();
-      formData.append('image', photo);
-      const { url } = await dispatch(uploadUserPhoto(formData)).unwrap();
-      setFieldValue('avatarUrl', url);
-    }
-  };
+  //   if (photo) {
+  //     console.log(photo);
+  //     setFieldValue('avatar', photo);
+      
+  //     // const formData = new FormData();
+  //     // formData.append('image', photo);
+  //     // const { url } = await dispatch(uploadUserPhoto(formData)).unwrap();
+  //   }
+  // };
 
   return (
     <div className="auth">
@@ -81,7 +90,7 @@ export const Register = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            console.log(values);
+            // console.log(values);
 
             return (
               <Form onSubmit={handleSubmit}>
@@ -89,9 +98,10 @@ export const Register = () => {
                   className="auth__avatar"
                   onClick={() => fileRef.current?.click()}
                 >
-                  {values.avatarUrl ? (
+                  {values.avatar ? (
                     // <img src={`http://localhost:5000${values.avatarUrl}`} alt="avatar" />
-                    <img src={`${process.env.REACT_APP_API_URL}${values.avatarUrl}`} alt="avatar" />
+                    // <img src={`${process.env.REACT_APP_API_URL}${values.avatar}`} alt="avatar" />
+                    <img src={URL.createObjectURL(values.avatar)} alt="avatar" />
                   ) : (
                     <AvatarPlusSVG />
                   )}
@@ -100,7 +110,7 @@ export const Register = () => {
                     ref={fileRef}
                     type="file"
                     name="avatarUrl"
-                    onChange={(e) => onUploadUserPhoto(e, setFieldValue)}
+                    onChange={(e) => setFieldValue('avatar', e.target.files?.[0])}
                     // onBlur={handleBlur}
                     hidden
                   />

@@ -10,6 +10,7 @@ interface InputProps {
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void
   style?: CSSProperties 
+  required?: boolean
 }
 
 export const Input:FC<InputProps> = ({ ...props }) => {

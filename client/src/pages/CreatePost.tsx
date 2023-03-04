@@ -9,6 +9,9 @@ import { useAppDispatch } from 'redux/hooks';
 import { createPost, fetchPost, updatePost } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
 import { base64ToFile } from 'utils/base64ToFile';
+import { ReactComponent as UploadSVG } from 'assets/upload.svg';
+import { Formik, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const options = {
   spellChecker: false,
@@ -23,6 +26,7 @@ const options = {
     uniqueId: 'MyUniqueID',
   },
 };
+
 
 interface INewPost extends Omit<INewPostRequest, 'tags' | 'imageUrl'> {
   tags: string;
@@ -93,67 +97,95 @@ export const CreatePost = () => {
   };
 
   return (
-    <div className="createPost">
-      <div className="createPost__content">
-        {newPost.image ? (
-          <>
-            <Button
-              text="Delete"
-              className="button button_delete"
-              onClick={onDeleteImage}
-            />
-            <img
-              className="createPost__content__img"
-              src={URL.createObjectURL(newPost.image)}
-              alt="Uploaded"
-            />
-          </>
-        ) : (
-          <Button
-            onClick={() => imageRef.current?.click()}
-            text="Upload image"
-            className="button button_transparent"
-          />
-        )}
-        <input
-          ref={imageRef}
-          type="file"
-          onChange={(e) =>
-            setNewPost({ ...newPost, image: e.target.files?.[0] as File })
-          }
-          hidden
-        />
-        <TextArea
-          placeholder="Post title..."
-          value={newPost.title}
-          onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-        />
-        <Input
-          type="text"
-          placeholder="#t a g s"
-          value={newPost.tags}
-          onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
-        />
-        <hr />
-      </div>
-      <SimpleMDE
-        className="editor"
-        value={newPost.text}
-        onChange={(value) => setNewPost({ ...newPost, text: value })}
-        options={options}
-      />
-      <div className="createPost__content__buttons">
-        <Button
-          text={isEditing ? 'Edit' : 'Publish'}
-          className="button button_colored"
-          onClick={onSubmitNewPost}
-        />
-        <Button
-          text="Cancel"
-          className="button button_cancel"
-          onClick={() => navigate('/')}
-        />
-      </div>
-    </div>
-  );
+            <div className="createPost">
+              <div className="createPost__content">
+                {newPost.image ? (
+                  <>
+                    <Button
+                      text="Delete"
+                      className="button button_delete"
+                      onClick={onDeleteImage}
+                    />
+                    <img
+                      className="createPost__content__img"
+                      src={URL.createObjectURL(newPost.image)}
+                      alt="Uploaded"
+                    />
+                  </>
+                ) : (
+                  <div className="createPost__content__upload">
+                    <Button
+                      onClick={() => imageRef.current?.click()}
+                      text="Upload image"
+                      className="button button_transparent"
+                    >
+                      <UploadSVG />
+                    </Button>
+                  </div>
+                )}
+                <input
+                  ref={imageRef}
+                  type="file"
+                  onChange={(e) =>
+                    setNewPost({
+                      ...newPost,
+                      image: e.target.files?.[0] as File,
+                    })
+                  }
+                  hidden
+                />
+
+                <TextArea
+                  placeholder="Post title..."
+                  value={newPost.title}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, title: e.target.value })
+                  }
+                />
+                  <hr />
+                {
+                !newPost.title && 
+              <div className='createPost__requiredErr'>* Required</div>
+              }
+                <Input
+                  type="text"
+                  placeholder="# t a g s"
+                  value={newPost.tags}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, tags: e.target.value })
+                  }
+                />
+                <hr />
+                {
+                !newPost.tags && 
+              <div className='createPost__requiredErr'>* Required</div>
+              }
+              </div>
+              <div className="markdown__wrapper">
+              <SimpleMDE
+                className="editor"
+                value={newPost.text}
+                onChange={(value) => setNewPost({ ...newPost, text: value })}
+                options={options}
+                />
+                {
+                  !newPost.text && 
+                <div className='createPost__requiredErr'>* Required</div>
+                }
+              </div>
+              <div className="createPost__content__buttons">
+                <Button
+                  text={isEditing ? 'Edit' : 'Publish'}
+                  className={`button ${(!newPost.title || !newPost.tags || !newPost.text) ? 'button_disabled' : 'button_colored'}`}
+                  onClick={onSubmitNewPost}
+                  disabled={!newPost.title || !newPost.tags || !newPost.text}
+                />
+                <Button
+                  text="Cancel"
+                  className="button button_cancel"
+                  onClick={() => navigate('/')}
+                />
+              </div>
+            </div>
+        );
 };

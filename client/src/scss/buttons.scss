@@ -30,4 +30,10 @@
     color: white;
     border: none;
   }
+
+  &_disabled {
+   background:  #b0afaf;
+   color: gray;
+   cursor: no-drop;
+  }
 }

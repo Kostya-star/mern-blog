@@ -27,11 +27,17 @@ const PostSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  imageUrl: String
-  // imageUrl: {
-  //   data: Buffer,
-  //   contentType: String
-  // }
+  imageUrl: String,
+  likes: {
+    usersLiked: {
+      type: [String],
+      default: [],
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+  },
 }, {
   timestamps: true
 })

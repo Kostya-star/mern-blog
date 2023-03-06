@@ -2,7 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IFetchPostById } from 'types/IFetchPostById';
 import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
+import { ILikePostResp } from 'types/ILikePostResp';
 import { IPost } from 'types/IPost';
+import { IUser } from './../../types/IUser';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
@@ -20,7 +22,7 @@ export const fetchPosts = createAsyncThunk(
 export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async ({ id, isPostView }: IFetchPostById) => {
-    const _isPostView = isPostView ? `?isPostView=true` : ''
+    const _isPostView = isPostView ? `?isPostView=true` : '';
 
     const resp = await instance.get<IPost>(`/posts/${id}${_isPostView}`);
 
@@ -47,6 +49,13 @@ export const updatePost = createAsyncThunk(
 export const deletePost = createAsyncThunk(
   'posts/deletePost',
   async (id: string) => await instance.delete(`/posts/${id}`),
+);
+
+export const likePost = createAsyncThunk(
+  'posts/onLikePost',
+  async (postId: string) => {
+    return await instance.post<ILikePostResp>(`/posts/like`, { postId });
+  },
 );
 
 export interface PostsState {

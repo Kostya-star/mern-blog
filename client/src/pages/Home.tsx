@@ -22,15 +22,13 @@ export const Home = () => {
     postsStatus,
     tagsStatus,
     commentStatus,
-    currentUserId,
-  } = useAppSelector(({ posts, tags, auth, comments }) => ({
+  } = useAppSelector(({ posts, tags, comments }) => ({
     posts: posts?.posts,
     postsStatus: posts?.status,
     tagsStatus: tags?.status,
     tags: tags?.tags,
     comments: comments?.comments,
     commentStatus: comments?.status,
-    currentUserId: auth?.data?._id,
   }));
 
   const isAuth = useAppSelector(isAuthSelector);
@@ -68,7 +66,6 @@ export const Home = () => {
               <PostItem
                 key={post._id}
                 post={post}
-                isCurrentUser={currentUserId === post.user._id}
                 deletePost={removePost}
               />
             ))}

@@ -144,11 +144,48 @@ const deletePost = async (req, res) => {
   }
 }
 
+const likePost = async (req, res) => {
+  try {
+    const { postId, userId } = req.body
+
+    const post = await PostModel.findById(postId);
+    if (!post) {
+      return res.status(404).send('Post not found');
+    }
+
+    const isPostLiked = post.likes.usersLiked.includes(userId)
+    const likesCount = post.likes.likesCount
+
+    if (isPostLiked) {
+      await PostModel.findByIdAndUpdate(
+        postId,
+        { $pull: { 'likes.usersLiked': userId }, $inc: { 'likes.likesCount': -1 } },
+        { new: true }
+      )
+      res.json({ isLiked: false, likeCount: likesCount - 1 });
+    } else {
+      await PostModel.findByIdAndUpdate(
+        postId,
+        { $push: { 'likes.usersLiked': userId }, $inc: { 'likes.likesCount': 1 } },
+        { new: true }
+      )
+      res.json({ isLiked: true, likeCount: likesCount + 1 });
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error when liking the post'
+    })
+  }
+}
+
 
 export default {
   createPost,
   getAllPosts,
   getOnePost,
   deletePost,
-  updatePost
+  updatePost,
+  likePost
 }

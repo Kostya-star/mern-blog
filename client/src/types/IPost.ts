@@ -10,5 +10,9 @@ export interface IPost {
   updatedAt: string
   viewCount: number
   commentCount: number
+  likes: {
+    usersLiked: string[],
+    likesCount: number
+  }
   user: IUser
 }

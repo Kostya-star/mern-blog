@@ -68,7 +68,7 @@ export const CreatePost = () => {
     try {
       const formData = new FormData();
       formData.append('title', newPost.title);
-      formData.append('tags', newPost.tags);
+      formData.append('tags', newPost.tags.trim());
       formData.append('text', newPost.text);
       formData.append('image', newPost.image || '');
       formData.append('postId', id as string);
@@ -145,8 +145,7 @@ export const CreatePost = () => {
           type="text"
           placeholder="# t a g s"
           value={newPost.tags}
-          pattern="^[^,#]+$"
-          required
+          title="No need to insert '#'. Insert words only"
           onChange={(e) =>
             setNewPost({
               ...newPost,

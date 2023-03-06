@@ -21,8 +21,6 @@ export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
   async ({ id, isPostView }: IFetchPostById) => {
     const _isPostView = isPostView ? `?isPostView=true` : ''
-    console.log(id, _isPostView);
-    
 
     const resp = await instance.get<IPost>(`/posts/${id}${_isPostView}`);
 

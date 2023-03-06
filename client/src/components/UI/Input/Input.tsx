@@ -10,6 +10,7 @@ interface InputProps {
   style?: CSSProperties 
   required?: boolean
   pattern?: string
+  title?: string
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void
 }

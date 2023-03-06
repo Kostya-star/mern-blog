@@ -32,49 +32,51 @@ export const FullPost = () => {
   const isAuth = useAppSelector(isAuthSelector);
   const { currentUserId, currentUserPhoto } = useAppSelector(({ auth }) => ({
     currentUserId: auth.data?._id,
-    currentUserPhoto: auth.data?.avatarUrl
-  }))
+    currentUserPhoto: auth.data?.avatarUrl,
+  }));
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const post = await dispatch(fetchPost(id as string)).unwrap();
-        setPost(post);
-        const comments = await dispatch(
-          fetchCommentsByPostId(id as string),
-        ).unwrap();
-        setComments(comments);
-      } catch (error) {
-        setError(error as any);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    if (id) {
+      (async () => {
+        try {
+          setLoading(true);
+          const post = await dispatch(fetchPost({ id, isPostView: true })).unwrap();
+          setPost(post);
+          const comments = await dispatch(fetchCommentsByPostId(id)).unwrap();
+          setComments(comments);
+        } catch (error) {
+          setError(error as any);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
   }, []);
 
   const onSubmitComment = async () => {
-    if(commentText.id && commentText.text) {
-      const updatedComment = { id: commentText.id, text: commentText.text }
-      dispatch(updateComment(updatedComment))
-      setComments(comments.map(comm => {
-        if(comm._id === commentText.id) {
-          return { ...comm, text: commentText.text }
-        }
-        return comm
-      }));
-      setCommentText({id: '', text: ''})
+    if (commentText.id && commentText.text) {
+      const updatedComment = { id: commentText.id, text: commentText.text };
+      dispatch(updateComment(updatedComment));
+      setComments(
+        comments.map((comm) => {
+          if (comm._id === commentText.id) {
+            return { ...comm, text: commentText.text };
+          }
+          return comm;
+        }),
+      );
+      setCommentText({ id: '', text: '' });
       return;
     }
     const { comment, updatedPost } = await dispatch(
       createComment({ postId: id as string, text: commentText.text }),
-      ).unwrap();
-      console.log('comment', comment);
-      console.log('updatedPost', updatedPost);
-      
-      setComments(() => [...comments, comment]);
-      setPost(updatedPost);
-      setCommentText({id: '', text: ''})
+    ).unwrap();
+    console.log('comment', comment);
+    console.log('updatedPost', updatedPost);
+
+    setComments(() => [...comments, comment]);
+    setPost(updatedPost);
+    setCommentText({ id: '', text: '' });
   };
 
   const onDeleteComment = async (commId: string) => {
@@ -99,19 +101,23 @@ export const FullPost = () => {
         comments={comments}
         onDelete={onDeleteComment}
         // onEditComment={onEditComment}
-        onEditComment={(comm) => setCommentText({ id: comm._id, text: comm.text })}
+        onEditComment={(comm) =>
+          setCommentText({ id: comm._id, text: comm.text })
+        }
         currentUserId={currentUserId}
       >
         <div className="comments__create">
           {/* <img src="https://mui.com/static/images/avatar/2.jpg" alt="" /> */}
-          <Avatar avatar={currentUserPhoto as string}/>
+          <Avatar avatar={currentUserPhoto as string} />
           <div className="comments__create__group">
             <div className="input">
               <Input
                 type="text"
                 placeholder="Write comment..."
-                value={commentText.text }
-                onChange={(e) => setCommentText({ ...commentText, text: e.target.value })}
+                value={commentText.text}
+                onChange={(e) =>
+                  setCommentText({ ...commentText, text: e.target.value })
+                }
               />
               {commentText.text && !isAuth && (
                 <div className="input_error"> you are not authenticated!</div>

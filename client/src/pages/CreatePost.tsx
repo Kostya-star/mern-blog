@@ -47,7 +47,7 @@ export const CreatePost = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchPost(id))
+      dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
           const file = base64ToFile(imageUrl);

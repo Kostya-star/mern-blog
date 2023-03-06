@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
+import { IFetchPostById } from 'types/IFetchPostById';
 import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
 import { IPost } from 'types/IPost';
 
@@ -18,8 +19,12 @@ export const fetchPosts = createAsyncThunk(
 
 export const fetchPost = createAsyncThunk(
   'posts/fetchPost',
-  async (id: string) => {
-    const resp = await instance.get<IPost>(`/posts/${id}`);
+  async ({ id, isPostView }: IFetchPostById) => {
+    const _isPostView = isPostView ? `?isPostView=true` : ''
+    console.log(id, _isPostView);
+    
+
+    const resp = await instance.get<IPost>(`/posts/${id}${_isPostView}`);
 
     return resp.data;
   },

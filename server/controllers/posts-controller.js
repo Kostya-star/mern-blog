@@ -9,7 +9,7 @@ const getAllPosts = async (req, res) => {
 
     let tag = {};
     if (tagProperty) {
-      tag.tags ={$all: [tagProperty]}
+      tag.tags = { $all: [tagProperty] }
     }
 
     const posts = await PostModel.find(tag).sort({ [sortProperty]: -1 }).populate('user').exec()
@@ -27,33 +27,24 @@ const getAllPosts = async (req, res) => {
 const getOnePost = async (req, res) => {
   try {
     const { id } = req.params
+    const isPostView = req.query.isPostView === 'true'
 
-    PostModel.findOneAndUpdate({
-      _id: id
-    },
-      {
-        $inc: { viewCount: 1 }
-      },
-      {
-        returnDocument: 'after'
-      },
-      (error, doc) => {
-        if (error) {
-          console.log(error);
-          return res.status(500).json({
-            message: 'Error when fetching the post'
-          })
-        }
+    if (isPostView) {
+      await PostModel.findByIdAndUpdate(
+        { _id: id },
+        { $inc: { viewCount: 1 } },
+        { new: true }
+      )
+    }
 
-        if (!doc) {
-          console.log(error);
-          return res.status(404).json({
-            message: 'The post is not found'
-          })
-        }
-        res.json(doc)
-      }
-    ).populate('user')
+    const post = await PostModel.findById(id).populate('user').exec()
+
+    if (!post) {
+      return res.status(404).json({
+        message: 'The post is not found'
+      })
+    }
+    res.json(post)
 
   } catch (error) {
     console.log(error);
@@ -70,10 +61,10 @@ const createPost = async (req, res) => {
 
     let imageUrl = ''
 
-    if(image) {
+    if (image) {
       imageUrl = getBase64(image)
     }
-    
+
     const post = new PostModel({
       title,
       text,
@@ -101,7 +92,7 @@ const updatePost = async (req, res) => {
 
     let imageUrl = ''
 
-    if(image) {
+    if (image) {
       imageUrl = getBase64(image)
     }
 
@@ -116,10 +107,10 @@ const updatePost = async (req, res) => {
         imageUrl
       })
 
-      res.json({
-        success: true
-      })
-  
+    res.json({
+      success: true
+    })
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -134,14 +125,14 @@ const deletePost = async (req, res) => {
 
     const post = await PostModel.findById(id)
 
-    if(!post) {
+    if (!post) {
       return res.status(404).json({
         message: 'The post is not found'
       })
     }
 
     await post.delete()
-    
+
     res.json({
       success: true
     })

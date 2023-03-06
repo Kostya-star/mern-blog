@@ -16,5 +16,7 @@ router.post('', upload.single('image'), checkAuth, postsController.createPost)
 router.patch('/edit', upload.single('image'), checkAuth, postsController.updatePost)
 router.delete('/:id', checkAuth, postsController.deletePost)
 
+router.post('/like', checkAuth, postsController.likePost)
+
 
 export default router

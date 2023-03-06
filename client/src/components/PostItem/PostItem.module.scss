@@ -109,24 +109,22 @@
 
       &__statistics {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
         gap: 20px;
         color: gray;
-
-        div {
+        svg {
+          path {
+            // fill: gray;
+          }
+        }
+        &__group {
           display: flex;
-          align-items: center;
-          // margin-right: 20px;
-          gap: 3px;
-          font-weight: 600;
-          &.comments {
-            &:hover {
-              color: black;
-              svg {
-                path {
-                  fill: black
-                }
-              }
-            }
+          svg {
+            cursor: pointer;
+          }
+          a {
+            margin-left: 20px;
           }
         }
       }

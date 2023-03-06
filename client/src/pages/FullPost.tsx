@@ -14,7 +14,6 @@ import {
   updateComment,
 } from 'redux/slices/comments';
 import { fetchPost } from 'redux/slices/posts';
-import { IComment } from './../types/IComment';
 import { IPost } from './../types/IPost';
 
 export const FullPost = () => {
@@ -25,25 +24,28 @@ export const FullPost = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [comments, setComments] = useState<IComment[]>([]);
   const [commentText, setCommentText] = useState({ id: '', text: '' });
-  // const [commentToUpdate, setCommentToUpdate] = useState<IComment | null>(null);
 
   const isAuth = useAppSelector(isAuthSelector);
-  const { currentUserId, currentUserPhoto } = useAppSelector(({ auth }) => ({
-    currentUserId: auth.data?._id,
-    currentUserPhoto: auth.data?.avatarUrl,
-  }));
+
+  const { currentUserId, currentUserPhoto, comments } = useAppSelector(
+    ({ auth, comments }) => ({
+      currentUserId: auth.data?._id,
+      currentUserPhoto: auth.data?.avatarUrl,
+      comments: comments.comments,
+    }),
+  );
 
   useEffect(() => {
     if (id) {
       (async () => {
         try {
           setLoading(true);
-          const post = await dispatch(fetchPost({ id, isPostView: true })).unwrap();
+          const post = await dispatch(
+            fetchPost({ id, isPostView: true }),
+          ).unwrap();
           setPost(post);
-          const comments = await dispatch(fetchCommentsByPostId(id)).unwrap();
-          setComments(comments);
+          dispatch(fetchCommentsByPostId(id));
         } catch (error) {
           setError(error as any);
         } finally {
@@ -57,32 +59,17 @@ export const FullPost = () => {
     if (commentText.id && commentText.text) {
       const updatedComment = { id: commentText.id, text: commentText.text };
       dispatch(updateComment(updatedComment));
-      setComments(
-        comments.map((comm) => {
-          if (comm._id === commentText.id) {
-            return { ...comm, text: commentText.text };
-          }
-          return comm;
-        }),
-      );
       setCommentText({ id: '', text: '' });
       return;
     }
-    const { comment, updatedPost } = await dispatch(
-      createComment({ postId: id as string, text: commentText.text }),
-    ).unwrap();
-    console.log('comment', comment);
-    console.log('updatedPost', updatedPost);
 
-    setComments(() => [...comments, comment]);
-    setPost(updatedPost);
+    const newComment = { postId: id as string, text: commentText.text };
+    dispatch(createComment(newComment));
     setCommentText({ id: '', text: '' });
   };
 
   const onDeleteComment = async (commId: string) => {
-    const { id, updatedPost } = await dispatch(deleteComment(commId)).unwrap();
-    setComments(comments.filter((comm) => comm._id !== id));
-    setPost(updatedPost);
+    dispatch(deleteComment(commId));
   };
 
   if (loading) {
@@ -107,7 +94,6 @@ export const FullPost = () => {
         currentUserId={currentUserId}
       >
         <div className="comments__create">
-          {/* <img src="https://mui.com/static/images/avatar/2.jpg" alt="" /> */}
           <Avatar avatar={currentUserPhoto as string} />
           <div className="comments__create__group">
             <div className="input">

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IComment } from 'types/IComment';
 import { ICreateCommentRequest } from 'types/ICreateCommentRequest';
-import { ICreateCommentResponse } from 'types/ICreateCommentResponse';
+import { IUpdateCommentReq } from 'types/IUpdateCommentReq';
 
 export const fetchComments = createAsyncThunk(
   'comments/fetchComments',
@@ -17,7 +17,6 @@ export const fetchCommentsByPostId = createAsyncThunk(
   'comments/fetchCommentsByPostId',
   async (postId: string) => {
     const resp = await instance.get<IComment[]>(`/comments/${postId}`);
-
     return resp.data;
   },
 );
@@ -25,30 +24,28 @@ export const fetchCommentsByPostId = createAsyncThunk(
 export const createComment = createAsyncThunk(
   'comments/createComment',
   async (newComment: ICreateCommentRequest) => {
-    const resp = await instance.post<ICreateCommentResponse>(
-      '/comments',
-      newComment,
-    );
-
+    const resp = await instance.post<IComment>('/comments', newComment);
     return resp.data;
   },
 );
 
 export const updateComment = createAsyncThunk(
   'comments/updateComment',
-  async (updatedComment: { id: string, text: string }) => {
-
-    return await instance.patch(`/comments/${updatedComment.id}`, {text: updatedComment.text})
-  }
+  async (updatedComment: IUpdateCommentReq) => {
+    const resp = await instance.patch<IComment>(
+      `/comments/${updatedComment.id}`,
+      { text: updatedComment.text },
+    );
+    return resp.data;
+  },
 );
 
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
   async (id: string) => {
-    const resp = await instance.delete(`/comments/${id}`)
-
-    return resp.data
-  }
+    const resp = await instance.delete<{ id: string }>(`/comments/${id}`);
+    return resp.data;
+  },
 );
 
 export interface CommentsState {
@@ -67,29 +64,72 @@ export const commentsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // FETCHING ALL COMMENTS
-      .addCase(fetchComments.pending, (state) => {
+      // FETCHING COMMENTS by post id
+      .addCase(fetchCommentsByPostId.pending, (state) => {
         state.comments = [];
         state.status = 'loading';
       })
       .addCase(
-        fetchComments.fulfilled,
+        fetchCommentsByPostId.fulfilled,
         (state, action: PayloadAction<IComment[]>) => {
           state.status = 'success';
           state.comments = action.payload;
         },
       )
-      .addCase(fetchComments.rejected, (state) => {
+      .addCase(fetchCommentsByPostId.rejected, (state) => {
         state.status = 'error';
         state.comments = [];
-      });
+      })
 
-    // DELETING A POST
-    // .addCase(deletePost.fulfilled, (state, action) => {
-    //   state.posts = state.posts.filter(
-    //     (post) => post._id !== action.meta.arg,
-    //   );
-    // });
+      // CREATE A COMMENT
+      .addCase(createComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        createComment.fulfilled,
+        (state, action: PayloadAction<IComment>) => {
+          state.status = 'success';
+          state.comments = [...state.comments, action.payload];
+        },
+      )
+      .addCase(createComment.rejected, (state) => {
+        state.status = 'error';
+        state.comments = [];
+      })
+
+      // UPDATE A COMMENT
+      .addCase(updateComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        updateComment.fulfilled,
+        (state, action: PayloadAction<IComment>) => {
+          state.status = 'success';
+
+          state.comments = state.comments.map((comment) => {
+            if (comment._id === action.payload._id) {
+              return { ...comment, text: action.payload.text };
+            }
+
+            return comment;
+          });
+        },
+      )
+      .addCase(updateComment.rejected, (state) => {
+        state.status = 'error';
+        state.comments = [];
+      })
+      // DELETE A COMMENT
+      .addCase(
+        deleteComment.fulfilled,
+        (state, action: PayloadAction<{ id: string }>) => {
+          state.status = 'success';
+
+          state.comments = state.comments.filter(
+            (comment) => comment._id !== action.payload.id,
+          );
+        },
+      );
   },
 });
 

@@ -27,9 +27,16 @@ export const PostItem: FC<IPostItemProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const currentUserId = useAppSelector(({ auth }) => auth.data?._id)
+  const { isShowEditDelete, currentUserId, commentCount } = useAppSelector(
+    ({ auth, comments }) => ({
+      currentUserId: auth.data?._id,
+      isShowEditDelete: auth.data?._id === post.user?._id,
+      commentCount: comments.comments.filter((comm) => comm.post === post._id)
+        .length,
+    }),
+  );
 
-  const isPostLiked = post.likes?.usersLiked.includes(currentUserId as string)
+  const isPostLiked = post.likes?.usersLiked.includes(currentUserId as string);
 
   const [likes, setLikes] = useState({
     isLiked: isPostLiked,
@@ -46,7 +53,7 @@ export const PostItem: FC<IPostItemProps> = ({
 
   return (
     <div className={s.post}>
-      {(currentUserId === post.user?._id) && deletePost ? (
+      {isShowEditDelete && deletePost ? (
         <div className={s.post__popupButtons}>
           <Link to={`/posts/${post._id}/edit`}>
             <EditSVG />
@@ -56,13 +63,7 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
       ) : null}
       <div className={s.post__header}>
-        {
-          post.imageUrl && (
-            // {/* <img src={`http://localhost:5000${post.imageUrl}`} alt="post img" /> */}
-            <img src={post.imageUrl} alt="post img" />
-          )
-          // {/* <img src={`${process.env.REACT_APP_API_URL}${post.imageUrl}`} alt="post img" /> */}
-        }
+        {post.imageUrl && <img src={post.imageUrl} alt="post img" />}
       </div>
       <div
         className={`${s.post__content} ${
@@ -103,7 +104,7 @@ export const PostItem: FC<IPostItemProps> = ({
               </div>
               <Link to={`/posts/${post._id}`}>
                 <CommentSVG />
-                {post.commentCount}
+                {commentCount}
               </Link>
             </div>
             <div>

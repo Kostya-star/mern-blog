@@ -46,36 +46,9 @@ const createComment = async (req, res) => {
     })
 
     await comment.save()
+    await comment.populate('user')
 
-    PostModel.findOneAndUpdate({
-      _id: postId
-    },
-      {
-        $inc: { commentCount: 1 }
-      },
-      {
-        returnDocument: 'after'
-      },
-      async (error, doc) => {
-        if (error) {
-          console.log(error);
-          return res.status(500).json({
-            message: 'Error when creating the comment'
-          })
-        }
-
-        if (!doc) {
-          console.log(error);
-          return res.status(404).json({
-            message: 'The post is not found'
-          })
-        }
-        await comment.populate('user')
-        await doc.populate('user')
-        res.json({ comment, updatedPost: doc })
-      },
-    )
-
+    res.json(comment)
 
   } catch (error) {
     console.log(error)
@@ -90,16 +63,14 @@ const updateComment = async (req, res) => {
     const { id } = req.params
     const { text } = req.body
 
-    await CommentModel.updateOne({
-      _id: id
-    },
-    {
-      text
-    })
+    const comment = await CommentModel.findByIdAndUpdate(
+      { _id: id },
+      { text },
+      { new: true }
+    )
 
-    res.json({
-      success: true
-    })
+    await comment.populate('user')
+    res.json(comment)
 
   } catch (error) {
     console.log(error)
@@ -122,34 +93,7 @@ const deleteComment = async (req, res) => {
     }
 
     await comment.delete()
-
-    PostModel.findByIdAndUpdate({
-      _id: comment.post
-    },
-      {
-        $inc: { commentCount: -1 }
-      },
-      {
-        returnDocument: 'after'
-      },
-      async (error, doc) => {
-        if (error) {
-          console.log(error);
-          return res.status(500).json({
-            message: 'Error when creating the comment'
-          })
-        }
-
-        if (!doc) {
-          console.log(error);
-          return res.status(404).json({
-            message: 'The post is not found'
-          })
-        }
-        await doc.populate('user')
-        res.json({id: comment._id, updatedPost: doc})
-      }
-    )
+    res.json({ id: comment._id })
 
   } catch (error) {
     console.log(error)

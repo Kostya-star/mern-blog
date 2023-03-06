@@ -5,7 +5,7 @@ import { ReactComponent as EyeSVG } from 'assets/eye.svg';
 import { ReactComponent as ThumbsUpSVG } from 'assets/thumb-up.svg';
 import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.svg';
 import { Avatar } from 'components/Avatar/Avatar';
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { IPost } from 'types/IPost';
@@ -27,12 +27,11 @@ export const PostItem: FC<IPostItemProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const { isShowEditDelete, currentUserId, commentCount } = useAppSelector(
+  const { isShowEditDelete, currentUserId } = useAppSelector(
     ({ auth, comments }) => ({
       currentUserId: auth.data?._id,
       isShowEditDelete: auth.data?._id === post.user?._id,
-      commentCount: comments.comments.filter((comm) => comm.post === post._id)
-        .length,
+      // commentCount: 
     }),
   );
 
@@ -42,6 +41,12 @@ export const PostItem: FC<IPostItemProps> = ({
     isLiked: isPostLiked,
     likeCount: post.likes?.likesCount,
   });
+
+  const [commentCount, setCommentCount] = useState(post.commentCount)
+
+  useEffect(() => {
+    setCommentCount(post.commentCount)
+  }, [post.commentCount])
 
   const timestamp = new Date(post.createdAt);
   const time = createTimeSince(timestamp);

@@ -45,6 +45,12 @@ const createComment = async (req, res) => {
       post: postId
     })
 
+    await PostModel.findByIdAndUpdate(
+      { _id: postId },
+      { $inc: { commentCount: 1 } },
+      { new: true }
+    )
+
     await comment.save()
     await comment.populate('user')
 
@@ -93,6 +99,13 @@ const deleteComment = async (req, res) => {
     }
 
     await comment.delete()
+
+    await PostModel.findByIdAndUpdate(
+      { _id: postId },
+      { $inc: { commentCount: 1 } },
+      { new: true }
+    )
+
     res.json({ id: comment._id })
 
   } catch (error) {

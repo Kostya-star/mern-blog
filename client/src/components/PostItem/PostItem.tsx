@@ -15,26 +15,28 @@ import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { fetchPosts, likePost } from 'redux/slices/posts';
+import { fetchCommentsByPostId } from 'redux/slices/comments';
+import { deletePost } from './../../redux/slices/posts';
 
 interface IPostItemProps {
   post: IPost;
   isPostText?: boolean;
-  deletePost?: (id: string) => void;
-  fetchCommsByPostId?: (postId: string) => void
+  // deletePost?: (id: string) => void;
+  // fetchCommsByPostId?: (postId: string) => void
 }
 
 export const PostItem: FC<IPostItemProps> = ({
   post,
   isPostText,
-  deletePost,
-  fetchCommsByPostId
+  // deletePost,
+  // fetchCommsByPostId
 }) => {
   const dispatch = useAppDispatch();
 
   const { isShowEditDelete, isPostLiked } = useAppSelector(
-    ({ auth }) => ({
+    ({ auth, }) => ({
       isShowEditDelete: auth.data?._id === post.user?._id,
-      isPostLiked: post.likes?.usersLiked.includes(auth.data?._id as string)
+      isPostLiked: post.likes?.usersLiked.includes(auth.data?._id as string),
     }),
   );
 
@@ -42,26 +44,34 @@ export const PostItem: FC<IPostItemProps> = ({
     isLiked: isPostLiked,
     likeCount: post.likes?.likesCount,
   });
-
+  
   const [isShowText, setShowText] = useState(false)
-
-  const timestamp = new Date(post.createdAt);
-  const time = createTimeSince(timestamp);
-
+  
   const onClickLike = async (postId: string) => {
     const { data } = await dispatch(likePost(postId)).unwrap();
     setLikes({ isLiked: data.isLiked, likeCount: data.likeCount });
   };
 
+  const fetchCommsByPostId = (postId: string) => {
+    dispatch(fetchCommentsByPostId(postId));
+  };
+
+  const removePost = (id: string) => {
+    dispatch(deletePost(id));
+  };
+
+  const timestamp = new Date(post.createdAt);
+  const time = createTimeSince(timestamp);
+
   return (
     <div className={s.post}>
-      {isShowEditDelete && deletePost ? (
+      {isShowEditDelete ? (
         <div className={s.post__popupButtons}>
           <Link to={`/posts/${post._id}/edit`}>
             <EditSVG />
           </Link>
 
-          <CloseSVG onClick={() => deletePost(post._id)} />
+          <CloseSVG onClick={() => removePost(post._id)} />
         </div>
       ) : null}
       <div className={s.post__header}>
@@ -120,9 +130,7 @@ export const PostItem: FC<IPostItemProps> = ({
                 {likes.likeCount}
               </div>
               <div
-                onClick={() =>
-                  fetchCommsByPostId && fetchCommsByPostId(post._id)
-                }
+                onClick={() => fetchCommsByPostId(post._id) }
               >
                 <CommentSVG />
                 {post.commentCount}

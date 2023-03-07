@@ -9,6 +9,7 @@ interface IButtonProps {
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode
   type?: "button" | "reset" | "submit" 
+  title?: string
 }
 
 export const Button: FC<IButtonProps> = ({ children, text, ...props }) => {

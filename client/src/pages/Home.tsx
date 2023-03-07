@@ -15,21 +15,15 @@ import { isAuthSelector } from 'redux/slices/auth';
 export const Home = () => {
   const dispatch = useAppDispatch();
 
-  const {
-    posts,
-    tags,
-    comments,
-    postsStatus,
-    tagsStatus,
-    commentStatus,
-  } = useAppSelector(({ posts, tags, comments }) => ({
-    posts: posts?.posts,
-    postsStatus: posts?.status,
-    tagsStatus: tags?.status,
-    tags: tags?.tags,
-    comments: comments?.comments,
-    commentStatus: comments?.status,
-  }));
+  const { posts, tags, postsStatus, tagsStatus, commentStatus } =
+    useAppSelector(({ posts, tags, comments }) => ({
+      posts: posts?.posts,
+      postsStatus: posts?.status,
+      tagsStatus: tags?.status,
+      tags: tags?.tags,
+      commentStatus: comments?.status,
+      commentCount: comments.comments?.length
+    }));
 
   const isAuth = useAppSelector(isAuthSelector);
 
@@ -43,14 +37,10 @@ export const Home = () => {
     dispatch(fetchPosts({ sortedCat }));
   };
 
-  const removePost = (id: string) => {
-    dispatch(deletePost(id));
-  };
-  // COMMENTS---------------------------
 
-  const fetchCommsByPostId = (postId: string) => {
-    dispatch(fetchCommentsByPostId(postId));
-  }
+  // const fetchCommsByPostId = (postId: string) => {
+  //   dispatch(fetchCommentsByPostId(postId));
+  // };
 
   return (
     <div className="home__wrapper">
@@ -71,8 +61,8 @@ export const Home = () => {
               <PostItem
                 key={post._id}
                 post={post}
-                deletePost={removePost}
-                fetchCommsByPostId={fetchCommsByPostId}
+                // deletePost={removePost}
+                // fetchCommsByPostId={fetchCommsByPostId}
               />
             ))}
         </div>
@@ -83,7 +73,11 @@ export const Home = () => {
 
           {commentStatus === 'loading' && <div>Loading...</div>}
           {commentStatus === 'error' && <div>ERROR</div>}
-          {commentStatus === 'success' && <Comments comments={comments} />}
+          {commentStatus === 'success' && (
+            <div className="home__content__comments">
+              <Comments />
+            </div>
+          )}
         </div>
       </div>
     </div>

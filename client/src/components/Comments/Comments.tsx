@@ -3,33 +3,34 @@ import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
-import { FC, Fragment, ReactNode, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
-import { createComment, deleteComment, updateComment } from 'redux/slices/comments';
-import { IComment } from 'types/IComment';
+import {
+  createComment,
+  deleteComment,
+  updateComment,
+} from 'redux/slices/comments';
 import { createTimeSince } from 'utils/createTimeSince';
-import s from './Comments.module.scss';
 import { useAppDispatch } from './../../redux/hooks';
+import s from './Comments.module.scss';
 
-interface ICommentsProps {
-  comments: IComment[];
-}
+interface ICommentsProps {}
 
-export const Comments: FC<ICommentsProps> = ({
-  comments,
-}) => {
-  const [commentText, setCommentText] = useState({ id: '', text: '' });
-
+export const Comments: FC<ICommentsProps> = () => {
   const isAuth = useAppSelector(isAuthSelector);
 
-  const { currentUserPhoto, currentUserId } = useAppSelector(
-    ({ auth }) => ({
+  const { currentUserPhoto, currentUserId, comments, postId } = useAppSelector(
+    ({ auth, comments }) => ({
       currentUserPhoto: auth.data?.avatarUrl,
-      currentUserId: auth.data?._id
+      currentUserId: auth.data?._id,
+      comments: comments.comments,
+      postId: comments.currentPost,
     }),
   );
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
+
+  const [commentText, setCommentText] = useState({ id: '', text: '' });
 
   const onSubmitComment = async () => {
     if (commentText.id && commentText.text) {
@@ -38,8 +39,7 @@ export const Comments: FC<ICommentsProps> = ({
       setCommentText({ id: '', text: '' });
       return;
     }
-// @ts-expect-error
-    const newComment = { postId: id as string, text: commentText.text };
+    const newComment = { postId, text: commentText.text };
     dispatch(createComment(newComment));
     setCommentText({ id: '', text: '' });
   };
@@ -47,7 +47,6 @@ export const Comments: FC<ICommentsProps> = ({
   const onDeleteComment = async (commId: string) => {
     dispatch(deleteComment(commId));
   };
-
 
   return (
     <div className={s.comments}>
@@ -60,11 +59,15 @@ export const Comments: FC<ICommentsProps> = ({
           <Fragment key={comment._id}>
             <div className={s.comment}>
               {currentUserId === comment.user._id && (
-                  <div className={s.comment__edit_delete}>
-                    <EditSVG onClick={() =>  setCommentText({ id: comment._id, text: comment.text })} />
-                    <CloseSVG onClick={() => onDeleteComment(comment._id)} />
-                  </div>
-                )}
+                <div className={s.comment__edit_delete}>
+                  <EditSVG
+                    onClick={() =>
+                      setCommentText({ id: comment._id, text: comment.text })
+                    }
+                  />
+                  <CloseSVG onClick={() => onDeleteComment(comment._id)} />
+                </div>
+              )}
               <Avatar avatar={comment.user?.avatarUrl as string} />
               <div className={s.comment__body}>
                 <p>{comment?.user.fullName}</p>
@@ -95,11 +98,21 @@ export const Comments: FC<ICommentsProps> = ({
           </div>
 
           <Button
-            className="button button_colored"
-            text={commentText.text && commentText.id ? 'Update' : 'Comment'}
+            className={`button ${
+              commentText.text ? `button_colored` : 'button_disabled'
+            }`}
+            title={!commentText.text ? 'Insert comment please!' : ''}
+            text={commentText.id ? 'Update' : 'Comment'}
             onClick={onSubmitComment}
             disabled={!commentText.text || !isAuth}
           />
+          {commentText.id && (
+            <Button
+              text="Cancel update"
+              className="button button_cancel"
+              onClick={() => setCommentText({ id: '', text: '' })}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -111,6 +111,7 @@
         display: flex;
         justify-content: end;
         color: $blue_light;
+        padding-right: 50px;
         p {
           display: flex;
           align-items: center;
@@ -118,7 +119,7 @@
           cursor: pointer;
         }
         svg {
-          width: 30px;
+          width: 25px;
         }
       }
 
@@ -135,6 +136,7 @@
         }
         &__group {
           display: flex;
+          gap: 20px;
           svg {
             cursor: pointer;
           }

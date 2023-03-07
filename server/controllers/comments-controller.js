@@ -100,7 +100,7 @@ const deleteComment = async (req, res) => {
       
     await comment.delete()
 
-    res.json({ id })
+    res.json({ id, postId: comment.post })
 
   } catch (error) {
     console.log(error)

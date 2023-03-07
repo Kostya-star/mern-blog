@@ -71,7 +71,26 @@ const initialState: PostsState = {
 export const postsSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {},
+  reducers: {
+    updateCommentCount: (
+      state,
+      action: PayloadAction<{ postId: string; operation: string }>,
+    ) => {
+      const postId = action.payload.postId;
+      const operation = action.payload.operation;
+
+      state.posts = state.posts.map((post) => {
+        if (post._id === postId) {
+          if (operation === 'plus') {
+            post = { ...post, commentCount: post.commentCount + 1 };
+          } else if (operation === 'minus') {
+            post = { ...post, commentCount: post.commentCount - 1 };
+          }
+        }
+        return post;
+      });
+    },
+  },
   extraReducers: (builder) => {
     builder
       // FETCHING ALL POSTS
@@ -100,6 +119,6 @@ export const postsSlice = createSlice({
   },
 });
 
-export const {} = postsSlice.actions;
+export const { updateCommentCount } = postsSlice.actions;
 
 export default postsSlice.reducer;

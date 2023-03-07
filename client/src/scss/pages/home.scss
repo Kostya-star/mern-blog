@@ -23,6 +23,10 @@
       flex-direction: column;
       gap: 30px;
       // width: 40%;
+      .home__content__comments {
+        position: sticky;
+        top: 70px;
+      }
     }
   }
 

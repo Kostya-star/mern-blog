@@ -72,7 +72,7 @@ export const FullPost = () => {
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments comments={comments} />
+      <Comments />
     </div>
   );
 };

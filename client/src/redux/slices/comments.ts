@@ -3,6 +3,7 @@ import { instance } from 'API/instance';
 import { IComment } from 'types/IComment';
 import { ICreateCommentRequest } from 'types/ICreateCommentRequest';
 import { IUpdateCommentReq } from 'types/IUpdateCommentReq';
+import { updateCommentCount } from './posts';
 
 export const fetchComments = createAsyncThunk(
   'comments/fetchComments',
@@ -17,14 +18,17 @@ export const fetchCommentsByPostId = createAsyncThunk(
   'comments/fetchCommentsByPostId',
   async (postId: string) => {
     const resp = await instance.get<IComment[]>(`/comments/${postId}`);
-    return resp.data;
+    return { comments: resp.data, currentPost: postId };
   },
 );
 
 export const createComment = createAsyncThunk(
   'comments/createComment',
-  async (newComment: ICreateCommentRequest) => {
+  async (newComment: ICreateCommentRequest, thunkApi) => {
     const resp = await instance.post<IComment>('/comments', newComment);
+    thunkApi.dispatch(
+      updateCommentCount({ postId: resp.data.post, operation: 'plus' }),
+    );
     return resp.data;
   },
 );
@@ -42,18 +46,25 @@ export const updateComment = createAsyncThunk(
 
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
-  async (commId: string) => {
-    const resp = await instance.delete<{ id: string }>(`/comments/${commId}`);
+  async (commId: string, thunkApi) => {
+    const resp = await instance.delete<{ id: string; postId: string }>(
+      `/comments/${commId}`,
+    );
+    thunkApi.dispatch(
+      updateCommentCount({ postId: resp.data.postId, operation: 'minus' }),
+    );
     return resp.data;
   },
 );
 
 export interface CommentsState {
+  currentPost: string;
   comments: IComment[];
   status: string;
 }
 
 const initialState: CommentsState = {
+  currentPost: '',
   comments: [],
   status: '',
 };
@@ -71,9 +82,13 @@ export const commentsSlice = createSlice({
       })
       .addCase(
         fetchCommentsByPostId.fulfilled,
-        (state, action: PayloadAction<IComment[]>) => {
+        (
+          state,
+          action: PayloadAction<{ comments: IComment[]; currentPost: string }>,
+        ) => {
           state.status = 'success';
-          state.comments = action.payload;
+          state.comments = action.payload.comments;
+          state.currentPost = action.payload.currentPost;
         },
       )
       .addCase(fetchCommentsByPostId.rejected, (state) => {
@@ -82,9 +97,6 @@ export const commentsSlice = createSlice({
       })
 
       // CREATE A COMMENT
-      .addCase(createComment.pending, (state) => {
-        state.status = 'loading';
-      })
       .addCase(
         createComment.fulfilled,
         (state, action: PayloadAction<IComment>) => {
@@ -98,9 +110,6 @@ export const commentsSlice = createSlice({
       })
 
       // UPDATE A COMMENT
-      .addCase(updateComment.pending, (state) => {
-        state.status = 'loading';
-      })
       .addCase(
         updateComment.fulfilled,
         (state, action: PayloadAction<IComment>) => {

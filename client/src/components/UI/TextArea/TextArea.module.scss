@@ -3,8 +3,9 @@
   outline: none;
   resize: none;
   width: 100%;
-  font-size: 45px;
-  font-weight: 800;
+  padding: 10px;
+  // font-size: 45px;
+  font-weight: 600;
   &::placeholder {
     color: gray;
   }

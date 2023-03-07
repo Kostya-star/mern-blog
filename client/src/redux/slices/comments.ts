@@ -72,7 +72,13 @@ const initialState: CommentsState = {
 export const commentsSlice = createSlice({
   name: 'comments',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCommentsSlice: (state) => {
+      state.comments = []
+      state.currentPost = ''
+      state.status = ''
+    }
+  },
   extraReducers: (builder) => {
     builder
       // FETCHING COMMENTS by post id
@@ -141,6 +147,6 @@ export const commentsSlice = createSlice({
   },
 });
 
-export const {} = commentsSlice.actions;
+export const {clearCommentsSlice} = commentsSlice.actions;
 
 export default commentsSlice.reducer;

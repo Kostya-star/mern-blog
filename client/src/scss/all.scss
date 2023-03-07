@@ -22,13 +22,6 @@
   // padding-bottom: 500px;
 }
 
-.input {
-  margin-bottom: 20px;
-
-  &_error {
-    color: tomato;
-  }
-}
 
 .app-body {
   height: 100%;
@@ -38,4 +31,16 @@
   background: radial-gradient(circle, rgba(232,208,219,1) 0%, rgba(226,247,244,1) 100%);
   padding-top: 40px;
   padding-bottom: 50px;
+}
+
+.input {
+  margin-bottom: 20px;
+
+  &_error {
+    color: tomato;
+  }
+}
+
+form {
+  width: 100%;
 }

@@ -90,11 +90,11 @@ export const PostItem: FC<IPostItemProps> = ({
           </div>
         </div>
         <div className={s.post__content__body}>
-          <Link to={`/posts/${post._id}`}>
+          {/* <Link to={`/posts/${post._id}`}> */}
             <div className={s.post__content__body__heading}>
               <h2>{post.title}</h2>
             </div>
-          </Link>
+          {/* </Link> */}
 
           <div className={s.post__content__body__tags}>
             {post.tags?.map((tag, ind) => (

@@ -5,6 +5,7 @@ import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
 import { ILikePostResp } from 'types/ILikePostResp';
 import { IPost } from 'types/IPost';
 import { IUser } from './../../types/IUser';
+import { clearCommentsSlice } from './comments';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
@@ -48,7 +49,10 @@ export const updatePost = createAsyncThunk(
 
 export const deletePost = createAsyncThunk(
   'posts/deletePost',
-  async (id: string) => await instance.delete(`/posts/${id}`),
+  async (id: string, thunkApi) => {
+    await instance.delete(`/posts/${id}`)
+    thunkApi.dispatch(clearCommentsSlice())
+  }
 );
 
 export const likePost = createAsyncThunk(

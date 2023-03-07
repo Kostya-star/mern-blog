@@ -1,4 +1,4 @@
-import React, { FC, ChangeEvent, FocusEvent } from 'react';
+import React, { FC, ChangeEvent, FocusEvent, forwardRef, Ref, FormEvent } from 'react';
 
 import s from './TextArea.module.scss'
 
@@ -7,15 +7,17 @@ interface ITextAreaProps {
   placeholder: string
   value: string
   name?: string
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void
   onBlur?: (e: FocusEvent<HTMLTextAreaElement>) => void
+  onInput?: (e: ChangeEvent<HTMLTextAreaElement>) => void
   required?: boolean
+  ref?: Ref<HTMLTextAreaElement>
 }
 
-export const TextArea:FC<ITextAreaProps> = ({ ...props }) => {
+export const TextArea:FC<ITextAreaProps> = forwardRef((props, ref) => {
   return (
     <>
-      <textarea { ...props }  className={s.textarea}></textarea>
+      <textarea { ...props } ref={ref}  className={s.textarea}></textarea>
     </>
   );
-};
+});

@@ -68,11 +68,17 @@ export const FullPost = () => {
   }
 
   return (
-    <div className="fullPost">
-      <div className="post">
+    <div >
+      <div >
         <PostItem isPostText={true} post={post} />
       </div>
       <Comments />
     </div>
+    // <div className="fullPost">
+    //   <div className="post">
+    //     <PostItem isPostText={true} post={post} />
+    //   </div>
+    //   <Comments />
+    // </div>
   );
 };

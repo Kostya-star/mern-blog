@@ -106,6 +106,21 @@
           }
         }
       }
+      
+      &__dropdown {
+        display: flex;
+        justify-content: end;
+        color: $blue_light;
+        p {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+        }
+        svg {
+          width: 30px;
+        }
+      }
 
       &__statistics {
         display: flex;

@@ -4,6 +4,8 @@ import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
 import { ReactComponent as ThumbsUpSVG } from 'assets/thumb-up.svg';
 import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.svg';
+import { ReactComponent as CircleDownSVG } from 'assets/circle-down.svg';
+import { ReactComponent as CircleUpSVG } from 'assets/circle-up.svg';
 import { Avatar } from 'components/Avatar/Avatar';
 import { FC, useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -18,35 +20,30 @@ interface IPostItemProps {
   post: IPost;
   isPostText?: boolean;
   deletePost?: (id: string) => void;
+  fetchCommsByPostId?: (postId: string) => void
 }
 
 export const PostItem: FC<IPostItemProps> = ({
   post,
   isPostText,
   deletePost,
+  fetchCommsByPostId
 }) => {
   const dispatch = useAppDispatch();
 
-  const { isShowEditDelete, currentUserId } = useAppSelector(
-    ({ auth, comments }) => ({
-      currentUserId: auth.data?._id,
+  const { isShowEditDelete, isPostLiked } = useAppSelector(
+    ({ auth }) => ({
       isShowEditDelete: auth.data?._id === post.user?._id,
-      // commentCount: 
+      isPostLiked: post.likes?.usersLiked.includes(auth.data?._id as string)
     }),
   );
-
-  const isPostLiked = post.likes?.usersLiked.includes(currentUserId as string);
 
   const [likes, setLikes] = useState({
     isLiked: isPostLiked,
     likeCount: post.likes?.likesCount,
   });
 
-  const [commentCount, setCommentCount] = useState(post.commentCount)
-
-  useEffect(() => {
-    setCommentCount(post.commentCount)
-  }, [post.commentCount])
+  const [isShowText, setShowText] = useState(false)
 
   const timestamp = new Date(post.createdAt);
   const time = createTimeSince(timestamp);
@@ -96,7 +93,22 @@ export const PostItem: FC<IPostItemProps> = ({
               </Link>
             ))}
           </div>
-          {isPostText && (
+          <div className={s.post__content__body__dropdown}>
+            <p onClick={() => setShowText(!isShowText)}>
+              {isShowText ? (
+                <>
+                  <span>Close text</span>
+                  <CircleUpSVG />
+                </>
+              ) : (
+                <>
+                  <span>Show text</span>
+                  <CircleDownSVG />
+                </>
+              )}
+            </p>
+          </div>
+          {isShowText && (
             <div className={s.post__content__body__text}>
               <ReactMarkdown children={post.text} />
             </div>
@@ -107,10 +119,14 @@ export const PostItem: FC<IPostItemProps> = ({
                 {likes.isLiked ? <ThumbsUpColoredSVG /> : <ThumbsUpSVG />}
                 {likes.likeCount}
               </div>
-              <Link to={`/posts/${post._id}`}>
+              <div
+                onClick={() =>
+                  fetchCommsByPostId && fetchCommsByPostId(post._id)
+                }
+              >
                 <CommentSVG />
-                {commentCount}
-              </Link>
+                {post.commentCount}
+              </div>
             </div>
             <div>
               <EyeSVG />

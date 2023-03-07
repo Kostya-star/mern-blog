@@ -91,22 +91,16 @@ const deleteComment = async (req, res) => {
     const { id } = req.params
 
     const comment = await CommentModel.findById(id)
-
-    if (!comment) {
-      return res.status(404).json({
-        message: 'The comment is not found'
-      })
-    }
-
+    
+    await PostModel.findByIdAndUpdate(
+      { _id: comment.post },
+      { $inc: { commentCount: -1 } },
+      { new: true }
+      )
+      
     await comment.delete()
 
-    await PostModel.findByIdAndUpdate(
-      { _id: postId },
-      { $inc: { commentCount: 1 } },
-      { new: true }
-    )
-
-    res.json({ id: comment._id })
+    res.json({ id })
 
   } catch (error) {
     console.log(error)

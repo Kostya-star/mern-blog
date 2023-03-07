@@ -24,17 +24,9 @@ export const FullPost = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [commentText, setCommentText] = useState({ id: '', text: '' });
-
-  const isAuth = useAppSelector(isAuthSelector);
-
-  const { currentUserId, currentUserPhoto, comments } = useAppSelector(
-    ({ auth, comments }) => ({
-      currentUserId: auth.data?._id,
-      currentUserPhoto: auth.data?.avatarUrl,
-      comments: comments.comments,
-    }),
-  );
+  const { comments } = useAppSelector(({ comments }) => ({
+    comments: comments.comments,
+  }));
 
   useEffect(() => {
     if (id) {
@@ -55,22 +47,18 @@ export const FullPost = () => {
     }
   }, []);
 
-  const onSubmitComment = async () => {
-    if (commentText.id && commentText.text) {
-      const updatedComment = { id: commentText.id, text: commentText.text };
-      dispatch(updateComment(updatedComment));
-      setCommentText({ id: '', text: '' });
-      return;
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        try {
+          const post = await dispatch(fetchPost({ id })).unwrap();
+          setPost(post);
+        } catch (error) {
+          setError(error as any);
+        }
+      })();
     }
-
-    const newComment = { postId: id as string, text: commentText.text };
-    dispatch(createComment(newComment));
-    setCommentText({ id: '', text: '' });
-  };
-
-  const onDeleteComment = async (commId: string) => {
-    dispatch(deleteComment(commId));
-  };
+  }, [comments.length]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -84,41 +72,7 @@ export const FullPost = () => {
       <div className="post">
         <PostItem isPostText={true} post={post} />
       </div>
-      <Comments
-        comments={comments}
-        onDelete={onDeleteComment}
-        // onEditComment={onEditComment}
-        onEditComment={(comm) =>
-          setCommentText({ id: comm._id, text: comm.text })
-        }
-        currentUserId={currentUserId}
-      >
-        <div className="comments__create">
-          <Avatar avatar={currentUserPhoto as string} />
-          <div className="comments__create__group">
-            <div className="input">
-              <Input
-                type="text"
-                placeholder="Write comment..."
-                value={commentText.text}
-                onChange={(e) =>
-                  setCommentText({ ...commentText, text: e.target.value })
-                }
-              />
-              {commentText.text && !isAuth && (
-                <div className="input_error"> you are not authenticated!</div>
-              )}
-            </div>
-
-            <Button
-              className="button button_colored"
-              text={commentText.text && commentText.id ? 'Update' : 'Comment'}
-              onClick={onSubmitComment}
-              disabled={!commentText.text || !isAuth}
-            />
-          </div>
-        </div>
-      </Comments>
+      <Comments comments={comments} />
     </div>
   );
 };

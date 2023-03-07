@@ -3,7 +3,7 @@ import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Tags } from 'components/Tags/Tags';
 import { useEffect } from 'react';
-import { fetchComments } from 'redux/slices/comments';
+import { fetchComments, fetchCommentsByPostId } from 'redux/slices/comments';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
@@ -46,6 +46,11 @@ export const Home = () => {
   const removePost = (id: string) => {
     dispatch(deletePost(id));
   };
+  // COMMENTS---------------------------
+
+  const fetchCommsByPostId = (postId: string) => {
+    dispatch(fetchCommentsByPostId(postId));
+  }
 
   return (
     <div className="home__wrapper">
@@ -67,6 +72,7 @@ export const Home = () => {
                 key={post._id}
                 post={post}
                 deletePost={removePost}
+                fetchCommsByPostId={fetchCommsByPostId}
               />
             ))}
         </div>

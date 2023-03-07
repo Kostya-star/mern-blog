@@ -42,8 +42,8 @@ export const updateComment = createAsyncThunk(
 
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
-  async (id: string) => {
-    const resp = await instance.delete<{ id: string }>(`/comments/${id}`);
+  async (commId: string) => {
+    const resp = await instance.delete<{ id: string }>(`/comments/${commId}`);
     return resp.data;
   },
 );
@@ -124,7 +124,6 @@ export const commentsSlice = createSlice({
         deleteComment.fulfilled,
         (state, action: PayloadAction<{ id: string }>) => {
           state.status = 'success';
-
           state.comments = state.comments.filter(
             (comment) => comment._id !== action.payload.id,
           );

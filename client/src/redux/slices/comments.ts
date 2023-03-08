@@ -57,6 +57,28 @@ export const deleteComment = createAsyncThunk(
   },
 );
 
+export const likeComment = createAsyncThunk(
+  'comments/likeComment',
+  async (
+    { commId, currentUserId }: { commId: string; currentUserId: string },
+    thunkApi,
+  ) => {
+    const { data } = await instance.post<{ isLiked: boolean }>(
+      `/comments/like`,
+      {
+        commId,
+      },
+    );
+    thunkApi.dispatch(
+      updateCommentLike({
+        isLiked: data.isLiked,
+        commId,
+        userId: currentUserId,
+      }),
+    );
+  },
+);
+
 export interface CommentsState {
   currentPost: string;
   comments: IComment[];
@@ -74,10 +96,32 @@ export const commentsSlice = createSlice({
   initialState,
   reducers: {
     clearCommentsSlice: (state) => {
-      state.comments = []
-      state.currentPost = ''
-      state.status = ''
-    }
+      state.comments = [];
+      state.currentPost = '';
+      state.status = '';
+    },
+    updateCommentLike: (
+      state,
+      action: PayloadAction<{
+        isLiked: boolean;
+        commId: string;
+        userId: string;
+      }>,
+    ) => {
+      const { isLiked, commId, userId } = action.payload;
+
+      const commToUpdate = state.comments.find(
+        (comm) => comm._id === commId,
+      ) as IComment;
+
+      if (isLiked) {
+        commToUpdate?.usersLiked?.push(userId);
+      } else {
+        commToUpdate.usersLiked = commToUpdate?.usersLiked?.filter(
+          (id) => id !== userId,
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -147,6 +191,6 @@ export const commentsSlice = createSlice({
   },
 });
 
-export const {clearCommentsSlice} = commentsSlice.actions;
+export const { clearCommentsSlice, updateCommentLike } = commentsSlice.actions;
 
 export default commentsSlice.reducer;

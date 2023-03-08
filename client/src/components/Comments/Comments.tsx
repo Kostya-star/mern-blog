@@ -7,6 +7,7 @@ import { isAuthSelector } from 'redux/slices/auth';
 import {
   createComment,
   deleteComment,
+  likeComment,
   updateComment,
 } from 'redux/slices/comments';
 import { createTimeSince } from 'utils/createTimeSince';
@@ -54,7 +55,7 @@ export const Comments: FC<ICommentsProps> = () => {
   };
 
   const onDeleteComment = async (commId: string) => {
-    dispatch(deleteComment(commId));
+    dispatch(deleteComment(commId))
   };
 
   return (
@@ -68,10 +69,10 @@ export const Comments: FC<ICommentsProps> = () => {
             key={comment._id}
             comment={comment}
             currentUserId={currentUserId}
-            setCommentText={setCommentText}
-            onDeleteComment={onDeleteComment}
             commRef={sidebarCommentsRef}
             creationTime={creationTime}
+            setCommentText={setCommentText}
+            onDeleteComment={onDeleteComment}
           />
         );
       })}
@@ -98,7 +99,7 @@ export const Comments: FC<ICommentsProps> = () => {
           <div className={s.comments__create__buttons}>
             <Button
               className={`button ${
-                commentText.text && !/^\s*$/.test(commentText.text)
+                (commentText.text && !/^\s*$/.test(commentText.text)) && isAuth
                   ? `button_colored`
                   : 'button_disabled'
               }`}

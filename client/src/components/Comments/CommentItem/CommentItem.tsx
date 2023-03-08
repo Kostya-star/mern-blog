@@ -1,9 +1,13 @@
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
+import { ReactComponent as ThumbUpSVG } from 'assets/thumb-up.svg';
+import { ReactComponent as ThumbUpColoredSVG } from 'assets/thumbs-up-colored.svg';
 import { Avatar } from 'components/Avatar/Avatar';
-import { FC, LegacyRef, memo } from 'react';
+import { FC, LegacyRef, memo, useState } from 'react';
 import { IComment } from 'types/IComment';
 import s from './CommentItem.module.scss';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { likeComment } from 'redux/slices/comments';
 
 interface ICommentItemProps {
   comment: IComment;
@@ -22,6 +26,16 @@ export const CommentItem: FC<ICommentItemProps> = ({
   setCommentText,
   onDeleteComment,
 }) => {
+  const dispatch = useAppDispatch()
+
+  const isCommLiked = comment.usersLiked.includes(currentUserId as string)
+
+  const onLikeComment = async (commId: string) => {
+    if(currentUserId) {
+      await dispatch(likeComment({ commId, currentUserId }))
+    }
+  }
+
   return (
     <div className={s.comment__wrapper} ref={commRef}>
       <div className={s.comment}>
@@ -41,7 +55,13 @@ export const CommentItem: FC<ICommentItemProps> = ({
           <p>{comment.text}</p>
         </div>
       </div>
-      <span className={s.comment__time}>{creationTime}</span>
+      <div className={s.comment__footer}>
+        <p onClick={() => onLikeComment(comment._id)}>
+          {isCommLiked ? <ThumbUpColoredSVG /> : <ThumbUpSVG />}
+          {comment.usersLiked.length}
+        </p>
+        <span className={s.comment__time}>{creationTime}</span>
+      </div>
       <hr />
     </div>
   );

@@ -6,5 +6,6 @@ export interface IComment {
   text: string
   updatedAt: string
   user: IUser
+  usersLiked: string[]
   post: string //postId
 }

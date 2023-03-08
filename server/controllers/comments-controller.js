@@ -110,10 +110,39 @@ const deleteComment = async (req, res) => {
   }
 }
 
+const likeComment = async (req, res) => {
+  try {
+    const { commId, userId } = req.body
+
+    const comment = await CommentModel.findById(commId)
+    
+    if(!comment) {
+      return res.status(404).json({
+        message: 'The comment is not found'
+      })
+    }
+
+    const isLiked = comment.usersLiked.includes(userId)
+    if(isLiked) {
+      await comment.updateOne({ $pull: { 'usersLiked': userId } })
+      res.json({ isLiked: false });
+    } else {
+      await comment.updateOne({ $push: { 'usersLiked': userId } })
+      res.json({ isLiked: true });
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when liking the comment'
+    })
+  }
+}
+
 export default {
   getComments,
   getCommentsByPostId,
   createComment,
   updateComment,
-  deleteComment
+  deleteComment,
+  likeComment
 }

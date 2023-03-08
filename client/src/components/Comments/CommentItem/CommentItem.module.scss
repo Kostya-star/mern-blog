@@ -1,4 +1,5 @@
 .comment__wrapper {
+  padding: 0 10px;
   &:hover {
     .comment__edit_delete {
       display: flex;
@@ -48,13 +49,23 @@
       }
     }
 
-    &__time {
-      display: block;
-      text-align: right;
-      font-size: 13px;
-      color: gray;
-      margin-bottom: 5px;
-    }
+    &__footer {
+      display: flex;
+      justify-content: end;
+      gap: 20px;
+      margin-bottom: 10px;
+      p {
+        color: gray;
+        svg {
+          width: 17px;
+          cursor: pointer;
+        }
+      }
+      span {
+        font-size: 13px;
+        color: gray;
+      }
+    } 
   }
 
 }

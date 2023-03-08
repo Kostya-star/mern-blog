@@ -16,6 +16,10 @@ const CommentSchema = new mongoose.Schema({
     ref: 'Post',
     required: true,
   },
+  usersLiked: {
+    type: Array,
+    default: []
+  }
 }, {
   timestamps: true
 })

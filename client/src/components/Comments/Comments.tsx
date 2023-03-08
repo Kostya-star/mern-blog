@@ -1,5 +1,3 @@
-import { ReactComponent as CloseSVG } from 'assets/close.svg';
-import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { TextArea } from 'components/UI/TextArea/TextArea';
@@ -11,7 +9,7 @@ import {
   deleteComment,
   updateComment,
 } from 'redux/slices/comments';
-import { createTimeSince } from 'utils/createTimeSince';
+import { CommentItem } from './CommentItem/Comment';
 import s from './Comments.module.scss';
 
 interface ICommentsProps {}
@@ -61,38 +59,16 @@ export const Comments: FC<ICommentsProps> = () => {
   return (
     <div className={s.comments}>
       <h3>Comments</h3>
-      {comments.map((comment) => {
-        const timestamp = new Date(comment.createdAt);
-        const creationTime = createTimeSince(timestamp);
-
-        return (
-          <div
-            key={comment._id}
-            className={s.comment__wrapper}
-            ref={sidebarCommentsRef}
-          >
-            <div className={s.comment}>
-              {currentUserId === comment.user._id && (
-                <div className={s.comment__edit_delete}>
-                  <EditSVG
-                    onClick={() =>
-                      setCommentText({ id: comment._id, text: comment.text })
-                    }
-                  />
-                  <CloseSVG onClick={() => onDeleteComment(comment._id)} />
-                </div>
-              )}
-              <Avatar avatar={comment.user?.avatarUrl as string} />
-              <div className={s.comment__body}>
-                <p>{comment?.user.fullName}</p>
-                <p>{comment.text}</p>
-              </div>
-            </div>
-            <span className={s.comment__time}>{creationTime}</span>
-            <hr />
-          </div>
-        );
-      })}
+      {comments.map((comment) => (
+        <CommentItem
+          key={comment._id}
+          comment={comment}
+          currentUserId={currentUserId}
+          setCommentText={setCommentText}
+          onDeleteComment={onDeleteComment}
+          commRef={sidebarCommentsRef}
+        />
+      ))}
 
       <div className={s.comments__create}>
         <Avatar avatar={currentUserPhoto as string} />
@@ -102,7 +78,7 @@ export const Comments: FC<ICommentsProps> = () => {
               placeholder="Write comment..."
               value={commentText.text}
               ref={textareaRef}
-              onInput={(e) => {
+              onChange={(e) => {
                 setCommentText({ ...commentText, text: e.target.value });
                 e.target.style.height = 'auto';
                 e.target.style.height = `${e.target.scrollHeight}px`;

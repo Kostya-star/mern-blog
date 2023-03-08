@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { fetchCommentsByPostId } from 'redux/slices/comments';
 import { deletePost, likePost } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
-import { createTimeSince } from 'utils/createTimeSince';
+// import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
 
 interface IPostItemProps {
@@ -58,7 +58,7 @@ export const PostItem: FC<IPostItemProps> = ({
   };
 
   const timestamp = new Date(post.createdAt);
-  const time = createTimeSince(timestamp);
+  // const time = createTimeSince(timestamp);
 
   return (
     <div className={s.post}>
@@ -83,7 +83,7 @@ export const PostItem: FC<IPostItemProps> = ({
           <Avatar avatar={post.user?.avatarUrl as string} />
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>
-            <span className={s.time}>{time}</span>
+            {/* <span className={s.time}>{time}</span> */}
           </div>
         </div>
         <div className={s.post__content__body}>

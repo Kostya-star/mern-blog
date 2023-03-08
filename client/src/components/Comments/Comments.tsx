@@ -9,7 +9,8 @@ import {
   deleteComment,
   updateComment,
 } from 'redux/slices/comments';
-import { CommentItem } from './CommentItem/Comment';
+import { createTimeSince } from 'utils/createTimeSince';
+import { CommentItem, MemoizedCommentItem } from './CommentItem/CommentItem';
 import s from './Comments.module.scss';
 
 interface ICommentsProps {}
@@ -59,16 +60,21 @@ export const Comments: FC<ICommentsProps> = () => {
   return (
     <div className={s.comments}>
       <h3>Comments</h3>
-      {comments.map((comment) => (
-        <CommentItem
-          key={comment._id}
-          comment={comment}
-          currentUserId={currentUserId}
-          setCommentText={setCommentText}
-          onDeleteComment={onDeleteComment}
-          commRef={sidebarCommentsRef}
-        />
-      ))}
+      {comments.map((comment) => {
+        const creationTime = createTimeSince(new Date(comment.createdAt));
+
+        return (
+          <MemoizedCommentItem
+            key={comment._id}
+            comment={comment}
+            currentUserId={currentUserId}
+            setCommentText={setCommentText}
+            onDeleteComment={onDeleteComment}
+            commRef={sidebarCommentsRef}
+            creationTime={creationTime}
+          />
+        );
+      })}
 
       <div className={s.comments__create}>
         <Avatar avatar={currentUserPhoto as string} />

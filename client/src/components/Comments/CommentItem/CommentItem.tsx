@@ -1,29 +1,27 @@
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { Avatar } from 'components/Avatar/Avatar';
-import { FC } from 'react';
+import { FC, LegacyRef, memo } from 'react';
 import { IComment } from 'types/IComment';
-import { createTimeSince } from 'utils/createTimeSince';
 import s from './CommentItem.module.scss';
 
 interface ICommentItemProps {
   comment: IComment;
   currentUserId?: string;
+  commRef: LegacyRef<HTMLDivElement>;
+  creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
   onDeleteComment: (commId: string) => void;
-  commRef: any;
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
   comment,
   currentUserId,
   commRef,
+  creationTime,
   setCommentText,
   onDeleteComment,
 }) => {
-  const timestamp = new Date(comment.createdAt);
-  const creationTime = createTimeSince(timestamp);
-
   return (
     <div className={s.comment__wrapper} ref={commRef}>
       <div className={s.comment}>
@@ -48,3 +46,11 @@ export const CommentItem: FC<ICommentItemProps> = ({
     </div>
   );
 };
+
+export const MemoizedCommentItem = memo(CommentItem, (prevProps, nextProps) => {
+  return (
+    prevProps.comment === nextProps.comment &&
+    prevProps.currentUserId === nextProps.currentUserId &&
+    prevProps.creationTime === nextProps.creationTime
+  );
+});

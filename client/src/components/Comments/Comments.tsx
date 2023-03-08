@@ -4,7 +4,7 @@ import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { TextArea } from 'components/UI/TextArea/TextArea';
 import { FC, useRef, useState } from 'react';
-import { useAppSelector } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import {
   createComment,
@@ -12,7 +12,6 @@ import {
   updateComment,
 } from 'redux/slices/comments';
 import { createTimeSince } from 'utils/createTimeSince';
-import { useAppDispatch } from './../../redux/hooks';
 import s from './Comments.module.scss';
 
 interface ICommentsProps {}
@@ -33,6 +32,7 @@ export const Comments: FC<ICommentsProps> = () => {
   const [commentText, setCommentText] = useState({ id: '', text: '' });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const sidebarCommentsRef = useRef<HTMLDivElement>(null);
 
   const onSubmitComment = async () => {
     if (commentText.id && commentText.text) {
@@ -42,7 +42,12 @@ export const Comments: FC<ICommentsProps> = () => {
       return;
     }
     const newComment = { postId, text: commentText.text };
-    dispatch(createComment(newComment));
+    dispatch(createComment(newComment)).then(() => {
+      const parentNode = sidebarCommentsRef.current?.parentNode as HTMLElement;
+      if (parentNode) {
+        parentNode.scrollTop = parentNode.scrollHeight;
+      }
+    });
     setCommentText({ id: '', text: '' });
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -61,7 +66,11 @@ export const Comments: FC<ICommentsProps> = () => {
         const creationTime = createTimeSince(timestamp);
 
         return (
-          <div key={comment._id} className={s.comment__wrapper}>
+          <div
+            key={comment._id}
+            className={s.comment__wrapper}
+            ref={sidebarCommentsRef}
+          >
             <div className={s.comment}>
               {currentUserId === comment.user._id && (
                 <div className={s.comment__edit_delete}>
@@ -107,12 +116,15 @@ export const Comments: FC<ICommentsProps> = () => {
           <div className={s.comments__create__buttons}>
             <Button
               className={`button ${
-                commentText.text ? `button_colored` : 'button_disabled'
+                commentText.text && !/^\s*$/.test(commentText.text)
+                  ? `button_colored`
+                  : 'button_disabled'
               }`}
-              title={!commentText.text ? 'Insert comment please!' : ''}
               text={commentText.id ? 'Update' : 'Comment'}
               onClick={onSubmitComment}
-              disabled={!commentText.text || !isAuth}
+              disabled={
+                !commentText.text || /^\s*$/.test(commentText.text) || !isAuth
+              }
             />
             {commentText.id && (
               <Button

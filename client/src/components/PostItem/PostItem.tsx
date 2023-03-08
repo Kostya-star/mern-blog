@@ -1,22 +1,21 @@
+import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
+import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as CommentSVG } from 'assets/comment.svg';
 import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as EyeSVG } from 'assets/eye.svg';
 import { ReactComponent as ThumbsUpSVG } from 'assets/thumb-up.svg';
 import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.svg';
-import { ReactComponent as CircleDownSVG } from 'assets/circle-down.svg';
-import { ReactComponent as CircleUpSVG } from 'assets/circle-up.svg';
 import { Avatar } from 'components/Avatar/Avatar';
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { fetchCommentsByPostId } from 'redux/slices/comments';
+import { deletePost, likePost } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
 import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { fetchPosts, likePost } from 'redux/slices/posts';
-import { fetchCommentsByPostId } from 'redux/slices/comments';
-import { deletePost } from './../../redux/slices/posts';
 
 interface IPostItemProps {
   post: IPost;
@@ -33,20 +32,18 @@ export const PostItem: FC<IPostItemProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const { isShowEditDelete, isPostLiked } = useAppSelector(
-    ({ auth, }) => ({
-      isShowEditDelete: auth.data?._id === post.user?._id,
-      isPostLiked: post.likes?.usersLiked.includes(auth.data?._id as string),
-    }),
-  );
+  const { isShowEditDelete, isPostLiked } = useAppSelector(({ auth }) => ({
+    isShowEditDelete: auth.data?._id === post.user?._id,
+    isPostLiked: post.likes?.usersLiked.includes(auth.data?._id as string),
+  }));
 
   const [likes, setLikes] = useState({
     isLiked: isPostLiked,
     likeCount: post.likes?.likesCount,
   });
-  
-  const [isShowText, setShowText] = useState(false)
-  
+
+  const [isShowText, setShowText] = useState(false);
+
   const onClickLike = async (postId: string) => {
     const { data } = await dispatch(likePost(postId)).unwrap();
     setLikes({ isLiked: data.isLiked, likeCount: data.likeCount });
@@ -91,9 +88,9 @@ export const PostItem: FC<IPostItemProps> = ({
         </div>
         <div className={s.post__content__body}>
           {/* <Link to={`/posts/${post._id}`}> */}
-            <div className={s.post__content__body__heading}>
-              <h2>{post.title}</h2>
-            </div>
+          <div className={s.post__content__body__heading}>
+            <h2>{post.title}</h2>
+          </div>
           {/* </Link> */}
 
           <div className={s.post__content__body__tags}>
@@ -108,12 +105,12 @@ export const PostItem: FC<IPostItemProps> = ({
               {isShowText ? (
                 <>
                   <span>Close text</span>
-                  <CircleUpSVG />
+                  <ArrowUpSVG />
                 </>
               ) : (
                 <>
                   <span>Show text</span>
-                  <CircleDownSVG />
+                  <ArrowDownSVG />
                 </>
               )}
             </p>
@@ -129,9 +126,7 @@ export const PostItem: FC<IPostItemProps> = ({
                 {likes.isLiked ? <ThumbsUpColoredSVG /> : <ThumbsUpSVG />}
                 {likes.likeCount}
               </div>
-              <div
-                onClick={() => fetchCommsByPostId(post._id) }
-              >
+              <div onClick={() => fetchCommsByPostId(post._id)}>
                 <CommentSVG />
                 {post.commentCount}
               </div>

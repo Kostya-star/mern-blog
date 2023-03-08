@@ -67,9 +67,9 @@ export const Home = () => {
             ))}
         </div>
         <div className="home__content__sidebar">
-          {tagsStatus === 'loading' && <div>Loading...</div>}
+          {/* {tagsStatus === 'loading' && <div>Loading...</div>}
           {tagsStatus === 'error' && <div>ERROR</div>}
-          {tagsStatus === 'success' && <Tags tags={tags} />}
+          {tagsStatus === 'success' && <Tags tags={tags} />} */}
 
           {commentStatus === 'loading' && <div>Loading...</div>}
           {commentStatus === 'error' && <div>ERROR</div>}

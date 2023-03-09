@@ -8,8 +8,9 @@ import { isAuthSelector } from 'redux/slices/auth';
 import { fetchComments } from 'redux/slices/comments';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
-import { useAppDispatch, useAppSelector } from './../redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
+import { Loader } from 'components/UI/Loader/Loader';
 
 export const Home = () => {
   const dispatch = useAppDispatch();
@@ -63,24 +64,24 @@ export const Home = () => {
       {isComments ? (
         <div className="home__content">
           <div className="home__content__posts">
-            {postsStatus === 'loading' && <div>Loading...</div>}
+            {postsStatus === 'loading' && <div className='loader'><Loader/></div>}
             {postsStatus === 'error' && <div>ERROR</div>}
             {postsStatus === 'success' &&
               posts?.map((post) => <PostItem key={post._id} post={post} />)}
           </div>
           <div className="home__content__sidebar">
-            {commentStatus === 'loading' && <div>Loading...</div>}
+            <div className="home__content__comments">
+            {commentStatus === 'loading' && <div className='loader'><Loader/></div>}
             {commentStatus === 'error' && <div>ERROR</div>}
             {commentStatus === 'success' && (
-              <div className="home__content__comments">
                 <Comments />
-              </div>
-            )}
+                )}
+                </div>
           </div>
         </div>
       ) : (
         <div className="home__content__posts">
-          {postsStatus === 'loading' && <div>Loading...</div>}
+          {postsStatus === 'loading' && <div className='loader'><Loader/></div>}
           {postsStatus === 'error' && <div>ERROR</div>}
           {postsStatus === 'success' &&
             posts?.map((post) => <PostItem key={post._id} post={post} />)}

@@ -64,24 +64,34 @@ export const Home = () => {
       {isComments ? (
         <div className="home__content">
           <div className="home__content__posts">
-            {postsStatus === 'loading' && <div className='loader'><Loader/></div>}
+            {postsStatus === 'loading' && (
+              <div className="loader">
+                <Loader />
+              </div>
+            )}
             {postsStatus === 'error' && <div>ERROR</div>}
             {postsStatus === 'success' &&
               posts?.map((post) => <PostItem key={post._id} post={post} />)}
           </div>
           <div className="home__content__sidebar">
             <div className="home__content__comments">
-            {commentStatus === 'loading' && <div className='loader'><Loader/></div>}
-            {commentStatus === 'error' && <div>ERROR</div>}
-            {commentStatus === 'success' && (
-                <Comments />
-                )}
+              {commentStatus === 'loading' && (
+                <div className="loader">
+                  <Loader />
                 </div>
+              )}
+              {commentStatus === 'error' && <div>ERROR</div>}
+              {commentStatus === 'success' && <Comments />}
+            </div>
           </div>
         </div>
       ) : (
         <div className="home__content__posts">
-          {postsStatus === 'loading' && <div className='loader'><Loader/></div>}
+          {postsStatus === 'loading' && (
+            <div className="loader">
+              <Loader />
+            </div>
+          )}
           {postsStatus === 'error' && <div>ERROR</div>}
           {postsStatus === 'success' &&
             posts?.map((post) => <PostItem key={post._id} post={post} />)}

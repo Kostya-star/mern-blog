@@ -81,7 +81,7 @@ export const Comments: FC<ICommentsProps> = () => {
       </div>
       {!isCommHidden && (
         <>
-          {comments.map((comment) => {
+          {comments.length ? comments.map((comment) => {
             const creationTime = createTimeSince(new Date(comment.createdAt));
 
             return (
@@ -93,7 +93,11 @@ export const Comments: FC<ICommentsProps> = () => {
                 setCommentText={setCommentText}
               />
             );
-          })}
+          }
+          )
+          :
+          <h3 className={s.comments__noComments}>No comments yet</h3>
+        }
           <div className={s.comments__create}>
             <Avatar avatar={currentUserPhoto as string} />
             <div className={s.comments__create__group}>

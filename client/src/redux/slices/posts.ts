@@ -57,8 +57,9 @@ export const deletePost = createAsyncThunk(
 
 export const likePost = createAsyncThunk(
   'posts/onLikePost',
-  async (postId: string) => {
-    return await instance.post<ILikePostResp>(`/posts/like`, { postId });
+  async (postId: string, thunkApi) => {
+    const { data } = await instance.post<ILikePostResp>(`/posts/like`, { postId });
+    thunkApi.dispatch(updateLikeCount(data))
   },
 );
 
@@ -94,6 +95,17 @@ export const postsSlice = createSlice({
         return post;
       });
     },
+    updateLikeCount: (state, action: PayloadAction<ILikePostResp>) => {
+      const { isLiked, userId, postId } = action.payload
+      const postToUpdate = state.posts.find(post => post._id === postId) as IPost
+
+      if(isLiked) {
+        postToUpdate?.usersLiked.push(userId)
+      } else {
+        postToUpdate.usersLiked = postToUpdate?.usersLiked.filter(id => id !== userId) 
+      }
+      
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -123,6 +135,6 @@ export const postsSlice = createSlice({
   },
 });
 
-export const { updateCommentCount } = postsSlice.actions;
+export const { updateCommentCount, updateLikeCount } = postsSlice.actions;
 
 export default postsSlice.reducer;

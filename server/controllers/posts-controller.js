@@ -150,26 +150,19 @@ const likePost = async (req, res) => {
 
     const post = await PostModel.findById(postId);
     if (!post) {
-      return res.status(404).send('Post not found');
+      return res.status(404).json({
+        message: 'The post is not found'
+      })
     }
 
-    const isPostLiked = post.likes.usersLiked.includes(userId)
-    const likesCount = post.likes.likesCount
+    const isLiked = post.usersLiked.includes(userId)
 
-    if (isPostLiked) {
-      await PostModel.findByIdAndUpdate(
-        postId,
-        { $pull: { 'likes.usersLiked': userId }, $inc: { 'likes.likesCount': -1 } },
-        { new: true }
-      )
-      res.json({ isLiked: false, likeCount: likesCount - 1 });
+    if (isLiked) {
+      await post.updateOne({ $pull: { 'usersLiked': userId } })
+      res.json({ isLiked: false, userId, postId: post._id });
     } else {
-      await PostModel.findByIdAndUpdate(
-        postId,
-        { $push: { 'likes.usersLiked': userId }, $inc: { 'likes.likesCount': 1 } },
-        { new: true }
-      )
-      res.json({ isLiked: true, likeCount: likesCount + 1 });
+      await post.updateOne({ $push: { 'usersLiked': userId } })
+      res.json({ isLiked: true, userId, postId: post._id });
     }
 
   } catch (error) {

@@ -4,14 +4,9 @@ import { TextArea } from 'components/UI/TextArea/TextArea';
 import { FC, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
-import {
-  createComment,
-  deleteComment,
-  likeComment,
-  updateComment,
-} from 'redux/slices/comments';
+import { createComment, updateComment } from 'redux/slices/comments';
 import { createTimeSince } from 'utils/createTimeSince';
-import { CommentItem, MemoizedCommentItem } from './CommentItem/CommentItem';
+import { MemoizedCommentItem } from './CommentItem/CommentItem';
 import s from './Comments.module.scss';
 
 interface ICommentsProps {}
@@ -19,10 +14,9 @@ interface ICommentsProps {}
 export const Comments: FC<ICommentsProps> = () => {
   const isAuth = useAppSelector(isAuthSelector);
 
-  const { currentUserPhoto, currentUserId, comments, postId } = useAppSelector(
+  const { currentUserPhoto, comments, postId } = useAppSelector(
     ({ auth, comments }) => ({
       currentUserPhoto: auth.data?.avatarUrl,
-      currentUserId: auth.data?._id,
       comments: comments.comments,
       postId: comments.currentPost,
     }),
@@ -54,10 +48,6 @@ export const Comments: FC<ICommentsProps> = () => {
     }
   };
 
-  const onDeleteComment = async (commId: string) => {
-    dispatch(deleteComment(commId))
-  };
-
   return (
     <div className={s.comments}>
       <h3>Comments</h3>
@@ -68,11 +58,9 @@ export const Comments: FC<ICommentsProps> = () => {
           <MemoizedCommentItem
             key={comment._id}
             comment={comment}
-            currentUserId={currentUserId}
             commRef={sidebarCommentsRef}
             creationTime={creationTime}
             setCommentText={setCommentText}
-            onDeleteComment={onDeleteComment}
           />
         );
       })}
@@ -99,7 +87,7 @@ export const Comments: FC<ICommentsProps> = () => {
           <div className={s.comments__create__buttons}>
             <Button
               className={`button ${
-                (commentText.text && !/^\s*$/.test(commentText.text)) && isAuth
+                commentText.text && !/^\s*$/.test(commentText.text) && isAuth
                   ? `button_colored`
                   : 'button_disabled'
               }`}

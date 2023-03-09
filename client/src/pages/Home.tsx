@@ -33,19 +33,11 @@ export const Home = () => {
     dispatch(fetchComments());
   }, []);
 
-  const onSortPosts = (sortedCat: string) => {
-    dispatch(fetchPosts({ sortedCat }));
-  };
-
-
-  // const fetchCommsByPostId = (postId: string) => {
-  //   dispatch(fetchCommentsByPostId(postId));
-  // };
 
   return (
     <div className="home__wrapper">
       <div className="home__navbar">
-        <Categories sortPosts={onSortPosts} />
+        <Categories />
         {isAuth && (
           <Link to="/add-post">
             <Button text="Create post" className="button button_colored" />
@@ -61,8 +53,6 @@ export const Home = () => {
               <PostItem
                 key={post._id}
                 post={post}
-                // deletePost={removePost}
-                // fetchCommsByPostId={fetchCommsByPostId}
               />
             ))}
         </div>

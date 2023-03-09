@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IComment } from 'types/IComment';
 import { ICreateCommentRequest } from 'types/ICreateCommentRequest';
+import { ILikeCommResp } from 'types/ILikeCommResp';
 import { IUpdateCommentReq } from 'types/IUpdateCommentReq';
 import { updateCommentCount } from './posts';
 
@@ -59,22 +60,10 @@ export const deleteComment = createAsyncThunk(
 
 export const likeComment = createAsyncThunk(
   'comments/likeComment',
-  async (
-    { commId, currentUserId }: { commId: string; currentUserId: string },
-    thunkApi,
-  ) => {
-    const { data } = await instance.post<{ isLiked: boolean }>(
-      `/comments/like`,
-      {
-        commId,
-      },
-    );
-    thunkApi.dispatch(
-      updateCommentLike({
-        isLiked: data.isLiked,
-        commId,
-        userId: currentUserId,
-      }),
+  async (commId: string, thunkApi) => {
+    const { data } = await instance.post<ILikeCommResp>(
+      `/comments/like`, { commId });
+    thunkApi.dispatch(updateCommentLike(data),
     );
   },
 );
@@ -102,11 +91,7 @@ export const commentsSlice = createSlice({
     },
     updateCommentLike: (
       state,
-      action: PayloadAction<{
-        isLiked: boolean;
-        commId: string;
-        userId: string;
-      }>,
+      action: PayloadAction<ILikeCommResp>,
     ) => {
       const { isLiked, commId, userId } = action.payload;
 

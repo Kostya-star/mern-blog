@@ -3,43 +3,46 @@ import { ReactComponent as EditSVG } from 'assets/edit.svg';
 import { ReactComponent as ThumbUpSVG } from 'assets/thumb-up.svg';
 import { ReactComponent as ThumbUpColoredSVG } from 'assets/thumbs-up-colored.svg';
 import { Avatar } from 'components/Avatar/Avatar';
-import { FC, LegacyRef, memo, useState } from 'react';
+import { FC, LegacyRef, memo } from 'react';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { deleteComment, likeComment } from 'redux/slices/comments';
 import { IComment } from 'types/IComment';
 import s from './CommentItem.module.scss';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { likeComment } from 'redux/slices/comments';
 
 interface ICommentItemProps {
   comment: IComment;
-  currentUserId?: string;
   commRef: LegacyRef<HTMLDivElement>;
   creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
-  onDeleteComment: (commId: string) => void;
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
   comment,
-  currentUserId,
   commRef,
   creationTime,
   setCommentText,
-  onDeleteComment,
 }) => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  const isCommLiked = comment.usersLiked.includes(currentUserId as string)
+  const { isLiked, likeCount, isShowEditDelete } = useAppSelector(({ auth }) => ({
+    isLiked: comment.usersLiked.includes(auth.data?._id as string),
+    likeCount: comment.usersLiked.length,
+    isShowEditDelete: comment.user._id === auth.data?._id
+  }))
 
-  const onLikeComment = async (commId: string) => {
-    if(currentUserId) {
-      await dispatch(likeComment({ commId, currentUserId }))
-    }
-  }
+
+  const onLikeComment = (commId: string) => {
+      dispatch(likeComment(commId));
+  };
+
+  const onDeleteComment = (commId: string) => {
+    dispatch(deleteComment(commId));
+  };
 
   return (
     <div className={s.comment__wrapper} ref={commRef}>
       <div className={s.comment}>
-        {currentUserId && currentUserId === comment.user._id && (
+        {isShowEditDelete && (
           <div className={s.comment__edit_delete}>
             <EditSVG
               onClick={() =>
@@ -57,8 +60,8 @@ export const CommentItem: FC<ICommentItemProps> = ({
       </div>
       <div className={s.comment__footer}>
         <p onClick={() => onLikeComment(comment._id)}>
-          {isCommLiked ? <ThumbUpColoredSVG /> : <ThumbUpSVG />}
-          {comment.usersLiked.length}
+          {isLiked ? <ThumbUpColoredSVG /> : <ThumbUpSVG />}
+          {likeCount}
         </p>
         <span className={s.comment__time}>{creationTime}</span>
       </div>
@@ -70,7 +73,6 @@ export const CommentItem: FC<ICommentItemProps> = ({
 export const MemoizedCommentItem = memo(CommentItem, (prevProps, nextProps) => {
   return (
     prevProps.comment === nextProps.comment &&
-    prevProps.currentUserId === nextProps.currentUserId &&
     prevProps.creationTime === nextProps.creationTime
   );
 });

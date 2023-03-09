@@ -17,7 +17,7 @@ export const AppRouter = () => {
       <div className="container">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/posts/:id" element={<FullPost />} />
+          {/* <Route path="/posts/:id" element={<FullPost />} /> */}
           <Route path="/tags/:tag" element={<Tags />} />
 
           {!isAuth && (

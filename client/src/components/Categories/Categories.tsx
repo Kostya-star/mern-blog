@@ -1,20 +1,20 @@
 import { FC, useState } from 'react';
 import s from './Categories.module.scss';
-
-interface ICategoriesProps {
-  sortPosts: (category: string) => void;
-}
+import { useAppDispatch } from './../../redux/hooks';
+import { fetchPosts } from 'redux/slices/posts';
 
 const categories = [
   { value: 'New', label: 'createdAt' },
   { value: 'Popular', label: 'viewCount' },
 ];
 
-export const Categories: FC<ICategoriesProps> = ({ sortPosts }) => {
+export const Categories: FC = () => {
+  const dispatch = useAppDispatch();
   const [activeCategory, setActiveCategory] = useState(0);
 
   const onClickCategory = (ind: number, cat: string) => {
-    sortPosts(cat);
+    dispatch(fetchPosts({ sortedCat: cat }));
+
     setActiveCategory(ind);
   };
 

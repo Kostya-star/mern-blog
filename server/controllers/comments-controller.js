@@ -123,12 +123,13 @@ const likeComment = async (req, res) => {
     }
 
     const isLiked = comment.usersLiked.includes(userId)
+    
     if(isLiked) {
       await comment.updateOne({ $pull: { 'usersLiked': userId } })
-      res.json({ isLiked: false });
+      res.json({ isLiked: false, commId, userId });
     } else {
       await comment.updateOne({ $push: { 'usersLiked': userId } })
-      res.json({ isLiked: true });
+      res.json({ isLiked: true, commId, userId });
     }
   } catch (error) {
     console.log(error)

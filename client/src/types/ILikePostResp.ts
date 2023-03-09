@@ -1,4 +1,5 @@
 export interface ILikePostResp {
   isLiked: boolean;
-  likeCount: number;
+  userId: string;
+  postId: string;
 }

@@ -17,11 +17,19 @@
     background-color: white;
     border-bottom: 1px solid #000;
     z-index: 2;
+
     span {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
       svg {
+        padding: 1px 5px;
+        width: 30px;
         cursor: pointer;
+
         &:hover {
-          background-color: gray;
+          background-color: rgb(186, 186, 186);
           border-radius: 5px;
         }
       }
@@ -48,12 +56,14 @@
     // }
     &__group {
       width: 100%;
+
       textarea {
         font-size: 16px;
         font-weight: 500;
         border-radius: 10px;
       }
     }
+
     &__buttons {
       display: flex;
       gap: 15px;

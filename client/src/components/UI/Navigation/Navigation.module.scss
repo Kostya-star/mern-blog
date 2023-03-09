@@ -3,13 +3,16 @@
   left: 0;
   right: 0;
   // width: 100%;
-  padding: 10px 20px;
+  padding: 5px 20px;
   background-color: white;
   z-index: 10;
+
   &__content {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
+
   &__logo {
     div {
       padding: 9px 10px;
@@ -20,16 +23,74 @@
       text-decoration: none;
       border: none;
       outline: none;
+
       &:hover {
-        background-color: #70a892; /* Darker green on hover */
+        background-color: #70a892;
+        /* Darker green on hover */
       }
     }
   }
+
   &__buttons {
     display: flex;
     gap: 15px;
   }
+
   &_fake {
-    height: 63px;
+    height: 73px;
+  }
+
+  &__profile {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 15px;
+    padding: 5px;
+    cursor: pointer;
+    &:hover {
+      background-color: rgb(232, 230, 230);
+      border-radius: 10px;
+    }
+
+    p {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    svg {
+      width: 15px;
+    }
+
+    &__dropdown {
+      position: absolute;
+      top: 110%;
+      background-color: #fff;
+      border: 1px solid rgb(75, 174, 220);
+      padding: 10px 15px;
+      border-radius: 10px;
+
+      ul {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        list-style: none;
+
+        svg {
+          width: 24px;
+        }
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: 2px underline;
+          }
+        }
+      }
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { Avatar } from 'components/Avatar/Avatar';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector, logout } from 'redux/slices/auth';
@@ -5,28 +6,56 @@ import 'scss/all.scss';
 import 'scss/buttons.scss';
 import { Button } from '../Button/Button';
 import s from './Navigation.module.scss';
+import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
+import { ReactComponent as UserEditSVG } from '../../../assets/user-edit.svg';
+import { ReactComponent as SignOutSVG } from '../../../assets/sign-out.svg';
+import { useRef, useState, useEffect } from 'react';
 
 export const Navigation = () => {
   const dispatch = useAppDispatch();
+
   const isAuth = useAppSelector(isAuthSelector);
+  const token = window.localStorage.getItem('token');
+
+  const [isShowDropdown, setShowDropdown] = useState(false);
+
+  const dropDownRef = useRef<HTMLDivElement>(null);
+
+  const { userPhoto, userName } = useAppSelector(({ auth }) => ({
+    userPhoto: auth.data?.avatarUrl,
+    userName: auth.data?.fullName,
+  }));
+
+  useEffect(() => {
+    const onOutsideDropDownClick = (e: Event) => {
+      if (
+        dropDownRef.current &&
+        !dropDownRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', onOutsideDropDownClick);
+
+    return () => {
+      document.removeEventListener('mousedown', onOutsideDropDownClick);
+    };
+  }, [dropDownRef]);
 
   const onLogoutHandle = () => {
+    setShowDropdown(false);
     window.localStorage.removeItem('token');
     dispatch(logout());
   };
 
-  const token = window.localStorage.getItem('token');
   return (
     <>
       <div className={s.navigation}>
         <div className={s.navigation__content}>
           <Link to="/" className={s.navigation__logo}>
-            <div>Constantin Blog</div>
+            <div>Go home</div>
           </Link>
-          {/* <h3 style={{ color: 'tomato', textDecoration: 'underline' }}>
-            IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP
-            IS STILL IN DEVELOPMENT MODE!
-          </h3> */}
           <div className={s.navigation__buttons}>
             {!isAuth && !token ? (
               <>
@@ -41,13 +70,34 @@ export const Navigation = () => {
                 </Link>
               </>
             ) : (
-              <Link to="/login">
-                <Button
-                  text="Log out"
-                  className="button button_delete"
-                  onClick={onLogoutHandle}
-                />
-              </Link>
+              <>
+                <div
+                  className={s.navigation__profile}
+                  onClick={() => setShowDropdown(!isShowDropdown)}
+                >
+                  <p>
+                    <span>{userName}</span> <ArrowDownSVG />
+                  </p>
+                  <Avatar avatar={userPhoto as string} />
+                </div>
+                {isShowDropdown && (
+                  <div
+                    className={s.navigation__profile__dropdown}
+                    ref={dropDownRef}
+                  >
+                    <ul>
+                      <li>
+                        View & Edit <UserEditSVG />
+                      </li>
+                    <Link to="/login">
+                      <li onClick={onLogoutHandle}>
+                        Sign out <SignOutSVG />
+                      </li>
+                  </Link>
+                    </ul>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

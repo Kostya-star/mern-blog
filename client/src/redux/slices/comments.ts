@@ -61,10 +61,10 @@ export const deleteComment = createAsyncThunk(
 export const likeComment = createAsyncThunk(
   'comments/likeComment',
   async (commId: string, thunkApi) => {
-    const { data } = await instance.post<ILikeCommResp>(
-      `/comments/like`, { commId });
-    thunkApi.dispatch(updateCommentLike(data),
-    );
+    const { data } = await instance.post<ILikeCommResp>(`/comments/like`, {
+      commId,
+    });
+    thunkApi.dispatch(updateCommentLike(data));
   },
 );
 
@@ -89,10 +89,7 @@ export const commentsSlice = createSlice({
       state.currentPost = '';
       state.status = '';
     },
-    updateCommentLike: (
-      state,
-      action: PayloadAction<ILikeCommResp>,
-    ) => {
+    updateCommentLike: (state, action: PayloadAction<ILikeCommResp>) => {
       const { isLiked, commId, userId } = action.payload;
 
       const commToUpdate = state.comments.find(

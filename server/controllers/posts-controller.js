@@ -1,6 +1,6 @@
 import PostModel from "../models/post-model.js"
-import fs from 'fs'
 import { getBase64 } from './../utils/getBase64.js';
+import CommentModel from '../models/comments-model.js'
 
 const getAllPosts = async (req, res) => {
   try {
@@ -132,6 +132,7 @@ const deletePost = async (req, res) => {
     }
 
     await post.delete()
+    await CommentModel.deleteMany({ post: post._id })
 
     res.json({
       success: true

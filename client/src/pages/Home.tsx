@@ -37,12 +37,8 @@ export const Home = () => {
     isShow: false,
   });
 
-  // useEffect(() => {
-  //   setShowComments({ ...toggleShowComments, isShow: !toggleShowComments.isShow })
-  // }, [toggleShowComments.postId])
   const onShowCommentsHandle = (postId: string) => {
     if (toggleShowComments.postId === postId) {
-      console.log(toggleShowComments);
       setShowComments({
         ...toggleShowComments,
         isShow: !toggleShowComments.isShow,
@@ -54,11 +50,15 @@ export const Home = () => {
 
   return (
     <div className="home__wrapper">
-      <div className="home__navbar">
+      <div
+        className={`home__navbar ${
+          toggleShowComments.isShow && 'home__navbar_shrink'
+        }`}
+      >
         <Categories />
         {isAuth && (
           <Link to="/add-post">
-            <Button text="Create post" className="button button_colored" />
+            <Button text="Add post" className="button button_colored" />
           </Link>
         )}
       </div>
@@ -80,9 +80,16 @@ export const Home = () => {
             {commentStatus === 'loading' && <div>Loading...</div>}
             {commentStatus === 'error' && <div>ERROR</div>}
             {commentStatus === 'success' && (
-            <div className="home__content__comments">
-              <Comments />
-            </div>
+              <div className="home__content__comments">
+                <Comments
+                  onCloseCommentsHandle={() =>
+                    setShowComments({
+                      postId: '',
+                      isShow: false,
+                    })
+                  }
+                />
+              </div>
             )}
           </div>
         </div>

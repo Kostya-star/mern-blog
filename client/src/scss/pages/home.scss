@@ -33,7 +33,10 @@
   &__navbar {
     display: flex;
     justify-content: space-between;
-    // max-width: 60%;
+    align-items: center;
     margin-bottom: 30px;
+    &_shrink{
+      max-width: 60%;
+    }
   }
 }

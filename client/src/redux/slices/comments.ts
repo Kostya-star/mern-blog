@@ -110,7 +110,7 @@ export const commentsSlice = createSlice({
       // FETCHING COMMENTS by post id
       .addCase(fetchCommentsByPostId.pending, (state) => {
         state.comments = [];
-        // state.status = 'loading';
+        state.status = 'loading';
       })
       .addCase(
         fetchCommentsByPostId.fulfilled,

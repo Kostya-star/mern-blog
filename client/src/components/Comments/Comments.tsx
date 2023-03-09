@@ -4,14 +4,21 @@ import { TextArea } from 'components/UI/TextArea/TextArea';
 import { FC, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
-import { createComment, updateComment } from 'redux/slices/comments';
+import {
+  clearCommentsSlice,
+  createComment,
+  updateComment,
+} from 'redux/slices/comments';
 import { createTimeSince } from 'utils/createTimeSince';
 import { MemoizedCommentItem } from './CommentItem/CommentItem';
 import s from './Comments.module.scss';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 
-interface ICommentsProps {}
+interface ICommentsProps {
+  onCloseCommentsHandle: () => void;
+}
 
-export const Comments: FC<ICommentsProps> = () => {
+export const Comments: FC<ICommentsProps> = ({ onCloseCommentsHandle }) => {
   const isAuth = useAppSelector(isAuthSelector);
 
   const { currentUserPhoto, comments, postId } = useAppSelector(
@@ -48,9 +55,19 @@ export const Comments: FC<ICommentsProps> = () => {
     }
   };
 
+  const onCloseComments = () => {
+    dispatch(clearCommentsSlice());
+    onCloseCommentsHandle();
+  };
+
   return (
     <div className={s.comments}>
-      <h3>Comments</h3>
+      <div className={s.comments__header}>
+        <h3>Comments</h3>
+        <span>
+          <CloseSVG onClick={onCloseComments} />
+        </span>
+      </div>
       {comments.map((comment) => {
         const creationTime = createTimeSince(new Date(comment.createdAt));
 

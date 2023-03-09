@@ -72,7 +72,7 @@ export const FullPost = () => {
       <div >
         {/* <PostItem isPostText={true} post={post} /> */}
       </div>
-      <Comments />
+      {/* <Comments /> */}
     </div>
     // <div className="fullPost">
     //   <div className="post">

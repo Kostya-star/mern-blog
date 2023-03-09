@@ -6,14 +6,29 @@
   max-height: calc(100vh - 80px);
   // position: relative;
 
-  h3 {
+  &__header {
     position: sticky;
     top: 0;
-    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
     padding: 10px 10px;
+    background-color: white;
+    border-bottom: 1px solid #000;
     z-index: 2;
-    margin-bottom: 25px;
+    span {
+      svg {
+        cursor: pointer;
+        &:hover {
+          background-color: gray;
+          border-radius: 5px;
+        }
+      }
+    }
+
   }
+
 
   &__create {
     display: flex;

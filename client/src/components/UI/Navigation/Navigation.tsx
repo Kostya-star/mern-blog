@@ -23,10 +23,10 @@ export const Navigation = () => {
           <Link to="/" className={s.navigation__logo}>
             <div>Constantin Blog</div>
           </Link>
-          <h3 style={{ color: 'tomato', textDecoration: 'underline' }}>
+          {/* <h3 style={{ color: 'tomato', textDecoration: 'underline' }}>
             IF SOMETHING IS NOT WORKING AS EXPECTED, KEEP IN MIND THAT THE APP
             IS STILL IN DEVELOPMENT MODE!
-          </h3>
+          </h3> */}
           <div className={s.navigation__buttons}>
             {!isAuth && !token ? (
               <>

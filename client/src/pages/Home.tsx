@@ -1,29 +1,28 @@
 import { Categories } from 'components/Categories/Categories';
 import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
-import { Tags } from 'components/Tags/Tags';
-import { useEffect } from 'react';
-import { fetchComments, fetchCommentsByPostId } from 'redux/slices/comments';
+import { Button } from 'components/UI/Button/Button';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { isAuthSelector } from 'redux/slices/auth';
+import { fetchComments } from 'redux/slices/comments';
 import { fetchPosts } from 'redux/slices/posts';
 import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
-import { deletePost } from './../redux/slices/posts';
-import { Link } from 'react-router-dom';
-import { Button } from 'components/UI/Button/Button';
-import { isAuthSelector } from 'redux/slices/auth';
 
 export const Home = () => {
   const dispatch = useAppDispatch();
 
-  const { posts, tags, postsStatus, tagsStatus, commentStatus } =
-    useAppSelector(({ posts, tags, comments }) => ({
+  const { posts, postsStatus, isComments, commentStatus } = useAppSelector(
+    ({ posts, tags, comments }) => ({
       posts: posts?.posts,
       postsStatus: posts?.status,
       tagsStatus: tags?.status,
       tags: tags?.tags,
       commentStatus: comments?.status,
-      commentCount: comments.comments?.length
-    }));
+      isComments: comments.comments?.length,
+    }),
+  );
 
   const isAuth = useAppSelector(isAuthSelector);
 
@@ -33,6 +32,25 @@ export const Home = () => {
     dispatch(fetchComments());
   }, []);
 
+  const [toggleShowComments, setShowComments] = useState({
+    postId: '',
+    isShow: false,
+  });
+
+  // useEffect(() => {
+  //   setShowComments({ ...toggleShowComments, isShow: !toggleShowComments.isShow })
+  // }, [toggleShowComments.postId])
+  const onShowCommentsHandle = (postId: string) => {
+    if (toggleShowComments.postId === postId) {
+      console.log(toggleShowComments);
+      setShowComments({
+        ...toggleShowComments,
+        isShow: !toggleShowComments.isShow,
+      });
+    } else {
+      setShowComments({ postId, isShow: true });
+    }
+  };
 
   return (
     <div className="home__wrapper">
@@ -44,7 +62,31 @@ export const Home = () => {
           </Link>
         )}
       </div>
-      <div className="home__content">
+      {toggleShowComments.isShow ? (
+        <div className="home__content">
+          <div className="home__content__posts">
+            {postsStatus === 'loading' && <div>Loading...</div>}
+            {postsStatus === 'error' && <div>ERROR</div>}
+            {postsStatus === 'success' &&
+              posts?.map((post) => (
+                <PostItem
+                  key={post._id}
+                  post={post}
+                  onShowComments={onShowCommentsHandle}
+                />
+              ))}
+          </div>
+          <div className="home__content__sidebar">
+            {commentStatus === 'loading' && <div>Loading...</div>}
+            {commentStatus === 'error' && <div>ERROR</div>}
+            {commentStatus === 'success' && (
+            <div className="home__content__comments">
+              <Comments />
+            </div>
+            )}
+          </div>
+        </div>
+      ) : (
         <div className="home__content__posts">
           {postsStatus === 'loading' && <div>Loading...</div>}
           {postsStatus === 'error' && <div>ERROR</div>}
@@ -53,23 +95,11 @@ export const Home = () => {
               <PostItem
                 key={post._id}
                 post={post}
+                onShowComments={onShowCommentsHandle}
               />
             ))}
         </div>
-        <div className="home__content__sidebar">
-          {/* {tagsStatus === 'loading' && <div>Loading...</div>}
-          {tagsStatus === 'error' && <div>ERROR</div>}
-          {tagsStatus === 'success' && <Tags tags={tags} />} */}
-
-          {commentStatus === 'loading' && <div>Loading...</div>}
-          {commentStatus === 'error' && <div>ERROR</div>}
-          {commentStatus === 'success' && (
-            <div className="home__content__comments">
-              <Comments />
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

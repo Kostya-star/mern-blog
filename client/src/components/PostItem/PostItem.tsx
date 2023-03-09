@@ -18,9 +18,10 @@ import s from './PostItem.module.scss';
 
 interface IPostItemProps {
   post: IPost;
+  onShowComments?: (postId: string) => void
 }
 
-export const PostItem: FC<IPostItemProps> = ({ post }) => {
+export const PostItem: FC<IPostItemProps> = ({ post, onShowComments }) => {
   const dispatch = useAppDispatch();
 
   const { isShowEditDelete, isLiked, likeCount } = useAppSelector(
@@ -37,9 +38,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
     dispatch(likePost(postId));
   };
 
-  const fetchCommsByPostId = (postId: string) => {
+  const onCommentsClickHandle = (postId: string) => {
+    onShowComments?.(postId)
     dispatch(fetchCommentsByPostId(postId));
-  };
+  }
 
   const removePost = (id: string) => {
     dispatch(deletePost(id));
@@ -113,7 +115,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
                 {isLiked ? <ThumbsUpColoredSVG /> : <ThumbsUpSVG />}
                 {likeCount}
               </div>
-              <div onClick={() => fetchCommsByPostId(post._id)}>
+              <div onClick={() => onCommentsClickHandle(post._id)}>
                 <CommentSVG />
                 {post.commentCount}
               </div>

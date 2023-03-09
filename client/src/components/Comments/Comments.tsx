@@ -15,10 +15,9 @@ import s from './Comments.module.scss';
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
 
 interface ICommentsProps {
-  onCloseCommentsHandle: () => void;
 }
 
-export const Comments: FC<ICommentsProps> = ({ onCloseCommentsHandle }) => {
+export const Comments: FC<ICommentsProps> = () => {
   const isAuth = useAppSelector(isAuthSelector);
 
   const { currentUserPhoto, comments, postId } = useAppSelector(
@@ -57,7 +56,6 @@ export const Comments: FC<ICommentsProps> = ({ onCloseCommentsHandle }) => {
 
   const onCloseComments = () => {
     dispatch(clearCommentsSlice());
-    onCloseCommentsHandle();
   };
 
   return (

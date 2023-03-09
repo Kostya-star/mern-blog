@@ -18,10 +18,10 @@ import s from './PostItem.module.scss';
 
 interface IPostItemProps {
   post: IPost;
-  onShowComments?: (postId: string) => void
+  // onShowComments?: (postId: string) => void
 }
 
-export const PostItem: FC<IPostItemProps> = ({ post, onShowComments }) => {
+export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
 
   const { isShowEditDelete, isLiked, likeCount } = useAppSelector(
@@ -39,7 +39,6 @@ export const PostItem: FC<IPostItemProps> = ({ post, onShowComments }) => {
   };
 
   const onCommentsClickHandle = (postId: string) => {
-    onShowComments?.(postId)
     dispatch(fetchCommentsByPostId(postId));
   }
 

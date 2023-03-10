@@ -14,7 +14,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  avatarUrl: String
+  avatarUrl: String,
+  postsCreated: {
+    type: Number,
+    default: 0
+  },
 }, {
   timestamps: true
 })

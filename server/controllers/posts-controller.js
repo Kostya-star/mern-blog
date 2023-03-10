@@ -1,6 +1,7 @@
 import PostModel from "../models/post-model.js"
 import { getBase64 } from './../utils/getBase64.js';
 import CommentModel from '../models/comments-model.js'
+import UserModel from "../models/user-model.js";
 
 const getAllPosts = async (req, res) => {
   try {
@@ -75,6 +76,12 @@ const createPost = async (req, res) => {
 
     await post.save()
 
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { $inc: { postsCreated: 1 } },
+      { new: true }
+    )
+
     res.json(post)
 
   } catch (error) {
@@ -122,6 +129,7 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     const { id } = req.params
+    const { userId } = req.body
 
     const post = await PostModel.findById(id)
 
@@ -133,6 +141,12 @@ const deletePost = async (req, res) => {
 
     await post.delete()
     await CommentModel.deleteMany({ post: post._id })
+
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { $inc: { postsCreated: -1 } },
+      { new: true }
+    )
 
     res.json({
       success: true

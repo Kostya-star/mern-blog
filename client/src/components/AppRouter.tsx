@@ -1,13 +1,12 @@
 import { CreatePost } from 'pages/CreatePost';
-import { FullPost } from 'pages/FullPost';
 import { Home } from 'pages/Home';
 import { Login } from 'pages/Login';
+import { Profile } from 'pages/Profile';
 import { Register } from 'pages/Register';
+import { Tags } from 'pages/Tags';
 import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
-import { useEffect } from 'react';
-import { Tags } from 'pages/Tags';
 
 export const AppRouter = () => {
   const isAuth = useAppSelector(isAuthSelector);
@@ -31,6 +30,7 @@ export const AppRouter = () => {
             <>
               <Route path="/add-post" element={<CreatePost />} />
               <Route path="/posts/:id/edit" element={<CreatePost />} />
+              <Route path="/profile/me" element={<Profile />} />
             </>
           )}
 

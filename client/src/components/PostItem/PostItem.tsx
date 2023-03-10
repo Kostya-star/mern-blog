@@ -40,7 +40,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
 
   const onCommentsClickHandle = (postId: string) => {
     dispatch(fetchCommentsByPostId(postId));
-  }
+  };
 
   const removePost = (id: string) => {
     dispatch(deletePost(id));
@@ -69,6 +69,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
       >
         <div className={s.post__content__header}>
           <Avatar avatar={post.user?.avatarUrl as string} />
+
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>
             <span className={s.time}>{timeCreation}</span>

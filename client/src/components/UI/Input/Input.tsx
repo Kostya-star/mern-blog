@@ -3,7 +3,8 @@ import s from './Input.module.scss'
 import { CSSProperties } from 'react';
 
 interface InputProps {
-  placeholder: string
+  placeholder?: string
+  id?: string
   type: string
   name?: string
   value?: string
@@ -11,6 +12,8 @@ interface InputProps {
   required?: boolean
   pattern?: string
   title?: string
+  checked?: boolean
+  disabled?: boolean
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: FocusEvent<HTMLInputElement>) => void
 }

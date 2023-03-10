@@ -6,4 +6,5 @@ export interface IUser {
   _id: string;
   avatarUrl?: string;
   token?: string;
+  postsCreated: number
 }

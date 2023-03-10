@@ -14,8 +14,6 @@ export const Avatar: FC<IAvatarProps> = ({ avatar }) => {
       {file ? (
         <img src={URL.createObjectURL(file)} alt="avatar" />
       ) : (
-        // <img src={`http://localhost:5000${avatar}`} alt="avatar" />
-        // <img src={`${process.env.REACT_APP_API_URL}${avatar}`} alt="avatar" />
         <AvatarDefaultSVG />
       )}
     </div>

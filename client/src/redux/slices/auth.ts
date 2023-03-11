@@ -39,7 +39,9 @@ export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser
 })
 
 export const deleteUser = createAsyncThunk('auth/deleteUser', async () => {
-  await instance.delete('auth/deleteUser')
+  const resp = await instance.delete<{ success: boolean }>('auth/delete')
+
+  return resp
 })
 
 export interface authState {
@@ -130,6 +132,14 @@ export const authSlice = createSlice({
         state.status = 'error';
         state.data = null;
       })
+      // DELETE USER
+      .addCase(
+        deleteUser.fulfilled,
+        (state) => {
+          state.status = 'success';
+          state.data = null;
+        },
+      )
   },
 });
 

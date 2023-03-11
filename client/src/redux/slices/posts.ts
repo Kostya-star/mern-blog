@@ -50,16 +50,18 @@ export const updatePost = createAsyncThunk(
 export const deletePost = createAsyncThunk(
   'posts/deletePost',
   async (id: string, thunkApi) => {
-    await instance.delete(`/posts/${id}`)
-    thunkApi.dispatch(clearCommentsSlice())
-  }
+    await instance.delete(`/posts/${id}`);
+    thunkApi.dispatch(clearCommentsSlice());
+  },
 );
 
 export const likePost = createAsyncThunk(
   'posts/onLikePost',
   async (postId: string, thunkApi) => {
-    const { data } = await instance.post<ILikePostResp>(`/posts/like`, { postId });
-    thunkApi.dispatch(updateLikeCount(data))
+    const { data } = await instance.post<ILikePostResp>(`/posts/like`, {
+      postId,
+    });
+    thunkApi.dispatch(updateLikeCount(data));
   },
 );
 
@@ -79,33 +81,51 @@ export const postsSlice = createSlice({
   reducers: {
     updateCommentCount: (
       state,
-      action: PayloadAction<{ postId: string; operation: string }>,
+      action: PayloadAction<{
+        postId: string;
+        userId: string;
+        operation: string;
+      }>,
     ) => {
       const postId = action.payload.postId;
+      const userId = action.payload.userId;
       const operation = action.payload.operation;
 
       state.posts = state.posts.map((post) => {
         if (post._id === postId) {
           if (operation === 'plus') {
-            post = { ...post, commentCount: post.commentCount + 1 };
+            post = {
+              ...post,
+              usersCommented: [...post.usersCommented, userId],
+            };
           } else if (operation === 'minus') {
-            post = { ...post, commentCount: post.commentCount - 1 };
+            post = { ...post, usersCommented: [...post.usersCommented] };
+
+            const firstUserId = post.usersCommented.findIndex(
+              (user) => user === userId,
+            );
+            if (firstUserId !== -1) {
+              post.usersCommented.splice(firstUserId, 1);
+            }
           }
         }
         return post;
       });
     },
     updateLikeCount: (state, action: PayloadAction<ILikePostResp>) => {
-      const { isLiked, userId, postId } = action.payload
-      const postToUpdate = state.posts.find(post => post._id === postId) as IPost
+      const { isLiked, userId, postId } = action.payload;
+      const postToUpdate = state.posts.find(
+        (post) => post._id === postId,
+      ) as IPost;
 
-      if(isLiked) {
-        postToUpdate?.usersLiked.push(userId)
+      if (isLiked) {
+        postToUpdate?.usersLiked.push(userId);
       } else {
-        postToUpdate.usersLiked = postToUpdate?.usersLiked.filter(id => id !== userId) 
+        postToUpdate.usersLiked = postToUpdate?.usersLiked.filter(
+          (id) => id !== userId,
+        );
       }
-      
-    }
+    },
   },
   extraReducers: (builder) => {
     builder

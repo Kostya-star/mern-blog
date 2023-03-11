@@ -8,7 +8,9 @@ import { useAppSelector } from 'redux/hooks';
 import { updateUser } from 'redux/slices/auth';
 import { base64ToFile } from 'utils/base64ToFile';
 import * as Yup from 'yup';
-import { useAppDispatch } from './../redux/hooks';
+import { useAppDispatch } from 'redux/hooks';
+import { deleteUser } from 'redux/slices/auth';
+import { useNavigate } from 'react-router-dom';
 
 const profileSections = ['About profile', 'Edit profile'];
 
@@ -45,13 +47,12 @@ interface IUserUpdatedValues {
 
 export const Profile = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
   const user = useAppSelector(({ auth }) => auth.data);
 
   const [image, setImage] = useState<File | null>(
     user?.avatarUrl ? (base64ToFile(user.avatarUrl) as File) : null,
   );
-
-  // const userPhoto = user?.avatarUrl ? base64ToFile(user?.avatarUrl) : '';
 
   const initialValues = {
     fullName: user?.fullName,
@@ -105,8 +106,15 @@ export const Profile = () => {
     e.preventDefault();
     setFieldValue('avatarUrl', '');
     setImage(null);
-    // dispatch(deletePhoto())
   };
+
+  const onDeleteUser = async() => {
+    const { data } = await dispatch(deleteUser()).unwrap()
+    if(data.success) {
+      window.localStorage.removeItem('token')
+      navigate('/login')
+    }
+  }
 
   return (
     <div className="profile">
@@ -319,7 +327,7 @@ export const Profile = () => {
         </div>
       </div>
       <div className="profile__deleteAccount">
-        <Button text='Delete account' className='button button_delete'/>
+        <Button text='Delete account' className='button button_delete' onClick={onDeleteUser}/>
       </div>
     </div>
   );

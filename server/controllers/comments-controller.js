@@ -47,7 +47,7 @@ const createComment = async (req, res) => {
 
     await PostModel.findByIdAndUpdate(
       { _id: postId },
-      { $inc: { commentCount: 1 } },
+      { $push: { 'usersCommented': userId } },
       { new: true }
     )
 
@@ -89,18 +89,19 @@ const updateComment = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const { id } = req.params
+    const { userId } = req.body
 
     const comment = await CommentModel.findById(id)
-    
+
     await PostModel.findByIdAndUpdate(
       { _id: comment.post },
-      { $inc: { commentCount: -1 } },
+      { $pull: { 'usersCommented': userId } },
       { new: true }
       )
       
     await comment.delete()
 
-    res.json({ id, postId: comment.post })
+    res.json({ id, postId: comment.post, userId: comment.user })
 
   } catch (error) {
     console.log(error)

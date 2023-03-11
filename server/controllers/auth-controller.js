@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import UserModel from '../models/user-model.js';
+import PostModel from '../models/post-model.js';
+import CommentModel from '../models/comments-model.js';
 import tokenService from '../services/token-service.js';
 import { getBase64 } from '../utils/getBase64.js';
 
@@ -157,8 +159,23 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const { userId } = req.body
-    console.log(userId);
     
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.json({
+        message: 'The user is not found'
+      })
+    }
+
+    await user.delete()
+    await PostModel.deleteMany({ user: userId })
+    await CommentModel.deleteMany({ user: userId })
+
+    res.json({
+      success: true
+    })
+
   } catch (error) {
     console.log(error);
     res.status(500).json({

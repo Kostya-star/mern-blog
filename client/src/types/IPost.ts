@@ -9,7 +9,7 @@ export interface IPost {
   title: string
   updatedAt: string
   viewCount: number
-  commentCount: number
+  usersCommented: string[]
   usersLiked: string[],
   user: IUser
 }

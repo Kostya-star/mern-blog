@@ -117,7 +117,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
               </div>
               <div onClick={() => onCommentsClickHandle(post._id)}>
                 <CommentSVG />
-                {post.commentCount}
+                {post.usersCommented.length}
               </div>
             </div>
             <div>

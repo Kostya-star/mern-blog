@@ -28,7 +28,7 @@ export const createComment = createAsyncThunk(
   async (newComment: ICreateCommentRequest, thunkApi) => {
     const resp = await instance.post<IComment>('/comments', newComment);
     thunkApi.dispatch(
-      updateCommentCount({ postId: resp.data.post, operation: 'plus' }),
+      updateCommentCount({ postId: resp.data.post, userId: resp.data.user._id, operation: 'plus' }),
     );
     return resp.data;
   },
@@ -48,11 +48,11 @@ export const updateComment = createAsyncThunk(
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
   async (commId: string, thunkApi) => {
-    const resp = await instance.delete<{ id: string; postId: string }>(
+    const resp = await instance.delete<{ id: string; postId: string, userId: string }>(
       `/comments/${commId}`,
     );
     thunkApi.dispatch(
-      updateCommentCount({ postId: resp.data.postId, operation: 'minus' }),
+      updateCommentCount({ postId: resp.data.postId, userId: resp.data.userId, operation: 'minus' }),
     );
     return resp.data;
   },

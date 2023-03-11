@@ -1,9 +1,10 @@
 .navigation {
-  position: fixed;
-  left: 0;
-  right: 0;
+  position: sticky;
+  top: 0;
+  // left: 0;
+  // right: 0;
   // width: 100%;
-  padding: 5px 20px;
+  padding: 10px 20px;
   background-color: white;
   z-index: 10;
 
@@ -36,9 +37,9 @@
     gap: 15px;
   }
 
-  &_fake {
-    height: 73px;
-  }
+  // &_fake {
+  //   height: 73px;
+  // }
 
   &__profile {
     display: flex;
@@ -58,8 +59,10 @@
       align-items: center;
     }
 
-    svg {
-      width: 15px;
+    p {
+      svg {
+        width: 15px;
+      }
     }
 
     &__dropdown {

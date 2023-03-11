@@ -7,8 +7,8 @@ import 'scss/buttons.scss';
 import { Button } from '../Button/Button';
 import s from './Navigation.module.scss';
 import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
-import { ReactComponent as UserEditSVG } from '../../../assets/user-edit.svg';
-import { ReactComponent as SignOutSVG } from '../../../assets/sign-out.svg';
+import { ReactComponent as UserEditSVG } from 'assets/user-edit.svg';
+import { ReactComponent as SignOutSVG } from 'assets/sign-out.svg';
 import { useRef, useState, useEffect } from 'react';
 
 export const Navigation = () => {
@@ -105,7 +105,7 @@ export const Navigation = () => {
           </div>
         </div>
       </div>
-      <div className={s.navigation_fake}></div>
+      {/* <div className={s.navigation_fake}></div> */}
     </>
   );
 };

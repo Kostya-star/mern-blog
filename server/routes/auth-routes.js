@@ -15,6 +15,7 @@ router.post('/login', loginValidator, checkValidationErrors, authController.logi
 router.get('/me', checkAuth, authController.getUser)
 
 router.put('/update', upload.single('image'), checkAuth, authController.updateUser)
+router.delete('/delete', checkAuth, authController.deleteUser)
 
 
 export default router

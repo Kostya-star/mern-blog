@@ -154,9 +154,23 @@ const updateUser = async (req, res) => {
   }
 }
 
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.body
+    console.log(userId);
+    
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when updating a user'
+    })
+  }
+}
+
 export default {
   register,
   login,
   getUser,
-  updateUser
+  updateUser,
+  deleteUser
 }

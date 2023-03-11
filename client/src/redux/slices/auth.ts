@@ -38,6 +38,10 @@ export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser
   return data
 })
 
+export const deleteUser = createAsyncThunk('auth/deleteUser', async () => {
+  await instance.delete('auth/deleteUser')
+})
+
 export interface authState {
   data: null | IUser;
   status: string;

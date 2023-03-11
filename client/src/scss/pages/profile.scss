@@ -2,8 +2,9 @@
   display: flex;
   justify-content: center;
   background-color: #dcdac5;
-  padding: 30px 10px;
+  padding: 30px 10px 80px 10px;
   border-radius: 10px;
+  position: relative;
 
   &__content {
     &__header {
@@ -91,5 +92,10 @@
       }
 
     }
+  }
+  &__deleteAccount {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
   }
 }

@@ -28,7 +28,11 @@ export const createComment = createAsyncThunk(
   async (newComment: ICreateCommentRequest, thunkApi) => {
     const resp = await instance.post<IComment>('/comments', newComment);
     thunkApi.dispatch(
-      updateCommentCount({ postId: resp.data.post, userId: resp.data.user._id, operation: 'plus' }),
+      updateCommentCount({
+        postId: resp.data.post,
+        userId: resp.data.user._id,
+        operation: 'plus',
+      }),
     );
     return resp.data;
   },
@@ -48,11 +52,17 @@ export const updateComment = createAsyncThunk(
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
   async (commId: string, thunkApi) => {
-    const resp = await instance.delete<{ id: string; postId: string, userId: string }>(
-      `/comments/${commId}`,
-    );
+    const resp = await instance.delete<{
+      id: string;
+      postId: string;
+      userId: string;
+    }>(`/comments/${commId}`);
     thunkApi.dispatch(
-      updateCommentCount({ postId: resp.data.postId, userId: resp.data.userId, operation: 'minus' }),
+      updateCommentCount({
+        postId: resp.data.postId,
+        userId: resp.data.userId,
+        operation: 'minus',
+      }),
     );
     return resp.data;
   },
@@ -72,14 +82,14 @@ export interface CommentsState {
   currentPost: string;
   comments: IComment[];
   status: string;
-  isComments: boolean
+  isComments: boolean;
 }
 
 const initialState: CommentsState = {
   currentPost: '',
   comments: [],
   status: '',
-  isComments: false
+  isComments: false,
 };
 
 export const commentsSlice = createSlice({
@@ -90,7 +100,7 @@ export const commentsSlice = createSlice({
       state.comments = [];
       state.currentPost = '';
       state.status = '';
-      state.isComments = false
+      state.isComments = false;
     },
     updateCommentLike: (state, action: PayloadAction<ILikeCommResp>) => {
       const { isLiked, commId, userId } = action.payload;
@@ -124,7 +134,7 @@ export const commentsSlice = createSlice({
           state.status = 'success';
           state.comments = action.payload.comments;
           state.currentPost = action.payload.currentPost;
-          state.isComments = true
+          state.isComments = true;
         },
       )
       .addCase(fetchCommentsByPostId.rejected, (state) => {

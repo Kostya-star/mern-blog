@@ -13,7 +13,6 @@ export const checkAuth = async (req, res, next) => {
     if (!decodedToken) {
       throw Error
     }
-
     req.body.userId = decodedToken._id
     next()
   } catch (error) {

@@ -9,7 +9,7 @@ const register = async (req, res) => {
     const image = req.file
 
     const userDb = await UserModel.findOne({ email })
-    
+
     if (userDb) {
       return res.status(400).json({
         message: 'This user already exists'
@@ -19,8 +19,8 @@ const register = async (req, res) => {
     const hashedPass = await bcrypt.hash(password, 5)
 
     let avatarUrl = ''
-    
-    if(image) {
+
+    if (image) {
       avatarUrl = getBase64(image)
     }
 
@@ -108,8 +108,55 @@ const getUser = async (req, res) => {
   }
 }
 
+const updateUser = async (req, res) => {
+  try {
+    const { userId, fullName, email, password } = req.body
+    const image = req.file
+
+    const user = await UserModel.findById(userId)
+
+    if (!user) {
+      return res.json({
+        message: 'The user is not found'
+      })
+    }
+
+    let hashedPass = ''
+
+    if (password) {
+      hashedPass = await bcrypt.hash(password, 5)
+    }
+
+    let avatarUrl = ''
+
+    if (image) {
+      avatarUrl = getBase64(image)
+    }
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { _id: userId },
+      {
+        fullName,
+        email,
+        hashedPassword: hashedPass || user.hashedPassword,
+        avatarUrl: avatarUrl || ''
+      },
+      { new: true }
+    )
+
+    res.json(updatedUser)
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when updating a user'
+    })
+  }
+}
+
 export default {
   register,
   login,
-  getUser
+  getUser,
+  updateUser
 }

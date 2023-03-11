@@ -1,14 +1,14 @@
+import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
-import { ErrorMessage, Form, Formik, FormikTouched } from 'formik';
-import { useState, useRef, ChangeEvent } from 'react';
+import { ErrorMessage, Form, Formik } from 'formik';
+import { ChangeEvent, useRef, useState } from 'react';
 import { useAppSelector } from 'redux/hooks';
-import { deletePhoto } from 'redux/slices/auth';
+import { updateUser } from 'redux/slices/auth';
 import { base64ToFile } from 'utils/base64ToFile';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
-import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 
 const profileSections = ['About profile', 'Edit profile'];
 
@@ -44,21 +44,21 @@ interface IUserUpdatedValues {
 }
 
 export const Profile = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const user = useAppSelector(({ auth }) => auth.data);
 
   const [image, setImage] = useState<File | null>(
-    user?.avatarUrl ? base64ToFile(user.avatarUrl) as File : null
+    user?.avatarUrl ? (base64ToFile(user.avatarUrl) as File) : null,
   );
 
-  const userPhoto = user?.avatarUrl ? base64ToFile(user?.avatarUrl) : '';
+  // const userPhoto = user?.avatarUrl ? base64ToFile(user?.avatarUrl) : '';
 
   const initialValues = {
     fullName: user?.fullName,
     email: user?.email,
     password: '',
     confirmPassword: '',
-    avatarUrl: userPhoto,
+    avatarUrl: 0,
     isPassword: false,
   };
 
@@ -73,24 +73,24 @@ export const Profile = () => {
     user?.createdAt as string,
   ).toLocaleDateString();
 
-  const onUpdateUserProfile = (values: any) => {
-    const { fullName, email, password, avatarUrl } = values;
+  const onUpdateUserProfile = (values: IUserUpdatedValues) => {
+    const { fullName, email, password } = values;
 
-    const updatedUser = {
-      fullName,
-      email,
-      password,
-      // avatarUrl: avatarUrl || image || '',
-      avatarUrl: image || '',
-    };
-    // axios.put('user/update/:id', updatedUser)
-    console.log(updatedUser);
+    const formData = new FormData();
+    formData.append('fullName', fullName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('image', image || '');
+
+    dispatch(updateUser(formData));
   };
 
   const onUploadImage = (
     event: ChangeEvent<HTMLInputElement>,
     setFieldValue: (field: string, val: any) => void,
   ) => {
+    event.preventDefault();
+
     const file = event.target?.files?.[0];
     if (file) {
       setImage(file);
@@ -98,11 +98,15 @@ export const Profile = () => {
     }
   };
 
-  const onDeleteImage = (setFieldValue: (field: string, val: any) => void) => {
-    setFieldValue('avatarUrl', '')
-    setImage(null)
+  const onDeleteImage = (
+    e: MouseEvent,
+    setFieldValue: (field: string, val: any) => void,
+  ) => {
+    e.preventDefault();
+    setFieldValue('avatarUrl', '');
+    setImage(null);
     // dispatch(deletePhoto())
-  }
+  };
 
   return (
     <div className="profile">
@@ -119,10 +123,10 @@ export const Profile = () => {
           ))}
         </div>
         <div className="profile__content__body">
-          {aboutSection && 
+          {aboutSection && (
             <>
-            <div className="profile__content__body__image">
-              <Avatar avatar={user?.avatarUrl as string} />
+              <div className="profile__content__body__image">
+                <Avatar avatar={user?.avatarUrl as string} />
               </div>
               <div className="profile__content__body__info">
                 <div>Name: {user?.fullName}</div>
@@ -131,62 +135,68 @@ export const Profile = () => {
                 <div>Posts created: {user?.postsCreated}</div>
               </div>
             </>
-          }
-{editSection && (
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={onUpdateUserProfile}
-            // enableReinitialize
-            // validateOnMount
-          >
-            {({
-              values,
-              isValid,
-              dirty,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              setFieldValue,
-              isSubmitting,
-            }) => {
-              // console.log(touched);
-              // console.log(dirty);
-              // console.log(values);
-              return (
-                <>
-                  <Form onSubmit={handleSubmit}>
-                    <div className="profile__content__form">
-                      <div className="profile__content__body__image">
-                        {image && (
-                          <img src={URL.createObjectURL(image as File)} alt="avatar" />
-                        )}
-                        {!image && (
-                          // <Avatar avatar={user?.avatarUrl as string} />
-                          <AvatarDefaultSVG />
-                        )}
+          )}
+          {editSection && (
+            <Formik
+              initialValues={initialValues as unknown as IUserUpdatedValues}
+              validationSchema={validationSchema}
+              onSubmit={onUpdateUserProfile}
+              // enableReinitialize
+              // validateOnMount
+            >
+              {({
+                values,
+                isValid,
+                dirty,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                setFieldValue,
+                isSubmitting,
+              }) => {
+                // console.log(touched);
+                // console.log(dirty);
+                // console.log(values);
+                return (
+                  <>
+                    <Form onSubmit={handleSubmit}>
+                      <div className="profile__content__form">
+                        <div className="profile__content__body__image">
+                          {image && (
+                            <img
+                              src={URL.createObjectURL(image as File)}
+                              alt="avatar"
+                            />
+                          )}
+                          {!image && (
+                            // <Avatar avatar={user?.avatarUrl as string} />
+                            <AvatarDefaultSVG />
+                          )}
                           <Button
                             text="Change photo"
                             className="button button_transparent"
-                            onClick={() => inputFileRef.current?.click()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              inputFileRef.current?.click();
+                            }}
                           />
                           <Button
                             text="Delete photo"
                             className="button button_delete"
-                            onClick={() => onDeleteImage(setFieldValue)}
+                            onClick={(e) =>
+                              onDeleteImage(e as any, setFieldValue)
+                            }
                           />
-                        <input
-                          ref={inputFileRef}
-                          type="file"
-                          onChange={(e) =>
-                            onUploadImage(e, setFieldValue)
-                          }
-                          hidden
-                        />
-                      </div>
-                      
-                        <div className="profile__content__form__fields" >
+                          <input
+                            ref={inputFileRef}
+                            type="file"
+                            onChange={(e) => onUploadImage(e, setFieldValue)}
+                            hidden
+                          />
+                        </div>
+
+                        <div className="profile__content__form__fields">
                           <label htmlFor="fullName" className="input">
                             Full name
                             <Input
@@ -299,14 +309,13 @@ export const Profile = () => {
                             disabled={!(isValid && dirty)}
                           />
                         </div>
-                     
-                    </div>
-                  </Form>
-                </>
-              );
-            }}
-          </Formik>
-           )}
+                      </div>
+                    </Form>
+                  </>
+                );
+              }}
+            </Formik>
+          )}
         </div>
       </div>
     </div>

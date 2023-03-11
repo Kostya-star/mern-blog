@@ -14,4 +14,7 @@ router.post('/register', upload.single('image'), registerValidator, checkValidat
 router.post('/login', loginValidator, checkValidationErrors, authController.login)
 router.get('/me', checkAuth, authController.getUser)
 
+router.put('/update', upload.single('image'), checkAuth, authController.updateUser)
+
+
 export default router

@@ -4,6 +4,7 @@ import { instance } from 'API/instance';
 import { RootState } from 'redux/store';
 import { ILoginRequest } from 'types/ILoginRequest';
 import { IRegisterRequest } from 'types/IRegisterRequest';
+import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { IUser } from 'types/IUser';
 
 export const onLoginThunk = createAsyncThunk(
@@ -31,6 +32,12 @@ export const onAuthMeThunk = createAsyncThunk(
   },
 );
 
+export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: FormData) => {
+  const { data } = await instance.put<IUser>('auth/update', updatedUser)
+  
+  return data
+})
+
 export interface authState {
   data: null | IUser;
   status: string;
@@ -49,9 +56,6 @@ export const authSlice = createSlice({
       state.status = '';
       state.data = null;
     },
-    deletePhoto: (state) => {
-      // state.data.avatarUrl = ''
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -104,12 +108,29 @@ export const authSlice = createSlice({
       .addCase(onAuthMeThunk.rejected, (state) => {
         state.status = 'error';
         state.data = null;
-      });
+      })
+
+      // UPDATE USER
+      .addCase(updateUser.pending, (state) => {
+        // state.data = null;
+        state.status = 'loading';
+      })
+      .addCase(
+        updateUser.fulfilled,
+        (state, action: PayloadAction<IUser>) => {
+          state.status = 'success';
+          state.data = action.payload;
+        },
+      )
+      .addCase(updateUser.rejected, (state) => {
+        state.status = 'error';
+        state.data = null;
+      })
   },
 });
 
 export const isAuthSelector = ({ auth }: RootState) => Boolean(auth.data);
 
-export const { logout, deletePhoto } = authSlice.actions;
+export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;

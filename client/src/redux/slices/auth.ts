@@ -49,6 +49,9 @@ export const authSlice = createSlice({
       state.status = '';
       state.data = null;
     },
+    deletePhoto: (state) => {
+      // state.data.avatarUrl = ''
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -107,6 +110,6 @@ export const authSlice = createSlice({
 
 export const isAuthSelector = ({ auth }: RootState) => Boolean(auth.data);
 
-export const { logout } = authSlice.actions;
+export const { logout, deletePhoto } = authSlice.actions;
 
 export default authSlice.reducer;

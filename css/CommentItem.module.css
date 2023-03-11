@@ -1,0 +1,59 @@
+.comment__wrapper {
+  padding: 0 10px;
+}
+.comment__wrapper:hover .comment__edit_delete {
+  display: flex;
+}
+.comment__wrapper .comment {
+  position: relative;
+  display: flex;
+  margin-bottom: 10px;
+}
+.comment__wrapper .comment img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+.comment__wrapper .comment__edit_delete {
+  display: none;
+  gap: 20px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.comment__wrapper .comment__edit_delete svg {
+  cursor: pointer;
+}
+.comment__wrapper .comment__edit_delete svg:hover {
+  background-color: rgb(181, 179, 179);
+  border-radius: 10px;
+}
+.comment__wrapper .comment__body p:first-child {
+  margin-bottom: 10px;
+}
+.comment__wrapper .comment__body p:last-child {
+  color: grey;
+  font-size: 14px;
+}
+.comment__wrapper .comment__footer {
+  display: flex;
+  justify-content: end;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+.comment__wrapper .comment__footer p {
+  color: gray;
+}
+.comment__wrapper .comment__footer p svg {
+  width: 17px;
+  cursor: pointer;
+}
+.comment__wrapper .comment__footer span {
+  font-size: 13px;
+  color: gray;
+}
+
+hr {
+  margin-bottom: 20px;
+}/*# sourceMappingURL=CommentItem.module.css.map */

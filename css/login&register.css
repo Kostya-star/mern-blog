@@ -1,0 +1,45 @@
+.auth {
+  display: flex;
+  justify-content: center;
+}
+.auth__avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 30px;
+  margin-bottom: 20px;
+  color: gray;
+  cursor: pointer;
+}
+.auth__avatar:hover {
+  color: black;
+}
+.auth__avatar:hover svg path {
+  fill: black;
+}
+.auth__avatar svg {
+  width: 136px;
+}
+.auth__avatar svg path {
+  fill: gray;
+}
+.auth__avatar img {
+  width: 250px;
+  height: 250px;
+  border-radius: 40px;
+}
+.auth__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 50px 40px;
+  border-radius: 5px;
+}
+.auth__content h1 {
+  margin-bottom: 20px;
+}
+.auth__content form {
+  margin-top: 20px;
+}/*# sourceMappingURL=login&register.css.map */

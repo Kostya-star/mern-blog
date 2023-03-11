@@ -1,10 +1,14 @@
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
-import { ErrorMessage, Form, Formik } from 'formik';
-import { useState } from 'react';
+import { ErrorMessage, Form, Formik, FormikTouched } from 'formik';
+import { useState, useRef, ChangeEvent } from 'react';
 import { useAppSelector } from 'redux/hooks';
+import { deletePhoto } from 'redux/slices/auth';
+import { base64ToFile } from 'utils/base64ToFile';
 import * as Yup from 'yup';
+import { useAppDispatch } from './../redux/hooks';
+import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 
 const profileSections = ['About profile', 'Edit profile'];
 
@@ -14,28 +18,53 @@ const validationSchema = Yup.object().shape({
     .min(2, 'Must be at least 2 characters')
     .required('Required'),
   email: Yup.string().email('Invalid email address').required('Required'),
-  password: Yup.string()
-    .when("isPassword", ([isPassword], _) => {
-      return isPassword ? Yup.string()
-        .min(6, 'Must be at least 6 characters')
-        .required('Required') : Yup.string().min(0)
-    } 
-    ),
-  confirmPassword: Yup.string()
-    .when('isPassword', ([isPassword], _) => {
-      return isPassword ? Yup.string()
+  password: Yup.string().when('isPassword', ([isPassword], _) => {
+    return isPassword
+      ? Yup.string()
+          .min(6, 'Must be at least 6 characters')
+          .required('Required')
+      : Yup.string().min(0);
+  }),
+  confirmPassword: Yup.string().when('isPassword', ([isPassword], _) => {
+    return isPassword
+      ? Yup.string()
           .oneOf([Yup.ref('password')], 'Passwords must match')
-          .required('Required') : Yup.string().min(0)
-          
-    } 
-    ),
+          .required('Required')
+      : Yup.string().min(0);
+  }),
 });
 
+interface IUserUpdatedValues {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  avatarUrl: File;
+  isPassword: boolean;
+}
+
 export const Profile = () => {
+  const dispatch = useAppDispatch()
   const user = useAppSelector(({ auth }) => auth.data);
 
+  const [image, setImage] = useState<File | null>(
+    user?.avatarUrl ? base64ToFile(user.avatarUrl) as File : null
+  );
+
+  const userPhoto = user?.avatarUrl ? base64ToFile(user?.avatarUrl) : '';
+
+  const initialValues = {
+    fullName: user?.fullName,
+    email: user?.email,
+    password: '',
+    confirmPassword: '',
+    avatarUrl: userPhoto,
+    isPassword: false,
+  };
+
   const [activeSection, setActiveSection] = useState(0);
-  // const [isChangePassword, setIsChangePassword] = useState(false);
+
+  const inputFileRef = useRef<HTMLInputElement>(null);
 
   const aboutSection = profileSections[activeSection] === 'About profile';
   const editSection = profileSections[activeSection] === 'Edit profile';
@@ -45,25 +74,38 @@ export const Profile = () => {
   ).toLocaleDateString();
 
   const onUpdateUserProfile = (values: any) => {
-    console.log(values);
+    const { fullName, email, password, avatarUrl } = values;
+
+    const updatedUser = {
+      fullName,
+      email,
+      password,
+      // avatarUrl: avatarUrl || image || '',
+      avatarUrl: image || '',
+    };
+    // axios.put('user/update/:id', updatedUser)
+    console.log(updatedUser);
   };
 
-  const initialValues = {
-    fullName: user?.fullName,
-    email: user?.email,
-    password: '',
-    confirmPassword: '',
-    avatarUrl: user?.avatarUrl,
-    isPassword: false,
+  const onUploadImage = (
+    event: ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, val: any) => void,
+  ) => {
+    const file = event.target?.files?.[0];
+    if (file) {
+      setImage(file);
+      setFieldValue('avatarUrl', null);
+    }
   };
 
+  const onDeleteImage = (setFieldValue: (field: string, val: any) => void) => {
+    setFieldValue('avatarUrl', '')
+    setImage(null)
+    // dispatch(deletePhoto())
+  }
 
   return (
     <div className="profile">
-      <div className="profile__image">
-        <Avatar avatar={user?.avatarUrl as string} />
-        {editSection && <span>change photo</span>}
-      </div>
       <div className="profile__content">
         <div className="profile__content__header">
           {profileSections.map((section, ind) => (
@@ -77,149 +119,194 @@ export const Profile = () => {
           ))}
         </div>
         <div className="profile__content__body">
-          {aboutSection && (
+          {aboutSection && 
             <>
-              <div>Name: {user?.fullName}</div>
-              <div>Email: {user?.email}</div>
-              <div>Created: {accountCreationDate}</div>
-              <div>Posts created: {user?.postsCreated}</div>
+            <div className="profile__content__body__image">
+              <Avatar avatar={user?.avatarUrl as string} />
+              </div>
+              <div className="profile__content__body__info">
+                <div>Name: {user?.fullName}</div>
+                <div>Email: {user?.email}</div>
+                <div>Created: {accountCreationDate}</div>
+                <div>Posts created: {user?.postsCreated}</div>
+              </div>
             </>
-          )}
-
-          {editSection && (
-            <div>
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={onUpdateUserProfile}
-                enableReinitialize
-              >
-                {({
-                  values,
-                  isValid,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  setFieldValue,
-                  isSubmitting,
-                }) => {
-                  console.log(values);
-                  return (
-                    <Form onSubmit={handleSubmit}>
-                      <label htmlFor="fullName" className="input">
-                        Full name
-                        <Input
-                          type="text"
-                          id="fullName"
-                          name="fullName"
-                          value={values.fullName}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
+          }
+{editSection && (
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onUpdateUserProfile}
+            // enableReinitialize
+            // validateOnMount
+          >
+            {({
+              values,
+              isValid,
+              dirty,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+              isSubmitting,
+            }) => {
+              // console.log(touched);
+              // console.log(dirty);
+              // console.log(values);
+              return (
+                <>
+                  <Form onSubmit={handleSubmit}>
+                    <div className="profile__content__form">
+                      <div className="profile__content__body__image">
+                        {image && (
+                          <img src={URL.createObjectURL(image as File)} alt="avatar" />
+                        )}
+                        {!image && (
+                          // <Avatar avatar={user?.avatarUrl as string} />
+                          <AvatarDefaultSVG />
+                        )}
+                          <Button
+                            text="Change photo"
+                            className="button button_transparent"
+                            onClick={() => inputFileRef.current?.click()}
+                          />
+                          <Button
+                            text="Delete photo"
+                            className="button button_delete"
+                            onClick={() => onDeleteImage(setFieldValue)}
+                          />
+                        <input
+                          ref={inputFileRef}
+                          type="file"
+                          onChange={(e) =>
+                            onUploadImage(e, setFieldValue)
+                          }
+                          hidden
                         />
-                        <ErrorMessage
-                          name="fullName"
-                          component="span"
-                          className="input_error"
-                        />
-                      </label>
-
-                      <label htmlFor="email" className="input">
-                        Email
-                        <Input
-                          type="email"
-                          id="email"
-                          name="email"
-                          value={values.email}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                        />
-                        <ErrorMessage
-                          name="email"
-                          component="span"
-                          className="input_error"
-                        />
-                      </label>
-
-                      {values.isPassword && (
-                        <>
-                          <label htmlFor="password" className="input">
-                            New password
+                      </div>
+                      
+                        <div className="profile__content__form__fields" >
+                          <label htmlFor="fullName" className="input">
+                            Full name
                             <Input
-                              type="password"
-                              id="password"
-                              name="password"
-                              value={!values.isPassword ? '' : values.password}
+                              type="text"
+                              id="fullName"
+                              name="fullName"
+                              value={values.fullName}
                               onChange={handleChange}
                               onBlur={handleBlur}
                             />
                             <ErrorMessage
-                              name="password"
+                              name="fullName"
+                              component="span"
+                              className="input_error"
+                            />
+                          </label>
+                          <label htmlFor="email" className="input">
+                            Email
+                            <Input
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={values.email}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                            <ErrorMessage
+                              name="email"
                               component="span"
                               className="input_error"
                             />
                           </label>
 
-                          <label htmlFor="confirmPassword" className="input">
-                            Confirm password
+                          {values.isPassword && (
+                            <>
+                              <label htmlFor="password" className="input">
+                                New password
+                                <Input
+                                  type="password"
+                                  id="password"
+                                  name="password"
+                                  value={
+                                    !values.isPassword ? '' : values.password
+                                  }
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                />
+                                <ErrorMessage
+                                  name="password"
+                                  component="span"
+                                  className="input_error"
+                                />
+                              </label>
+
+                              <label
+                                htmlFor="confirmPassword"
+                                className="input"
+                              >
+                                Confirm password
+                                <Input
+                                  type="password"
+                                  id="confirmPassword"
+                                  name="confirmPassword"
+                                  value={
+                                    !values.isPassword
+                                      ? ''
+                                      : values.confirmPassword
+                                  }
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                />
+                                <ErrorMessage
+                                  name="confirmPassword"
+                                  component="span"
+                                  className="input_error"
+                                />
+                              </label>
+                            </>
+                          )}
+                          <label
+                            htmlFor="isPassword"
+                            className="input checkbox"
+                          >
+                            <span>Change password?</span>
                             <Input
-                              type="password"
-                              id="confirmPassword"
-                              name="confirmPassword"
-                              value={!values.isPassword ? '' : values.confirmPassword}
-                              onChange={handleChange}
+                              type="checkbox"
+                              id="isPassword"
+                              name="isPassword"
                               onBlur={handleBlur}
-                            />
-                            <ErrorMessage
-                              name="confirmPassword"
-                              component="span"
-                              className="input_error"
+                              // onChange={handleChange}
+                              onChange={(e) => {
+                                if (!e.target.checked) {
+                                  setFieldValue('password', '');
+                                  setFieldValue('confirmPassword', '');
+                                }
+                                handleChange(e);
+                              }}
+                              checked={values.isPassword}
                             />
                           </label>
-                        </>
-                      )}
-                      <label htmlFor="isPassword" className="input">
-                        Change password?
-                        <Input
-                          type="checkbox"
-                          id="isPassword"
-                          name="isPassword"
-                          onBlur={handleBlur}
-                          // onChange={handleChange}
-                          onChange={(e) => {
-                            if (!e.target.checked) {
-                              setFieldValue('password', '');
-                              setFieldValue('confirmPassword', '');
-                            }
-                            handleChange(e)
-                          }}
-                          // checked={isChangePassword}
-                          checked={values.isPassword}
-                          // onChange={() => setIsChangePassword(!isChangePassword)}
-                        />
-                      </label>
 
-                      {/* <div className="change_password">
-                      <span
-                        onClick={() => setIsChangePassword(!isChangePassword)}
-                      >
-                        Change password?
-                      </span>
-                    </div> */}
-
-                      <Button
-                        type="submit"
-                        text="Save changes"
-                        className={`button ${
-                          isValid ? 'button_colored' : 'button_disabled'
-                        }`}
-                        disabled={!isValid}
-                      />
-                    </Form>
-                  );
-                }}
-              </Formik>
-            </div>
-          )}
+                          <Button
+                            type="submit"
+                            text="Save changes"
+                            className={`button ${
+                              isValid && dirty
+                                ? 'button_colored'
+                                : 'button_disabled'
+                            }`}
+                            disabled={!(isValid && dirty)}
+                          />
+                        </div>
+                     
+                    </div>
+                  </Form>
+                </>
+              );
+            }}
+          </Formik>
+           )}
         </div>
       </div>
     </div>

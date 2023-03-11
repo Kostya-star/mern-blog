@@ -1,0 +1,119 @@
+.post {
+  position: relative;
+}
+.post .post__popupButtons {
+  display: none;
+}
+.post:hover .post__popupButtons {
+  display: flex;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  gap: 20px;
+  border-radius: 10px;
+  background-color: white;
+  padding: 10px;
+}
+.post:hover .post__popupButtons svg {
+  cursor: pointer;
+}
+.post:hover .post__popupButtons svg:hover {
+  background-color: rgb(173, 170, 170);
+  border-radius: 5px;
+}
+.post__header {
+  font-size: 0px;
+  margin-bottom: none;
+  padding-bottom: none;
+}
+.post__header img {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  width: 100%;
+}
+.post__content {
+  padding: 20px;
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.post__content_trimtop {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.post__content__header {
+  display: flex;
+  margin-bottom: 20px;
+}
+.post__content__header div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.post__content__header div span {
+  display: block;
+}
+.post__content__header div span.fullName {
+  font-weight: 600;
+}
+.post__content__header div span.time {
+  color: gray;
+  font-size: 15px;
+}
+.post__content__body {
+  padding-left: 65px;
+}
+.post__content__body__heading h2 {
+  margin-bottom: 15px;
+  font-size: 35px;
+  color: black;
+  word-wrap: break-word;
+}
+.post__content__body__tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+.post__content__body__tags span {
+  margin-right: 20px;
+  color: rgb(166, 161, 161);
+}
+.post__content__body__tags span:hover {
+  color: black;
+}
+.post__content__body__dropdown {
+  display: flex;
+  justify-content: end;
+  color: #58a6d6;
+  padding-right: 50px;
+}
+.post__content__body__dropdown p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.post__content__body__dropdown svg {
+  width: 15px;
+}
+.post__content__body__statistics {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  color: gray;
+}
+.post__content__body__statistics__group {
+  display: flex;
+  gap: 20px;
+}
+.post__content__body__statistics__group svg {
+  cursor: pointer;
+}
+.post__content__body__statistics__group a {
+  margin-left: 20px;
+}
+.post__content__body__text {
+  margin-bottom: 20px;
+  font-size: 20px;
+}/*# sourceMappingURL=PostItem.module.css.map */

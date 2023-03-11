@@ -1,0 +1,31 @@
+.button {
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 17px;
+  cursor: pointer;
+}
+.button_colored {
+  color: white;
+  background-color: #4361EE;
+  border: none;
+}
+.button_transparent {
+  color: #4361EE;
+  background-color: white;
+  border: 1px solid #4361EE;
+}
+.button_cancel {
+  background-color: rgb(200, 199, 199);
+  border: none;
+  color: #4361EE;
+}
+.button_delete {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+}
+.button_disabled {
+  background: #b0afaf;
+  color: gray;
+  cursor: no-drop;
+}/*# sourceMappingURL=buttons.css.map */

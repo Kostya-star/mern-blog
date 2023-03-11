@@ -93,12 +93,15 @@ const deleteComment = async (req, res) => {
 
     const comment = await CommentModel.findById(id)
 
-    await PostModel.findByIdAndUpdate(
-      { _id: comment.post },
-      { $pull: { 'usersCommented': userId } },
-      { new: true }
-      )
-      
+    const post = await PostModel.findById(comment.post);
+
+    const index = post.usersCommented.findIndex((user) => user.toString() === userId.toString());
+
+    if (index !== -1) {
+      post.usersCommented.splice(index, 1);
+      await post.save();
+    }
+
     await comment.delete()
 
     res.json({ id, postId: comment.post, userId: comment.user })
@@ -116,16 +119,16 @@ const likeComment = async (req, res) => {
     const { commId, userId } = req.body
 
     const comment = await CommentModel.findById(commId)
-    
-    if(!comment) {
+
+    if (!comment) {
       return res.status(404).json({
         message: 'The comment is not found'
       })
     }
 
     const isLiked = comment.usersLiked.includes(userId)
-    
-    if(isLiked) {
+
+    if (isLiked) {
       await comment.updateOne({ $pull: { 'usersLiked': userId } })
       res.json({ isLiked: false, commId, userId });
     } else {

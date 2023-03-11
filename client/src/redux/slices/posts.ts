@@ -104,9 +104,9 @@ export const postsSlice = createSlice({
             const firstUserId = post.usersCommented.findIndex(
               (user) => user === userId,
             );
-            if (firstUserId !== -1) {
+            // if (firstUserId !== -1) {
               post.usersCommented.splice(firstUserId, 1);
-            }
+            // }
           }
         }
         return post;

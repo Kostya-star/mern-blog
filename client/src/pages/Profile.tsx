@@ -326,9 +326,9 @@ export const Profile = () => {
           )}
         </div>
       </div>
-      <div className="profile__deleteAccount">
+      {/* <div className="profile__deleteAccount">
         <Button text='Delete account' className='button button_delete' onClick={onDeleteUser}/>
-      </div>
+      </div> */}
     </div>
   );
 };

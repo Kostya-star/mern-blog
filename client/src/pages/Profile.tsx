@@ -47,7 +47,7 @@ interface IUserUpdatedValues {
 
 export const Profile = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = useAppSelector(({ auth }) => auth.data);
 
   const [image, setImage] = useState<File | null>(
@@ -108,13 +108,19 @@ export const Profile = () => {
     setImage(null);
   };
 
-  const onDeleteUser = async() => {
-    const { data } = await dispatch(deleteUser()).unwrap()
-    if(data.success) {
-      window.localStorage.removeItem('token')
-      navigate('/login')
+  const onDeleteUser = async () => {
+    if (
+      window.confirm(
+        'Do you really want to delete your account? NOTE: all of your data: posts, comments... will be erased forever!',
+      )
+    ) {
+      const { data } = await dispatch(deleteUser()).unwrap();
+      if (data.success) {
+        window.localStorage.removeItem('token');
+        navigate('/login');
+      }
     }
-  }
+  };
 
   return (
     <div className="profile">
@@ -163,8 +169,6 @@ export const Profile = () => {
                 setFieldValue,
                 isSubmitting,
               }) => {
-                // console.log(touched);
-                // console.log(dirty);
                 // console.log(values);
                 return (
                   <>
@@ -326,9 +330,13 @@ export const Profile = () => {
           )}
         </div>
       </div>
-      {/* <div className="profile__deleteAccount">
-        <Button text='Delete account' className='button button_delete' onClick={onDeleteUser}/>
-      </div> */}
+      <div className="profile__deleteAccount">
+        <Button
+          text="Delete account"
+          className="button button_delete"
+          onClick={onDeleteUser}
+        />
+      </div>
     </div>
   );
 };

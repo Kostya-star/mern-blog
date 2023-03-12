@@ -6,6 +6,7 @@ import { ILoginRequest } from 'types/ILoginRequest';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { IUser } from 'types/IUser';
+import { clearCommentsSlice } from './comments';
 
 export const onLoginThunk = createAsyncThunk(
   'auth/onLoginThunk',
@@ -38,9 +39,9 @@ export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser
   return data
 })
 
-export const deleteUser = createAsyncThunk('auth/deleteUser', async () => {
+export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi) => {
   const resp = await instance.delete<{ success: boolean }>('auth/delete')
-
+  thunkApi.dispatch(clearCommentsSlice())
   return resp
 })
 

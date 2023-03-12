@@ -21,10 +21,9 @@ export const Navigation = () => {
 
   const dropDownRef = useRef<HTMLDivElement>(null);
 
-  const { userPhoto, userName, userId } = useAppSelector(({ auth }) => ({
+  const { userPhoto, userName } = useAppSelector(({ auth }) => ({
     userPhoto: auth.data?.avatarUrl,
     userName: auth.data?.fullName,
-    userId: auth.data?._id
   }));
 
   useEffect(() => {
@@ -105,7 +104,6 @@ export const Navigation = () => {
           </div>
         </div>
       </div>
-      {/* <div className={s.navigation_fake}></div> */}
     </>
   );
 };

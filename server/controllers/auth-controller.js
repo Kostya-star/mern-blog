@@ -169,8 +169,13 @@ const deleteUser = async (req, res) => {
     }
 
     await user.delete()
+
     await PostModel.deleteMany({ user: userId })
     await CommentModel.deleteMany({ user: userId })
+
+    await PostModel.updateMany({ usersLiked: userId }, { $pull: { usersLiked: userId } })
+    await PostModel.updateMany({ usersCommented: userId }, { $pull: { usersCommented: userId } })
+    await CommentModel.updateMany({ usersLiked: userId }, { $pull: { usersLiked: userId } })
 
     res.json({
       success: true

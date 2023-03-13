@@ -2,7 +2,10 @@
 
 .home {
   &__wrapper {
-    // padding-top: 40px;
+    &_shrink {
+      width: 60%;
+      margin: 0 auto;
+    }
   }
 
   &__content {

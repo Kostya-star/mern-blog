@@ -52,7 +52,7 @@ export const Home = () => {
   }, []);
 
   return (
-    <div className="home__wrapper">
+    <div className={`home__wrapper ${!isComments && 'home__wrapper_shrink'}`}>
       <div className={`home__navbar ${isComments && 'home__navbar_shrink'}`}>
         <Categories />
         {isAuth && (
@@ -96,6 +96,7 @@ export const Home = () => {
           {postsStatus === 'success' &&
             posts?.map((post) => <PostItem key={post._id} post={post} />)}
         </div>
+
       )}
       {isScrollBtnVisible && (
         <div className="home__scrollUp">

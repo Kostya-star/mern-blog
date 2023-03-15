@@ -35,11 +35,13 @@ mongoose.set('strictQuery', false)
 const start = async () => {
   try {
     await mongoose.connect(process.env.DB_URL)
+    app.listen(PORT, () => console.log(`Server started on PORT${PORT}`))
   } catch (error) {
     console.log(error);
   }
 }
 
-start().then(() => {
-  app.listen(PORT, () => console.log(`Server started on PORT${PORT}`))
-})
+start()
+// .then(() => {
+//   app.listen(PORT, () => console.log(`Server started on PORT${PORT}`))
+// })

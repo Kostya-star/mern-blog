@@ -4,7 +4,7 @@
   // left: 0;
   // right: 0;
   // width: 100%;
-  padding: 10px 20px;
+  padding: 5px 20px;
   background-color: white;
   z-index: 10;
 
@@ -37,10 +37,6 @@
     gap: 15px;
   }
 
-  // &_fake {
-  //   height: 73px;
-  // }
-
   &__profile {
     display: flex;
     align-items: center;
@@ -57,21 +53,28 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      svg {
+        width: 10px;
+      }
+      span {
+        font-size: 13px;
+      }
     }
 
-    p {
-      svg {
-        width: 15px;
-      }
+    img {
+      width: 40px;
+      height: 40px;
     }
 
     &__dropdown {
       position: absolute;
       top: 110%;
+      right: 50px;
       background-color: #fff;
       border: 1px solid rgb(75, 174, 220);
       padding: 10px 15px;
       border-radius: 10px;
+      min-width: 145px;
 
       ul {
         display: flex;
@@ -80,7 +83,7 @@
         list-style: none;
 
         svg {
-          width: 24px;
+          width: 20px;
         }
 
         li {

@@ -31,25 +31,29 @@ export const Home = () => {
 
   useEffect(() => {
     dispatch(fetchPosts({ sortedCat: 'createdAt' }));
-    dispatch(fetchTags());
-    dispatch(fetchComments());
+    // dispatch(fetchTags());
+    // dispatch(fetchComments());
   }, []);
 
   useEffect(() => {
     const handlePageScroll = () => {
-      if (window.pageYOffset > 300) {
-        setScrollBtnVisible(true);
-      } else {
+      if (window.pageYOffset > 300 && !isScrollBtnVisible) {
+          setScrollBtnVisible(true);
+        } else if(window.pageYOffset < 300 && isScrollBtnVisible) {
         setScrollBtnVisible(false);
       }
     };
-
     window.addEventListener('scroll', handlePageScroll);
 
     return () => {
       window.removeEventListener('scroll', handlePageScroll);
     };
-  }, []);
+  });
+
+  const onClickScrollTop = () => {
+    // setScrollBtnVisible(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className={`home__wrapper ${!isComments && 'home__wrapper_shrink'}`}>
@@ -103,7 +107,7 @@ export const Home = () => {
           <Button
             text="Scroll up"
             className="button button_transparent"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={onClickScrollTop}
           >
             <ArrowUpSVG />
           </Button>

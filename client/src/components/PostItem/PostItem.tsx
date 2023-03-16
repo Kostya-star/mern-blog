@@ -68,7 +68,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
         }`}
       >
         <div className={s.post__content__header}>
-          <Avatar avatar={post.user?.avatarUrl as string} />
+          <Avatar avatar={post.user.avatarUrl as string} />
 
           <div>
             <span className={s.fullName}>{post.user?.fullName}</span>

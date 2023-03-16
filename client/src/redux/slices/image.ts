@@ -1,32 +1,32 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { instance } from 'API/instance';
-import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
-import { INewPostRequest } from 'types/INewPostRequest';
-import { IPost } from 'types/IPost';
-import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
-import { IUploadImgResp } from 'types/IUploadImgResp';
+// import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+// import { instance } from 'API/instance';
+// import { IFetchPostsQueryParams } from 'types/IFetchPostsQueryRequest';
+// import { INewPostRequest } from 'types/INewPostRequest';
+// import { IPost } from 'types/IPost';
+// import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
+// import { IUploadImgResp } from 'types/IUploadImgResp';
 
 
-export const uploadPostImage = createAsyncThunk(
-  'images/uploadPostImage',
-  async (formData: FormData) => {
-    const resp = await instance.post<IUploadImgResp>('/upload/postImg', formData, {
-      // headers: {
-      //   'Content-Type': 'multipart/form-data'
-      // }
-    });
-    return resp.data;
-  },
-);
+// export const uploadPostImage = createAsyncThunk(
+//   'images/uploadPostImage',
+//   async (formData: FormData) => {
+//     const resp = await instance.post<IUploadImgResp>('/upload/postImg', formData, {
+//       // headers: {
+//       //   'Content-Type': 'multipart/form-data'
+//       // }
+//     });
+//     return resp.data;
+//   },
+// );
 
-export const uploadUserPhoto = createAsyncThunk(
-  'images/uploadUserPhoto',
-  async (formData: FormData) => {
-    const resp = await instance.post<IUploadImgResp>('/upload/userPhoto', formData);
-    return resp.data;
-  },
-);
+// export const uploadUserPhoto = createAsyncThunk(
+//   'images/uploadUserPhoto',
+//   async (formData: FormData) => {
+//     const resp = await instance.post<IUploadImgResp>('/upload/userPhoto', formData);
+//     return resp.data;
+//   },
+// );
 
 // export interface PostsState {
 //   posts: IPost[];

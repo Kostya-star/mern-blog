@@ -14,7 +14,7 @@ router.post('/register', upload.single('image'), registerValidator, checkValidat
 router.post('/login', loginValidator, checkValidationErrors, authController.login)
 router.get('/me', checkAuth, authController.getUser)
 
-router.put('/update', updateUserValidator, checkValidationErrors, upload.single('image'), checkAuth, authController.updateUser)
+router.put('/update', upload.single('image'), updateUserValidator, checkValidationErrors, checkAuth, authController.updateUser)
 router.delete('/delete', checkAuth, authController.deleteUser)
 
 

@@ -45,9 +45,6 @@ export const onRegister = createAsyncThunk(
         throw new Error(err.message);
       }
     } 
-    // {
-    //   throw new Error(error.response.data.message)
-    // }
   },
 );
 
@@ -61,9 +58,20 @@ export const onAuthMeThunk = createAsyncThunk(
 );
 
 export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: FormData) => {
-  const { data } = await instance.put<IUser>('auth/update', updatedUser)
-  
-  return data
+  try {
+    const { data } = await instance.put<IUser>('auth/update', updatedUser)
+    return data
+    
+  } catch (serverErr: any) {
+    const err = serverErr.response.data
+    
+    if(Array.isArray(err)) {
+      const error = err.map((err: any) => err.msg).join(', ')
+      throw new Error(error);
+    } else {
+      throw new Error(err.message);
+    }
+  } 
 })
 
 export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi) => {
@@ -151,14 +159,15 @@ export const authSlice = createSlice({
       })
       .addCase(
         updateUser.fulfilled,
-        (state, action: PayloadAction<IUser>) => {
-          state.status = 'success';
-          state.data = action.payload;
+        (state, action: PayloadAction<IUser | null>) => {
+          if(action.payload) {
+            state.status = 'success';
+            state.data = action.payload;
+          }
         },
       )
       .addCase(updateUser.rejected, (state) => {
-        state.status = 'error';
-        state.data = null;
+        // state.status = 'error';
       })
       // DELETE USER
       .addCase(

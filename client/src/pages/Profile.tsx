@@ -64,6 +64,7 @@ export const Profile = () => {
   };
 
   const [activeSection, setActiveSection] = useState(0);
+  const [serverError, setServerError] = useState('');
 
   const inputFileRef = useRef<HTMLInputElement>(null);
 
@@ -74,16 +75,25 @@ export const Profile = () => {
     user?.createdAt as string,
   ).toLocaleDateString();
 
-  const onUpdateUserProfile = (values: IUserUpdatedValues) => {
-    const { fullName, email, password } = values;
+  const onUpdateUserProfile = async (values: IUserUpdatedValues) => {
+    try {
+      const { fullName, email, password } = values;
+  
+      const formData = new FormData();
+      formData.append('fullName', fullName);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('image', image || '');
+  
+      const resp = await dispatch(updateUser(formData)).unwrap()
 
-    const formData = new FormData();
-    formData.append('fullName', fullName);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('image', image || '');
-
-    dispatch(updateUser(formData));
+      if(resp) {
+        setServerError('');
+      }
+      
+    } catch (error: any) {
+      setServerError(error.message);
+    }
   };
 
   const onUploadImage = (
@@ -312,6 +322,10 @@ export const Profile = () => {
                               checked={values.isPassword}
                             />
                           </label>
+
+                          {
+                            serverError && <div className='input input_error'>{serverError}</div>
+                          }
 
                           <Button
                             type="submit"

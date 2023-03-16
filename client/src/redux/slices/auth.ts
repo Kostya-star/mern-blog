@@ -8,11 +8,23 @@ import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { IUser } from 'types/IUser';
 import { clearCommentsSlice } from './comments';
 
-export const onLoginThunk = createAsyncThunk(
-  'auth/onLoginThunk',
+export const onLogin = createAsyncThunk(
+  'auth/onLogin',
   async (params: ILoginRequest) => {
-    const resp = await instance.post<IUser>('/auth/login', params);
-    return resp.data;
+    try {
+      const resp = await instance.post<IUser>('/auth/login', params);
+      return resp.data;
+      
+    } catch (serverErr: any) {
+      const err = serverErr.response.data
+
+      if(Array.isArray(err)) {
+        const error = err.map((err: any) => err.msg).join(', ')
+        throw new Error(error);
+      } else {
+        throw new Error(err.message);
+      }
+    }
   },
 );
 
@@ -23,9 +35,19 @@ export const onRegister = createAsyncThunk(
       const resp = await instance.post<IUser>('/auth/register', formData);
       return resp.data;
 
-    } catch (error: any) {
-      throw new Error(error.response.data.message)
-    }
+    } catch (serverErr: any) {
+      const err = serverErr.response.data
+
+      if(Array.isArray(err)) {
+        const error = err.map((err: any) => err.msg).join(', ')
+        throw new Error(error);
+      } else {
+        throw new Error(err.message);
+      }
+    } 
+    // {
+    //   throw new Error(error.response.data.message)
+    // }
   },
 );
 
@@ -72,18 +94,18 @@ export const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
     // onLoginThunk
-      .addCase(onLoginThunk.pending, (state) => {
+      .addCase(onLogin.pending, (state) => {
         state.data = null;
         state.status = 'loading';
       })
       .addCase(
-        onLoginThunk.fulfilled,
-        (state, action: PayloadAction<IUser>) => {
+        onLogin.fulfilled,
+        (state, action: PayloadAction<IUser | null>) => {
           state.status = 'success';
           state.data = action.payload;
         },
       )
-      .addCase(onLoginThunk.rejected, (state) => {
+      .addCase(onLogin.rejected, (state) => {
         state.status = 'error';
         state.data = null;
       })

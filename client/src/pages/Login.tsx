@@ -1,8 +1,9 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAuthSelector, onLoginThunk } from 'redux/slices/auth';
+import { isAuthSelector, onLogin } from 'redux/slices/auth';
 import { ILoginRequest } from 'types/ILoginRequest';
 import * as Yup from 'yup';
 import { useAppDispatch, useAppSelector } from './../redux/hooks';
@@ -22,15 +23,22 @@ export const Login = () => {
   const dispatch = useAppDispatch();
   const isAuth = useAppSelector(isAuthSelector);
 
+  const [serverError, setServerError] = useState('')
+
   const onLoginSubmit = async (
     values: ILoginRequest,
     actions: FormikHelpers<ILoginRequest>,
   ) => {
-    const resp = await dispatch(onLoginThunk(values)).unwrap();
-
-    if (resp.token) {
-      window.localStorage.setItem('token', resp.token);
-      navigate('/');
+    try {
+      const resp = await dispatch(onLogin(values)).unwrap();
+  
+      if (resp?.token) {
+        window.localStorage.setItem('token', resp.token);
+        navigate('/');
+      }
+      
+    } catch (error: any) {
+      setServerError(error.message)
     }
 
     // actions.setSubmitting(true)
@@ -88,6 +96,10 @@ export const Login = () => {
                   className="input_error"
                 />
               </div>
+
+              {
+                serverError && <div className='input input_error'>{serverError}</div>
+              }
 
               <Button
                 text="Sign in"

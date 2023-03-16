@@ -10,3 +10,7 @@ export const loginValidator = [
   body('email', 'Invalid email format').isEmail(),
   body('password', 'Password must be greater than 5 symbols').isLength({ min: 5 }),
 ]
+
+export const updateUserValidator = [
+  body('email', 'Invalid email format').isEmail(),
+]

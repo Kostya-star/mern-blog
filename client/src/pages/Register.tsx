@@ -2,7 +2,7 @@ import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik } from 'formik';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { onRegister } from 'redux/slices/auth';
 import 'scss/all.scss';
@@ -33,6 +33,8 @@ export const Register = () => {
 
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const[serverError, setServerError] = useState('')
+
   const onRegisterSubmit = async (values: IRegisterRequest) => {
     try {
       const formData = new FormData();
@@ -43,12 +45,12 @@ export const Register = () => {
 
       const resp = await dispatch(onRegister(formData)).unwrap();
 
-      if (resp.token) {
+      if (resp?.token) {
         window.localStorage.setItem('token', resp.token);
         navigate('/');
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setServerError(error.message)
     }
   };
 
@@ -148,6 +150,10 @@ export const Register = () => {
                     className="input_error"
                   />
                 </div>
+                {
+                  serverError &&
+                  <div className='input input_error'>{serverError}</div>
+                }
                 <Button
                   text="Sign up"
                   className="button button_colored"

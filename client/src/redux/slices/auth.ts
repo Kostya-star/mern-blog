@@ -19,8 +19,13 @@ export const onLoginThunk = createAsyncThunk(
 export const onRegister = createAsyncThunk(
   'auth/onRegister',
   async (formData: FormData) => {
-    const resp = await instance.post<IUser>('/auth/register', formData);
-    return resp.data;
+    try {
+      const resp = await instance.post<IUser>('/auth/register', formData);
+      return resp.data;
+
+    } catch (error: any) {
+      throw new Error(error.response.data.message)
+    }
   },
 );
 
@@ -90,7 +95,7 @@ export const authSlice = createSlice({
       })
       .addCase(
         onRegister.fulfilled,
-        (state, action: PayloadAction<IUser>) => {
+        (state, action: PayloadAction<IUser | null>) => {
           state.status = 'success';
           state.data = action.payload;
         },

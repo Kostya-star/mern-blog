@@ -51,7 +51,6 @@ export const Home = () => {
   });
 
   const onClickScrollTop = () => {
-    // setScrollBtnVisible(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -105,7 +104,7 @@ export const Home = () => {
       {isScrollBtnVisible && (
         <div className="home__scrollUp">
           <Button
-            text="Scroll up"
+            text="scroll up"
             className="button button_transparent"
             onClick={onClickScrollTop}
           >

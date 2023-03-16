@@ -2,8 +2,8 @@ import axios from 'axios'
 
 export const instance = axios.create({
   // baseURL: 'http://localhost:5000'
+  baseURL: process.env.BASE_REQUEST_URL
   // baseURL: 'https://mern-blog-7m87.onrender.com/'
-  baseURL: process.env.BASE_URL
   // baseURL: 'https://mern-blog99.herokuapp.com/' - obsolete & not used anymore
 })
 

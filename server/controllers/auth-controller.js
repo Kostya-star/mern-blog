@@ -14,7 +14,7 @@ const register = async (req, res) => {
 
     if (userDb) {
       return res.status(400).json({
-        message: 'This user already exists'
+        message: 'This email is already registered'
       })
       // throw new Error('the user already exists')
     }

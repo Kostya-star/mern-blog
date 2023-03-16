@@ -5,7 +5,9 @@
   // right: 0;
   // width: 100%;
   padding: 5px 20px;
-  background-color: white;
+  // background-color: white;
+  // background: rgb(226, 247, 244);
+  background: radial-gradient(circle, rgb(232, 208, 219) 0%, rgb(226, 247, 244) 100%);
   z-index: 10;
 
   &__content {

@@ -57,7 +57,7 @@ export const Navigation = () => {
             <div>Go home</div>
           </Link>
           <div className={s.navigation__buttons}>
-            {!isAuth && !token ? (
+            {!isAuth ? (
               <>
                 <Link to="/login">
                   <Button text="Log in" className="button button_transparent" />

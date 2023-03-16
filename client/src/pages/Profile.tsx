@@ -114,11 +114,14 @@ export const Profile = () => {
         'Do you really want to delete your account? NOTE: all of your data: posts, comments... will be erased forever!',
       )
     ) {
-      const { data } = await dispatch(deleteUser()).unwrap();
-      if (data.success) {
-        window.localStorage.removeItem('token');
-        navigate('/login');
-      }
+      dispatch(deleteUser())
+        .unwrap()
+        .then(({ data }) => {
+          if (data.success) {
+            window.localStorage.removeItem('token');
+            navigate('/login');
+          }
+        });
     }
   };
 

@@ -8,7 +8,7 @@ import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.s
 import { Avatar } from 'components/Avatar/Avatar';
 import { FC, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { fetchCommentsByPostId } from 'redux/slices/comments';
 import { deletePost, likePost } from 'redux/slices/posts';
@@ -23,6 +23,7 @@ interface IPostItemProps {
 
 export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const { isShowEditDelete, isLiked, likeCount } = useAppSelector(
     ({ auth }) => ({
@@ -48,6 +49,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
 
   const timeCreation = createTimeSince(new Date(post.createdAt));
 
+  const onNavigateToProfile = () => {
+    navigate(`/profile/${post.user._id}`)
+  }
+
   return (
     <div className={s.post}>
       {isShowEditDelete ? (
@@ -68,10 +73,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
         }`}
       >
         <div className={s.post__content__header}>
-          <Avatar avatar={post.user.avatarUrl as string} />
+          <Avatar avatar={post.user.avatarUrl as string} onClick={onNavigateToProfile}/>
 
           <div>
-            <span className={s.fullName}>{post.user?.fullName}</span>
+            <span className={s.fullName} onClick={onNavigateToProfile}>{post.user?.fullName}</span>
             <span className={s.time}>{timeCreation}</span>
           </div>
         </div>

@@ -1,0 +1,61 @@
+.profileEdit {
+  background-color: rgb(182, 226, 202);
+  padding: 20px;
+  border-radius: 20px;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__top {
+    margin-bottom: 30px;
+  }
+
+  &__form {
+    display: grid;
+    grid-template-columns: 30% 40%;
+    grid-column-gap: 100px;
+    justify-content: center;
+    // display: flex;
+    // gap: 30px;
+    // justify-content: space-evenly;
+
+    &__image {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+
+      button {
+        width: 100%;
+      }
+
+      img,
+      svg {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+      }
+    }
+
+    &__checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      cursor: pointer;
+
+      input {
+        width: fit-content;
+        cursor: pointer;
+      }
+
+      &:hover {
+        text-decoration: underline;
+        color: rgb(8, 8, 211);
+      }
+    }
+  }
+}

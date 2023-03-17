@@ -5,12 +5,13 @@ import s from './Avatar.module.scss';
 
 interface IAvatarProps {
   avatar: string;
+  onClick?: () => void
 }
 
-export const Avatar: FC<IAvatarProps> = ({ avatar }) => {
+export const Avatar: FC<IAvatarProps> = ({ avatar, onClick }) => {
   const file = base64ToFile(avatar);
   return (
-    <div className={s.avatar}>
+    <div className={`${s.avatar} ${onClick && s.isClickable}`} onClick={onClick}>
       {file ? (
         <img src={URL.createObjectURL(file)} alt="avatar" />
       ) : (

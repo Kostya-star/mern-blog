@@ -1,7 +1,8 @@
 import { CreatePost } from 'pages/CreatePost';
 import { Home } from 'pages/Home';
 import { Login } from 'pages/Login';
-import { Profile } from 'pages/Profile';
+import { ProfileAbout } from 'pages/ProfileAbout';
+import { ProfileEdit } from 'pages/ProfileEdit';
 import { Register } from 'pages/Register';
 import { Tags } from 'pages/Tags';
 import { Route, Routes } from 'react-router-dom';
@@ -30,7 +31,8 @@ export const AppRouter = () => {
             <>
               <Route path="/add-post" element={<CreatePost />} />
               <Route path="/posts/:id/edit" element={<CreatePost />} />
-              <Route path="/profile/me" element={<Profile />} />
+              <Route path="/profile/about" element={<ProfileAbout />} />
+              <Route path="/profile/edit" element={<ProfileEdit />} />
             </>
           )}
 

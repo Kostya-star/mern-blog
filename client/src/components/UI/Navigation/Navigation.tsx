@@ -8,6 +8,7 @@ import { Button } from '../Button/Button';
 import s from './Navigation.module.scss';
 import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
 import { ReactComponent as UserEditSVG } from 'assets/user-edit.svg';
+import { ReactComponent as UserAboutSVG } from 'assets/about-profile.svg';
 import { ReactComponent as SignOutSVG } from 'assets/sign-out.svg';
 import { useRef, useState, useEffect } from 'react';
 
@@ -86,9 +87,14 @@ export const Navigation = () => {
                     ref={dropDownRef}
                   >
                     <ul>
-                      <Link to='/profile/me'>
+                      <Link to='/profile/about'>
                         <li>
-                          View & Edit <UserEditSVG />
+                          About me <UserAboutSVG />
+                        </li>
+                      </Link>
+                      <Link to='/profile/edit'>
+                        <li>
+                          Edit me<UserEditSVG />
                         </li>
                       </Link>
                     <Link to="/login">

@@ -57,6 +57,12 @@ export const onAuthMeThunk = createAsyncThunk(
   },
 );
 
+export const getUserById = createAsyncThunk('auth/getUserById', async(userId: string) => {
+  const resp = await instance.get<IUser>(`/auth/${userId}`)
+  
+  return resp.data
+}) 
+
 export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: FormData) => {
   try {
     const { data } = await instance.put<IUser>('auth/update', updatedUser)

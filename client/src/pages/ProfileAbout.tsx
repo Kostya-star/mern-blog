@@ -7,6 +7,10 @@ import { useAppDispatch } from 'redux/hooks';
 import { useEffect, useState } from 'react';
 import { IUser } from 'types/IUser';
 import { Loader } from 'components/UI/Loader/Loader';
+import { fetchPostsByUserId } from 'redux/slices/posts';
+import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.svg';
+import { ReactComponent as CommentColoredSVG } from 'assets/comment-colored.svg';
+import emptyImage from 'assets/no-image.jpg';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -15,9 +19,13 @@ export const ProfileAbout = () => {
 
   const { id } = useParams();
 
-  const currentUser = useAppSelector(({ auth }) => auth.data);
+  const { currentUser, posts, postStatus } = useAppSelector(({ auth, posts }) => ({
+    currentUser: auth.data,
+    posts: posts.posts,
+    postStatus: posts.status
+  }));
 
-  const [isLoading, setLoading] = useState(true);
+  const [isUserProfileLoading, setUserProfileLoading] = useState(false);
   const [browsedUser, setBrowsedUser] = useState<IUser>({
     avatarUrl: '',
     createdAt: '',
@@ -29,20 +37,24 @@ export const ProfileAbout = () => {
   });
 
   useEffect(() => {
-      if (id) {
-        (async () => {
+    if (id) {
+      (async () => {
+        try {
+          setUserProfileLoading(true)
           const user = await dispatch(getUserById(id)).unwrap();
-          if(user) {
+          dispatch(fetchPostsByUserId(id));
+          if (user) {
             setBrowsedUser(user);
-            setLoading(false);
           }
-        })();
-      } else {
-        if (currentUser) {
-          setBrowsedUser(currentUser);
-          setLoading(false);
+          
+        } catch (error) {
+          console.log(error);
+          
+        } finally {
+          setUserProfileLoading(false);
         }
-      }
+      })();
+    }
   }, [location.pathname]);
 
   const accountCreationDate = new Date(
@@ -68,9 +80,9 @@ export const ProfileAbout = () => {
 
   return (
     <div className="profileAbout">
-      <div className="profileAbout__content">
+      <div className="profileAbout__userData">
         <h2 className="profileAbout__top">About profile</h2>
-        {isLoading ? (
+        {isUserProfileLoading ? (
           <Loader />
         ) : (
           <div className="profileAbout__body">
@@ -88,17 +100,41 @@ export const ProfileAbout = () => {
             </div>
           </div>
         )}
+        {currentUser?._id === browsedUser._id && (
+          <div className="profileAbout__deleteAccount">
+            <Button
+              text="Delete account"
+              className="button button_delete"
+              onClick={onDeleteUser}
+            />
+          </div>
+        )}
       </div>
 
-      {currentUser?._id === browsedUser._id && (
-        <div className="profileAbout__deleteAccount">
-          <Button
-            text="Delete account"
-            className="button button_delete"
-            onClick={onDeleteUser}
-          />
-        </div>
-      )}
+      <div style={{ marginTop: '30px' }}>
+        <hr style={{ height: '1px', backgroundColor: 'black' }} />
+      </div>
+
+      <div className="profileAbout__posts">
+        {postStatus === 'loading' && <Loader/>}
+        {postStatus === 'success' && (posts?.length ? (
+          posts.map((post) => (
+            <div key={post._id} className="profileAbout__posts__post">
+              <img src={post.imageUrl || emptyImage} alt="postimage" />
+              <div className="profileAbout__posts__post__statistics">
+                <span>
+                  <ThumbsUpColoredSVG /> {post.usersLiked.length}
+                </span>
+                <span>
+                  <CommentColoredSVG /> {post.usersCommented.length}
+                </span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div>No posts of this user</div>
+        ))}
+      </div>
     </div>
   );
 };

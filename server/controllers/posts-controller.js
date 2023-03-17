@@ -188,6 +188,22 @@ const likePost = async (req, res) => {
   }
 }
 
+export const getPostsByUserId = async(req, res) => {
+  try {
+    const { id } = req.params
+    
+    const posts = await PostModel.find({ user: id }).populate('user')
+    
+    res.json(posts)
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error when liking the post'
+    })
+  }
+}
+
 
 export default {
   createPost,
@@ -195,5 +211,6 @@ export default {
   getOnePost,
   deletePost,
   updatePost,
-  likePost
+  likePost,
+  getPostsByUserId
 }

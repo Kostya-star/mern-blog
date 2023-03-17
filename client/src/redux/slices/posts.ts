@@ -65,6 +65,13 @@ export const likePost = createAsyncThunk(
   },
 );
 
+export const fetchPostsByUserId = createAsyncThunk('posts/fetchPostsByUserId', async (userId: string) => {
+  const resp = await instance.get<IPost[]>(`/posts/user/${userId}`)
+console.log(resp.data);
+
+  return resp.data
+})
+
 export interface PostsState {
   posts: IPost[];
   status: string;
@@ -142,6 +149,22 @@ export const postsSlice = createSlice({
         },
       )
       .addCase(fetchPosts.rejected, (state) => {
+        state.status = 'error';
+        state.posts = [];
+      })
+      // FETCH POSTS BY USER ID
+      .addCase(fetchPostsByUserId.pending, (state) => {
+        state.posts = [];
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchPostsByUserId.fulfilled,
+        (state, action: PayloadAction<IPost[]>) => {
+          state.status = 'success';
+          state.posts = action.payload;
+        },
+      )
+      .addCase(fetchPostsByUserId.rejected, (state) => {
         state.status = 'error';
         state.posts = [];
       })

@@ -1,13 +1,19 @@
 .profileAbout {
-  background-color: rgb(182, 226, 202);
-  padding: 20px;
-  border-radius: 20px;
-  position: relative;
-
-  &__content {
+  
+  &__userData {
+    position: relative;
+    border-radius: 20px;
+    padding: 20px;
+    background-color: rgb(182, 226, 202);
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  &__deleteAccount {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
   }
 
   &__top {
@@ -34,9 +40,53 @@
     }
   }
 
-  &__deleteAccount {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+  &__posts {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-row-gap: 40px;
+    &__post {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      position: relative;
+      cursor: pointer;
+      img {
+        width: 300px;
+        height: 300px;
+      }
+
+      &__statistics {
+        display: none;
+      }
+      &:hover {
+        &:after {
+          content: '';
+          background-color: rgba($color: black, $alpha: .4) ;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+        }
+        .profileAbout__posts__post__statistics {
+          display: flex;
+          gap: 20px;
+          position: absolute;
+          z-index: 2;
+          span {
+            color: white;
+            font-weight: 600;
+            svg {
+              width: 20px;
+              height: 20px;
+              path {
+                fill: white
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

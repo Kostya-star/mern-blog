@@ -29,22 +29,20 @@ export const ProfileAbout = () => {
   });
 
   useEffect(() => {
-    try {
       if (id) {
         (async () => {
           const user = await dispatch(getUserById(id)).unwrap();
-          setBrowsedUser(user);
+          if(user) {
+            setBrowsedUser(user);
+            setLoading(false);
+          }
         })();
       } else {
         if (currentUser) {
           setBrowsedUser(currentUser);
+          setLoading(false);
         }
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
   }, [location.pathname]);
 
   const accountCreationDate = new Date(

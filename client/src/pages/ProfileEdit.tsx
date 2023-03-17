@@ -22,6 +22,7 @@ const validationSchema = Yup.object().shape({
   isPassword: Yup.boolean(),
   fullName: Yup.string()
     .min(2, 'Must be at least 2 characters')
+    .matches(/^[a-zA-Z\s]+$/, 'Must contain only letters')
     .required('Required'),
   email: Yup.string().email('Invalid email address').required('Required'),
   password: Yup.string().when('isPassword', ([isPassword], _) => {
@@ -77,7 +78,7 @@ export const ProfileEdit = () => {
 
       if (resp) {
         setServerError('');
-        alert('Profile is successfully updated!')
+        alert('Profile is successfully updated!');
       }
     } catch (error: any) {
       setServerError(error.message);

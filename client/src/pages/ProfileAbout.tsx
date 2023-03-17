@@ -1,18 +1,46 @@
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
-import { deleteUser } from 'redux/slices/auth';
-import { useAppDispatch } from './../redux/hooks';
+import { deleteUser, getUserById } from 'redux/slices/auth';
+import { useAppDispatch } from 'redux/hooks';
+import { useEffect, useState } from 'react';
+import { IUser } from 'types/IUser';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { id } = useParams();
 
   const currentUser = useAppSelector(({ auth }) => auth.data);
 
+  const [browsedUser, setBrowsedUser] = useState<IUser>({
+    avatarUrl: '',
+    createdAt: '',
+    email: '',
+    fullName: '',
+    postsCreated: 0,
+    updatedAt: '',
+    _id: '',
+  });
+
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        const user = await dispatch(getUserById(id)).unwrap();
+        setBrowsedUser(user);
+      })();
+    } else {
+      if (currentUser) {
+        setBrowsedUser(currentUser);
+      }
+    }
+  }, [location.pathname]);
+
   const accountCreationDate = new Date(
-    currentUser?.createdAt as string,
+    browsedUser?.createdAt as string,
   ).toLocaleDateString();
 
   const onDeleteUser = async () => {
@@ -37,23 +65,25 @@ export const ProfileAbout = () => {
       <div className="profileAbout__content">
         <h2 className="profileAbout__top">About profile</h2>
         <div className="profileAbout__body">
-          <Avatar avatar={currentUser?.avatarUrl as string} />
+          <Avatar avatar={browsedUser?.avatarUrl as string} />
           <div className="profileAbout__body__text">
-            <div>Name: {currentUser?.fullName}</div>
-            <div>Email: {currentUser?.email}</div>
+            <div>Name: {browsedUser?.fullName} {browsedUser._id === '64010100736d71817f3d671f' && <strong>ADMIN</strong>}</div>
+            {/* <div>Email: {browsedUser?.email}</div> */}
             <div>Created: {accountCreationDate}</div>
-            <div>Posts created: {currentUser?.postsCreated}</div>
+            <div>Posts created: {browsedUser?.postsCreated}</div>
           </div>
         </div>
       </div>
 
-      <div className="profileAbout__deleteAccount">
-        <Button
-          text="Delete account"
-          className="button button_delete"
-          onClick={onDeleteUser}
-        />
-      </div>
+      {currentUser?._id === browsedUser._id && (
+        <div className="profileAbout__deleteAccount">
+          <Button
+            text="Delete account"
+            className="button button_delete"
+            onClick={onDeleteUser}
+          />
+        </div>
+      )}
     </div>
   );
 };

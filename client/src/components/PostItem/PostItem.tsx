@@ -49,8 +49,8 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
 
   const timeCreation = createTimeSince(new Date(post.createdAt));
 
-  const onNavigateToProfile = () => {
-    navigate(`/profile/${post.user._id}`)
+  const onRedirectAboutProfile = () => {
+    navigate(`/profile/about/${post.user._id}`)
   }
 
   return (
@@ -73,10 +73,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
         }`}
       >
         <div className={s.post__content__header}>
-          <Avatar avatar={post.user.avatarUrl as string} onClick={onNavigateToProfile}/>
+          <Avatar avatar={post.user.avatarUrl as string} onClick={onRedirectAboutProfile}/>
 
           <div>
-            <span className={s.fullName} onClick={onNavigateToProfile}>{post.user?.fullName}</span>
+            <span className={s.fullName} onClick={onRedirectAboutProfile}>{post.user?.fullName}</span>
             <span className={s.time}>{timeCreation}</span>
           </div>
         </div>

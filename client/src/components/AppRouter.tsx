@@ -19,6 +19,7 @@ export const AppRouter = () => {
           <Route path="/" element={<Home />} />
           {/* <Route path="/posts/:id" element={<FullPost />} /> */}
           <Route path="/tags/:tag" element={<Tags />} />
+          <Route path="/profile/about/:id" element={<ProfileAbout />} />
 
           {!isAuth && (
             <>

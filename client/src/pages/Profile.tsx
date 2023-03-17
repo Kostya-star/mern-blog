@@ -89,6 +89,7 @@ export const Profile = () => {
 
       if(resp) {
         setServerError('');
+        setActiveSection(0)
       }
       
     } catch (error: any) {

@@ -14,6 +14,8 @@ import emptyImage from 'assets/no-image.jpg';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Modal } from 'components/UI/Modal/Modal';
 import { IPost } from 'types/IPost';
+import { Comments } from 'components/Comments/Comments';
+import { clearCommentsSlice } from 'redux/slices/comments';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -22,13 +24,14 @@ export const ProfileAbout = () => {
 
   const { id } = useParams();
 
-  const { currentUser, posts, postStatus } = useAppSelector(
-    ({ auth, posts }) => ({
+  const { currentUser, posts, postsStatus, isComments, commentsStatus } =
+    useAppSelector(({ auth, posts, comments }) => ({
       currentUser: auth.data,
       posts: posts.posts,
-      postStatus: posts.status,
-    }),
-  );
+      postsStatus: posts.status,
+      isComments: comments.isComments,
+      commentsStatus: comments.status,
+    }));
 
   const [isUserProfileLoading, setUserProfileLoading] = useState(false);
   const [browsedUser, setBrowsedUser] = useState<IUser>({
@@ -63,10 +66,6 @@ export const ProfileAbout = () => {
     }
   }, [location.pathname]);
 
-  const accountCreationDate = new Date(
-    browsedUser?.createdAt as string,
-  ).toLocaleDateString();
-
   const onDeleteUser = async () => {
     if (
       window.confirm(
@@ -87,7 +86,21 @@ export const ProfileAbout = () => {
   const onShowFullPost = (post: IPost) => {
     setModalVisible(true);
     setSelectedPost(post);
+    dispatch(clearCommentsSlice());
   };
+
+  const onCloseFullPost = () => {
+    setModalVisible(false)
+    dispatch(clearCommentsSlice());
+  }
+
+  const accountCreationDate = new Date(
+    browsedUser?.createdAt as string,
+  ).toLocaleDateString();
+
+  const currentBrowsedFullPost = posts?.find(
+    (post) => post._id === selectedPost?._id,
+  );
 
   return (
     <div className="profileAbout">
@@ -127,8 +140,8 @@ export const ProfileAbout = () => {
       </div>
 
       <div className="profileAbout__posts">
-        {postStatus === 'loading' && <Loader />}
-        {postStatus === 'success' &&
+        {postsStatus === 'loading' && <Loader />}
+        {postsStatus === 'success' &&
           (posts?.length ? (
             posts.map((post) => (
               <div
@@ -151,9 +164,19 @@ export const ProfileAbout = () => {
             <div>No posts of this user</div>
           ))}
 
-        {(isModalVisible && selectedPost) && (
-          <Modal isVisible={isModalVisible} setVisible={setModalVisible}>
-            <PostItem post={selectedPost} />
+        {isModalVisible && currentBrowsedFullPost && (
+          <Modal isVisible={isModalVisible} onCloseModal={onCloseFullPost}>
+            <div className='profileAbout__modal'>
+              <div className='profileAbout__modal__post' onClick={(e) => e.stopPropagation()}>
+                <PostItem post={currentBrowsedFullPost} />
+              </div>
+              {
+                isComments &&
+              <div className='profileAbout__modal__comments' onClick={(e) => e.stopPropagation()}>
+                <Comments />
+              </div>
+              }
+            </div>
           </Modal>
         )}
       </div>

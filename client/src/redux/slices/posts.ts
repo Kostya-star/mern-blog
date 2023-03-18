@@ -67,7 +67,6 @@ export const likePost = createAsyncThunk(
 
 export const fetchPostsByUserId = createAsyncThunk('posts/fetchPostsByUserId', async (userId: string) => {
   const resp = await instance.get<IPost[]>(`/posts/user/${userId}`)
-console.log(resp.data);
 
   return resp.data
 })

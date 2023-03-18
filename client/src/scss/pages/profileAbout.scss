@@ -4,7 +4,7 @@
     position: relative;
     border-radius: 20px;
     padding: 20px;
-    background-color: rgb(182, 226, 202);
+    background-color: rgb(169, 229, 196);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -33,7 +33,7 @@
     &__text {
       display: flex;
       flex-direction: column;
-      background-color: rgb(206, 203, 203);
+      // background-color: rgb(206, 203, 203);
       border-radius: 30px;
       padding: 30px;
       gap: 20px;
@@ -87,6 +87,22 @@
           }
         }
       }
+    }
+  }
+
+  &__modal {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    &__post {
+      width: 600px;
+      height: fit-content;
+    }
+    &__comments {
+      width: 400px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
     }
   }
 }

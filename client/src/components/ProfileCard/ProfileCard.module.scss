@@ -1,0 +1,19 @@
+.profileCard {
+  display: flex;
+  gap: 50px;
+
+  img,
+  svg {
+    width: 200px;
+    height: 200px;
+  }
+
+  &__data {
+    display: flex;
+    flex-direction: column;
+    // background-color: rgb(206, 203, 203);
+    border-radius: 30px;
+    padding: 30px;
+    gap: 20px;
+  }
+}

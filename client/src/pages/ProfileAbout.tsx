@@ -1,12 +1,18 @@
-import { Avatar } from 'components/Avatar/Avatar';
+import { Comments } from 'components/Comments/Comments';
+import { PostItem } from 'components/PostItem/PostItem';
+import { PostThumbnail } from 'components/PostThumbnail/PostThumbnail';
+import { ProfileCard } from 'components/ProfileCard/ProfileCard';
 import { Button } from 'components/UI/Button/Button';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useAppSelector } from 'redux/hooks';
-import { deleteUser, getUserById } from 'redux/slices/auth';
-import { useAppDispatch } from 'redux/hooks';
-import { useEffect, useState } from 'react';
-import { IUser } from 'types/IUser';
 import { Loader } from 'components/UI/Loader/Loader';
+import { Modal } from 'components/UI/Modal/Modal';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { deleteUser, getUserById } from 'redux/slices/auth';
+import { clearCommentsSlice } from 'redux/slices/comments';
+import { fetchPostsByUserId } from 'redux/slices/posts';
+import { IPost } from 'types/IPost';
+import { IUser } from 'types/IUser';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -15,9 +21,16 @@ export const ProfileAbout = () => {
 
   const { id } = useParams();
 
-  const currentUser = useAppSelector(({ auth }) => auth.data);
+  const { currentUser, posts, postsStatus, isComments, commentsStatus } =
+    useAppSelector(({ auth, posts, comments }) => ({
+      currentUser: auth.data,
+      posts: posts.posts,
+      postsStatus: posts.status,
+      isComments: comments.isComments,
+      commentsStatus: comments.status,
+    }));
 
-  const [isLoading, setLoading] = useState(true);
+  const [isUserProfileLoading, setUserProfileLoading] = useState(false);
   const [browsedUser, setBrowsedUser] = useState<IUser>({
     avatarUrl: '',
     createdAt: '',
@@ -28,26 +41,32 @@ export const ProfileAbout = () => {
     _id: '',
   });
 
-  useEffect(() => {
-      if (id) {
-        (async () => {
-          const user = await dispatch(getUserById(id)).unwrap();
-          if(user) {
-            setBrowsedUser(user);
-            setLoading(false);
-          }
-        })();
-      } else {
-        if (currentUser) {
-          setBrowsedUser(currentUser);
-          setLoading(false);
-        }
-      }
-  }, [location.pathname]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
 
-  const accountCreationDate = new Date(
-    browsedUser?.createdAt as string,
-  ).toLocaleDateString();
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        try {
+          setUserProfileLoading(true);
+          dispatch(clearCommentsSlice());
+          const user = await dispatch(getUserById(id)).unwrap();
+          dispatch(fetchPostsByUserId(id));
+          if (user) {
+            setBrowsedUser(user);
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setUserProfileLoading(false);
+        }
+      })();
+    }
+
+    return () => {
+      dispatch(clearCommentsSlice());
+    };
+  }, [location.pathname]);
 
   const onDeleteUser = async () => {
     if (
@@ -66,39 +85,86 @@ export const ProfileAbout = () => {
     }
   };
 
+  const onShowFullPost = (post: IPost) => {
+    setModalVisible(true);
+    setSelectedPost(post);
+  };
+
+  const onCloseFullPost = () => {
+    setModalVisible(false);
+    dispatch(clearCommentsSlice());
+  };
+
+  const currentBrowsedFullPost = posts?.find(
+    (post) => post._id === selectedPost?._id,
+  );
+
   return (
     <div className="profileAbout">
-      <div className="profileAbout__content">
+      <div className="profileAbout__userData">
         <h2 className="profileAbout__top">About profile</h2>
-        {isLoading ? (
+        {isUserProfileLoading ? (
           <Loader />
         ) : (
-          <div className="profileAbout__body">
-            <Avatar avatar={browsedUser?.avatarUrl as string} />
-            <div className="profileAbout__body__text">
-              <div>
-                Name: {browsedUser?.fullName}{' '}
-                {browsedUser._id === '64010100736d71817f3d671f' && (
-                  <strong>ADMIN</strong>
-                )}
-              </div>
-              {/* <div>Email: {browsedUser?.email}</div> */}
-              <div>Created: {accountCreationDate}</div>
-              <div>Posts created: {browsedUser?.postsCreated}</div>
-            </div>
+          <ProfileCard browsedUser={browsedUser} />
+        )}
+        {currentUser?._id === browsedUser._id && (
+          <div className="profileAbout__deleteAccount">
+            <Button
+              text="Delete account"
+              className="button button_delete"
+              onClick={onDeleteUser}
+            />
           </div>
         )}
       </div>
 
-      {currentUser?._id === browsedUser._id && (
-        <div className="profileAbout__deleteAccount">
-          <Button
-            text="Delete account"
-            className="button button_delete"
-            onClick={onDeleteUser}
-          />
+      <div style={{ marginTop: '30px' }}>
+        <hr style={{ height: '1px', backgroundColor: 'black' }} />
+      </div>
+
+      {postsStatus === 'loading' && (
+        <div className="loader">
+          <Loader />
         </div>
       )}
+      {postsStatus === 'success' &&
+        (!posts?.length ? (
+          <h1 className="profileAbout__noPosts">No posts of this user</h1>
+        ) : (
+          <div className="profileAbout__posts">
+            {postsStatus === 'success' &&
+              posts?.length &&
+              posts.map((post) => (
+                <PostThumbnail
+                  key={post._id}
+                  post={post}
+                  onShowFullPost={() => onShowFullPost(post)}
+                />
+              ))}
+
+            {isModalVisible && currentBrowsedFullPost && (
+              <Modal isVisible={isModalVisible} onCloseModal={onCloseFullPost}>
+                <div className="profileAbout__modal">
+                  <div
+                    className="profileAbout__modal__post"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <PostItem post={currentBrowsedFullPost} />
+                  </div>
+                  {isComments && (
+                    <div
+                      className="profileAbout__modal__comments"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Comments />
+                    </div>
+                  )}
+                </div>
+              </Modal>
+            )}
+          </div>
+        ))}
     </div>
   );
 };

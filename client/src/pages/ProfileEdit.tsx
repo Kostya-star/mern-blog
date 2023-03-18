@@ -115,7 +115,7 @@ export const ProfileEdit = () => {
           initialValues={initialValues as unknown as IUserUpdatedValues}
           validationSchema={validationSchema}
           onSubmit={onUpdateUserProfile}
-          // enableReinitialize
+          enableReinitialize
           // validateOnMount
         >
           {({
@@ -129,7 +129,7 @@ export const ProfileEdit = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            // console.log(values);
+            console.log(values);
             return (
               <Form onSubmit={handleSubmit}>
                 <div className="profileEdit__form">
@@ -268,6 +268,7 @@ export const ProfileEdit = () => {
                         isValid && dirty ? 'button_colored' : 'button_disabled'
                       }`}
                       disabled={!(isValid && dirty)}
+                      // disabled={!isValid || !dirty}
                     />
                   </div>
                 </div>

@@ -22,9 +22,10 @@ export const Navigation = () => {
 
   const dropDownRef = useRef<HTMLDivElement>(null);
 
-  const { userPhoto, userName } = useAppSelector(({ auth }) => ({
+  const { userPhoto, userName, userId } = useAppSelector(({ auth }) => ({
     userPhoto: auth.data?.avatarUrl,
     userName: auth.data?.fullName,
+    userId: auth.data?._id
   }));
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export const Navigation = () => {
                     ref={dropDownRef}
                   >
                     <ul>
-                      <Link to='/profile/about'>
+                      <Link to={`/profile/about/${userId}`}>
                         <li>
                           About me <UserAboutSVG />
                         </li>

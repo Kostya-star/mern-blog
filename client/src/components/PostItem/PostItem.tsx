@@ -23,15 +23,11 @@ interface IPostItemProps {
 
 export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const { isShowEditDelete, isLiked, likeCount } = useAppSelector(
-    ({ auth }) => ({
-      isShowEditDelete: auth.data?._id === post.user?._id,
-      isLiked: post.usersLiked.includes(auth.data?._id as string),
-      likeCount: post.usersLiked.length,
-    }),
-  );
+  const { currentUser } = useAppSelector(({ auth }) => ({
+    currentUser: auth.data?._id,
+  }));
 
   const [isShowText, setShowText] = useState(false);
 
@@ -46,12 +42,15 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const removePost = (id: string) => {
     dispatch(deletePost(id));
   };
+  
+  const onRedirectAboutProfile = () => {
+    navigate(`/profile/about/${post.user._id}`);
+  };
 
   const timeCreation = createTimeSince(new Date(post.createdAt));
+  const isShowEditDelete = currentUser === post.user?._id;
+  const isLiked = post.usersLiked.includes(currentUser as string);
 
-  const onRedirectAboutProfile = () => {
-    navigate(`/profile/about/${post.user._id}`)
-  }
 
   return (
     <div className={s.post}>
@@ -73,10 +72,15 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
         }`}
       >
         <div className={s.post__content__header}>
-          <Avatar avatar={post.user.avatarUrl as string} onClick={onRedirectAboutProfile}/>
+          <Avatar
+            avatar={post.user.avatarUrl as string}
+            onClick={onRedirectAboutProfile}
+          />
 
           <div>
-            <span className={s.fullName} onClick={onRedirectAboutProfile}>{post.user?.fullName}</span>
+            <span className={s.fullName} onClick={onRedirectAboutProfile}>
+              {post.user?.fullName}
+            </span>
             <span className={s.time}>{timeCreation}</span>
           </div>
         </div>
@@ -118,7 +122,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
             <div className={s.post__content__body__statistics__group}>
               <div onClick={() => onClickLike(post._id)}>
                 {isLiked ? <ThumbsUpColoredSVG /> : <ThumbsUpSVG />}
-                {likeCount}
+                {post.usersLiked.length}
               </div>
               <div onClick={() => onCommentsClickHandle(post._id)}>
                 <CommentSVG />

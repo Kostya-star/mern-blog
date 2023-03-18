@@ -1,0 +1,50 @@
+.postThumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  cursor: pointer;
+
+  img {
+    width: 300px;
+    height: 300px;
+  }
+
+  &__statistics {
+    display: none;
+  }
+
+  &:hover {
+    &:after {
+      content: '';
+      background-color: rgba($color: black, $alpha: .4);
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .postThumbnail__statistics {
+      display: flex;
+      gap: 20px;
+      position: absolute;
+      z-index: 2;
+
+      span {
+        color: white;
+        font-weight: 600;
+
+        svg {
+          width: 20px;
+          height: 20px;
+
+          path {
+            fill: white
+          }
+        }
+      }
+    }
+  }
+}

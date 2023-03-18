@@ -1,0 +1,27 @@
+.modal {
+  display: none;
+  position: fixed;
+  overflow-y: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba($color: gray, $alpha: .5);
+  z-index: 20;
+  &__visible {
+    display: block;
+  }
+  &__content {
+    // width: 600px;
+    // margin: 0 auto;
+    padding: 30px 0;
+  }
+  &__closeSVG {
+    position: fixed;
+    right: 25px;
+    top: 25px;
+    background-color: white;
+    width: 25px;
+    cursor: pointer;
+  }
+}

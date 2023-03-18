@@ -16,78 +16,19 @@
     right: 10px;
   }
 
-  &__top {
-    margin-bottom: 30px;
+  &__noPosts {
+    display: flex;
+    justify-content: center;
   }
 
-  &__body {
-    display: flex;
-    gap: 50px;
-
-    img,
-    svg {
-      width: 200px;
-      height: 200px;
-    }
-
-    &__text {
-      display: flex;
-      flex-direction: column;
-      // background-color: rgb(206, 203, 203);
-      border-radius: 30px;
-      padding: 30px;
-      gap: 20px;
-    }
+  &__top {
+    margin-bottom: 30px;
   }
 
   &__posts {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-row-gap: 40px;
-    &__post {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      position: relative;
-      cursor: pointer;
-      img {
-        width: 300px;
-        height: 300px;
-      }
-
-      &__statistics {
-        display: none;
-      }
-      &:hover {
-        &:after {
-          content: '';
-          background-color: rgba($color: black, $alpha: .4) ;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
-        .profileAbout__posts__post__statistics {
-          display: flex;
-          gap: 20px;
-          position: absolute;
-          z-index: 2;
-          span {
-            color: white;
-            font-weight: 600;
-            svg {
-              width: 20px;
-              height: 20px;
-              path {
-                fill: white
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   &__modal {

@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { deleteComment, likeComment } from 'redux/slices/comments';
 import { IComment } from 'types/IComment';
 import s from './CommentItem.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 interface ICommentItemProps {
   comment: IComment;
@@ -23,6 +24,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
   setCommentText,
 }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const { isLiked, likeCount, isShowEditDelete } = useAppSelector(({ auth }) => ({
     isLiked: comment.usersLiked.includes(auth.data?._id as string),
@@ -39,6 +41,10 @@ export const CommentItem: FC<ICommentItemProps> = ({
     dispatch(deleteComment(commId));
   };
 
+  const onRedirectAboutProfile = () => {
+    navigate(`/profile/about/${comment.user._id}`);
+  };
+
   return (
     <div className={s.comment__wrapper} ref={commRef}>
       <div className={s.comment}>
@@ -52,9 +58,9 @@ export const CommentItem: FC<ICommentItemProps> = ({
             <CloseSVG onClick={() => onDeleteComment(comment._id)} />
           </div>
         )}
-        <Avatar avatar={comment.user?.avatarUrl as string} />
+        <Avatar avatar={comment.user?.avatarUrl as string} onClick={onRedirectAboutProfile}/>
         <div className={s.comment__body}>
-          <p>{comment?.user.fullName}</p>
+          <p onClick={onRedirectAboutProfile}>{comment?.user.fullName}</p>
           <p>{comment.text}</p>
         </div>
       </div>

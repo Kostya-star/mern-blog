@@ -11,6 +11,9 @@ import { fetchPostsByUserId } from 'redux/slices/posts';
 import { ReactComponent as ThumbsUpColoredSVG } from 'assets/thumbs-up-colored.svg';
 import { ReactComponent as CommentColoredSVG } from 'assets/comment-colored.svg';
 import emptyImage from 'assets/no-image.jpg';
+import { PostItem } from 'components/PostItem/PostItem';
+import { Modal } from 'components/UI/Modal/Modal';
+import { IPost } from 'types/IPost';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -19,11 +22,13 @@ export const ProfileAbout = () => {
 
   const { id } = useParams();
 
-  const { currentUser, posts, postStatus } = useAppSelector(({ auth, posts }) => ({
-    currentUser: auth.data,
-    posts: posts.posts,
-    postStatus: posts.status
-  }));
+  const { currentUser, posts, postStatus } = useAppSelector(
+    ({ auth, posts }) => ({
+      currentUser: auth.data,
+      posts: posts.posts,
+      postStatus: posts.status,
+    }),
+  );
 
   const [isUserProfileLoading, setUserProfileLoading] = useState(false);
   const [browsedUser, setBrowsedUser] = useState<IUser>({
@@ -36,20 +41,21 @@ export const ProfileAbout = () => {
     _id: '',
   });
 
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
+
   useEffect(() => {
     if (id) {
       (async () => {
         try {
-          setUserProfileLoading(true)
+          setUserProfileLoading(true);
           const user = await dispatch(getUserById(id)).unwrap();
           dispatch(fetchPostsByUserId(id));
           if (user) {
             setBrowsedUser(user);
           }
-          
         } catch (error) {
           console.log(error);
-          
         } finally {
           setUserProfileLoading(false);
         }
@@ -76,6 +82,11 @@ export const ProfileAbout = () => {
           }
         });
     }
+  };
+
+  const onShowFullPost = (post: IPost) => {
+    setModalVisible(true);
+    setSelectedPost(post);
   };
 
   return (
@@ -116,24 +127,35 @@ export const ProfileAbout = () => {
       </div>
 
       <div className="profileAbout__posts">
-        {postStatus === 'loading' && <Loader/>}
-        {postStatus === 'success' && (posts?.length ? (
-          posts.map((post) => (
-            <div key={post._id} className="profileAbout__posts__post">
-              <img src={post.imageUrl || emptyImage} alt="postimage" />
-              <div className="profileAbout__posts__post__statistics">
-                <span>
-                  <ThumbsUpColoredSVG /> {post.usersLiked.length}
-                </span>
-                <span>
-                  <CommentColoredSVG /> {post.usersCommented.length}
-                </span>
+        {postStatus === 'loading' && <Loader />}
+        {postStatus === 'success' &&
+          (posts?.length ? (
+            posts.map((post) => (
+              <div
+                key={post._id}
+                className="profileAbout__posts__post"
+                onClick={() => onShowFullPost(post)}
+              >
+                <img src={post.imageUrl || emptyImage} alt="postimage" />
+                <div className="profileAbout__posts__post__statistics">
+                  <span>
+                    <ThumbsUpColoredSVG /> {post.usersLiked.length}
+                  </span>
+                  <span>
+                    <CommentColoredSVG /> {post.usersCommented.length}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <div>No posts of this user</div>
-        ))}
+            ))
+          ) : (
+            <div>No posts of this user</div>
+          ))}
+
+        {(isModalVisible && selectedPost) && (
+          <Modal isVisible={isModalVisible} setVisible={setModalVisible}>
+            <PostItem post={selectedPost} />
+          </Modal>
+        )}
       </div>
     </div>
   );

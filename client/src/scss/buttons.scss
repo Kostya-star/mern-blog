@@ -32,8 +32,14 @@
   }
 
   &_disabled {
-   background:  #b0afaf;
-   color: gray;
-   cursor: no-drop;
+    background: #b0afaf;
+    color: gray;
+    cursor: no-drop;
+  }
+
+  &_follow {
+    background-color: rgb(103, 185, 240);
+    color: white;
+    border: none;
   }
 }

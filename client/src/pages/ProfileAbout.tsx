@@ -8,7 +8,7 @@ import { Modal } from 'components/UI/Modal/Modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { deleteUser, getUserById } from 'redux/slices/auth';
+import { deleteUser, follow_unfollow, getUserById } from 'redux/slices/auth';
 import { clearCommentsSlice } from 'redux/slices/comments';
 import { fetchPostsByUserId } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
@@ -21,27 +21,36 @@ export const ProfileAbout = () => {
 
   const { id } = useParams();
 
-  const { currentUser, posts, postsStatus, isComments, commentsStatus } =
-    useAppSelector(({ auth, posts, comments }) => ({
-      currentUser: auth.data,
-      posts: posts.posts,
-      postsStatus: posts.status,
-      isComments: comments.isComments,
-      commentsStatus: comments.status,
-    }));
+  const {
+    currentUser,
+    posts,
+    postsStatus,
+    isComments,
+    commentsStatus,
+    browsedUser,
+    userProfileLoading,
+  } = useAppSelector(({ auth, posts, comments }) => ({
+    currentUser: auth.data,
+    posts: posts.posts,
+    postsStatus: posts.status,
+    isComments: comments.isComments,
+    commentsStatus: comments.status,
+    browsedUser: auth.browsedUser,
+    userProfileLoading: auth.status,
+  }));
 
-  const [isUserProfileLoading, setUserProfileLoading] = useState(false);
-  const [browsedUser, setBrowsedUser] = useState<IUser>({
-    avatarUrl: '',
-    createdAt: '',
-    email: '',
-    fullName: '',
-    postsCreated: 0,
-    updatedAt: '',
-    _id: '',
-    usersFollowing: [],
-    usersFollowed: []
-  });
+  // const [isUserProfileLoading, setUserProfileLoading] = useState(false);
+  // const [browsedUser, setBrowsedUser] = useState<IUser>({
+  //   avatarUrl: '',
+  //   createdAt: '',
+  //   email: '',
+  //   fullName: '',
+  //   postsCreated: 0,
+  //   updatedAt: '',
+  //   _id: '',
+  //   usersFollowing: [],
+  //   usersFollowed: [],
+  // });
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
@@ -49,16 +58,18 @@ export const ProfileAbout = () => {
   useEffect(() => {
     if (id) {
       try {
-          setUserProfileLoading(true);
-          dispatch(clearCommentsSlice());
-          dispatch(fetchPostsByUserId(id));
-          dispatch(getUserById(id)).unwrap().then(user => {
-            setBrowsedUser(user);
-            setUserProfileLoading(false);
-          });
-        } catch (error) {
-          console.log(error);
-        }
+        // setUserProfileLoading(true);
+        dispatch(clearCommentsSlice());
+        dispatch(fetchPostsByUserId(id));
+        dispatch(getUserById(id));
+        // .unwrap()
+        // .then((user) => {
+        //   setBrowsedUser(user);
+        //   setUserProfileLoading(false);
+        // });
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     return () => {
@@ -93,20 +104,29 @@ export const ProfileAbout = () => {
     dispatch(clearCommentsSlice());
   };
 
+  const onFollowUser = (followedUserId: string) => {
+    dispatch(follow_unfollow(followedUserId));
+  };
+
   const currentBrowsedFullPost = posts?.find(
     (post) => post._id === selectedPost?._id,
   );
 
+  const isFollowed = browsedUser?.usersFollowed.includes(currentUser?._id as string)
+
   return (
     <div className="profileAbout">
       <div className="profileAbout__userData">
-        <h2 className="profileAbout__top">About profile</h2>
-        {isUserProfileLoading ? (
-          <Loader />
-        ) : (
-          <ProfileCard browsedUser={browsedUser} />
+        {userProfileLoading === 'loading' && <Loader />}
+        {userProfileLoading === 'success' && browsedUser && (
+          <ProfileCard
+            browsedUser={browsedUser}
+            onFollowUser={onFollowUser}
+            isFollowed={isFollowed as boolean}
+            isShowAvatarButtons={browsedUser._id !== currentUser?._id}
+          />
         )}
-        {currentUser?._id === browsedUser._id && (
+        {currentUser?._id === browsedUser?._id && (
           <div className="profileAbout__deleteAccount">
             <Button
               text="Delete account"
@@ -132,12 +152,12 @@ export const ProfileAbout = () => {
         ) : (
           <div className="profileAbout__posts">
             {posts.map((post) => (
-                <PostThumbnail
-                  key={post._id}
-                  post={post}
-                  onShowFullPost={() => onShowFullPost(post)}
-                />
-              ))}
+              <PostThumbnail
+                key={post._id}
+                post={post}
+                onShowFullPost={() => onShowFullPost(post)}
+              />
+            ))}
 
             {isModalVisible && currentBrowsedFullPost && (
               <Modal isVisible={isModalVisible} onCloseModal={onCloseFullPost}>

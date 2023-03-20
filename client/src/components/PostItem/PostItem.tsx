@@ -16,7 +16,6 @@ import { deletePost, likePost } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
 import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
-import { instance } from 'API/instance';
 import { follow_unfollow } from 'redux/slices/auth';
 import { Loader } from 'components/UI/Loader/Loader';
 
@@ -120,12 +119,6 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
                     <PlusSVG />
                   </div>
                 ))}
-              <div
-                className={s.group__follow}
-                onClick={() => onFollowUser(post.user._id)}
-              >
-                Unfollow
-              </div>
             </div>
             <div className={s.time}>{timeCreation}</div>
           </div>

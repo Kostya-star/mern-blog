@@ -6,9 +6,9 @@ import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
 import { ILoginRequest } from 'types/ILoginRequest';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import { IUpdateUserReq } from 'types/IUpdateUserReq';
-import { IUser } from 'types/IUser';
 import { clearCommentsSlice } from './comments';
-import { updateFollowersCount } from './posts';
+import { updateFollowersForPosts } from './posts';
+import { IUser } from './../../types/IUser';
 
 export const onLogin = createAsyncThunk(
   'auth/onLogin',
@@ -91,19 +91,22 @@ export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi
 export const follow_unfollow = createAsyncThunk('auth/follow_unfollow', async (followedUserId: string, thunkAPI) => {
   const { data } = await instance.post<IFollowUnfollowResp>('auth/follow', { followedUserId });
     
-  thunkAPI.dispatch(updateFollowersCount(data))
+  thunkAPI.dispatch(updateFollowersForPosts(data))
+  thunkAPI.dispatch(updateBrowsedProfileFollowers(data))
   return data
 })
 
 export interface authState {
   data: null | IUser;
   status: string;
+  browsedUser: null | IUser;
   followStatus: string
 }
 
 const initialState: authState = {
   data: null,
   status: '',
+  browsedUser: null,
   followStatus: ''
 };
 
@@ -115,6 +118,17 @@ export const authSlice = createSlice({
       state.status = '';
       state.data = null;
     },
+    updateBrowsedProfileFollowers: (state, action: PayloadAction<IFollowUnfollowResp>) => {
+      const  { followedUserId, followingUserId, isFollowed } = action.payload
+
+      if(state.browsedUser) {
+        if(isFollowed) {
+          state.browsedUser.usersFollowed.push(followingUserId)
+        } else {
+          state.browsedUser = { ...state.browsedUser, usersFollowed: state.browsedUser.usersFollowed.filter(userId => userId !== followingUserId) }
+        }
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -204,13 +218,28 @@ export const authSlice = createSlice({
         .addCase(
           follow_unfollow.fulfilled,
           (state, action: PayloadAction<IFollowUnfollowResp>) => {
-            if(action.payload) {
               state.followStatus = 'success';
               // state.data = action.payload;
-            }
           },
         )
         .addCase(follow_unfollow.rejected, (state) => {
+          state.followStatus = 'error';
+        })
+
+        //GET USER BY ID
+
+        .addCase(getUserById.pending, (state) => {
+          state.browsedUser = null;
+          state.status = 'loading';
+        })
+        .addCase(
+          getUserById.fulfilled,
+          (state, action: PayloadAction<IUser>) => {
+              state.status = 'success';
+              state.browsedUser = action.payload;
+          },
+        )
+        .addCase(getUserById.rejected, (state) => {
           state.status = 'error';
         })
   },
@@ -218,6 +247,6 @@ export const authSlice = createSlice({
 
 export const isAuthSelector = ({ auth }: RootState) => Boolean(auth.data);
 
-export const { logout } = authSlice.actions;
+export const { logout, updateBrowsedProfileFollowers } = authSlice.actions;
 
 export default authSlice.reducer;

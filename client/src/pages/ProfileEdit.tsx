@@ -111,7 +111,7 @@ export const ProfileEdit = () => {
   return (
     <div className="profileEdit">
       <div className="profileEdit__content">
-        <h2 className="profileEdit__top">Edit profile</h2>
+        {/* <h2 className="profileEdit__top">Edit profile</h2> */}
         <Formik
           initialValues={initialValues as unknown as IUserUpdatedValues}
           validationSchema={validationSchema}
@@ -130,7 +130,7 @@ export const ProfileEdit = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            console.log(values);
+            // console.log(values);
             return (
               <Form onSubmit={handleSubmit}>
                 <div className="profileEdit__form">

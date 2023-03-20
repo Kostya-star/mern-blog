@@ -1,11 +1,30 @@
 .profileCard {
   display: flex;
-  gap: 50px;
+  gap: 30px;
+
+  &__avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    
+    &__buttons {
+      display: flex;
+      gap: 10px;
+      button {
+        font-size: 15px;
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
 
   img,
   svg {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
+    margin: 0;
   }
 
   &__data {
@@ -15,5 +34,10 @@
     border-radius: 30px;
     padding: 30px;
     gap: 20px;
+
+    &__statistics {
+      display: flex;
+      gap: 20px;
+    }
   }
 }

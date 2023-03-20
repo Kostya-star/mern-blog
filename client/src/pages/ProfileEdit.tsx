@@ -8,6 +8,7 @@ import { useAppDispatch } from './../redux/hooks';
 import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
+import { InputPassword } from 'components/UI/InputPassword/InputPassword';
 
 interface IUserUpdatedValues {
   fullName: string;
@@ -200,8 +201,7 @@ export const ProfileEdit = () => {
                       <>
                         <label htmlFor="password" className="input">
                           New password
-                          <Input
-                            type="password"
+                          <InputPassword
                             id="password"
                             name="password"
                             value={!values.isPassword ? '' : values.password}
@@ -217,8 +217,7 @@ export const ProfileEdit = () => {
 
                         <label htmlFor="confirmPassword" className="input">
                           Confirm password
-                          <Input
-                            type="password"
+                          <InputPassword
                             id="confirmPassword"
                             name="confirmPassword"
                             value={

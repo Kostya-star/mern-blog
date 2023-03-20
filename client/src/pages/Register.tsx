@@ -1,5 +1,4 @@
 import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
-import { ReactComponent as EyeSVG } from '../assets/eye.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik } from 'formik';
@@ -10,6 +9,7 @@ import 'scss/all.scss';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
+import { InputPassword } from 'components/UI/InputPassword/InputPassword';
 
 const initialValues = {
   fullName: '',
@@ -137,8 +137,7 @@ export const Register = () => {
                   />
                 </div>
                 <div className="input">
-                  <Input
-                    type="password"
+                  <InputPassword
                     name="password"
                     onChange={handleChange}
                     onBlur={handleBlur}

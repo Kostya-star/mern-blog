@@ -1,5 +1,6 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
+import { InputPassword } from 'components/UI/InputPassword/InputPassword';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -82,8 +83,7 @@ export const Login = () => {
                 />
               </div>
               <div className="input">
-                <Input
-                  type="password"
+                <InputPassword
                   name="password"
                   placeholder="Password"
                   onChange={handleChange}

@@ -18,5 +18,6 @@ router.get('/:id', authController.getUser)
 router.put('/update', upload.single('image'), updateUserValidator, checkValidationErrors, checkAuth, authController.updateMe)
 router.delete('/delete', checkAuth, authController.deleteMe)
 
+router.post('/follow', checkAuth, authController.follow_unfollow)
 
 export default router

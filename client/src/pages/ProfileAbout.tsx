@@ -39,6 +39,8 @@ export const ProfileAbout = () => {
     postsCreated: 0,
     updatedAt: '',
     _id: '',
+    usersFollowing: [],
+    usersFollowed: []
   });
 
   const [isModalVisible, setModalVisible] = useState(false);

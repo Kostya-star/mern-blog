@@ -6,6 +6,7 @@ import { ILikePostResp } from 'types/ILikePostResp';
 import { IPost } from 'types/IPost';
 import { IUser } from './../../types/IUser';
 import { clearCommentsSlice } from './comments';
+import { IFollowUnfollowResp } from './../../types/IFollowUnfollowResp';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
@@ -132,6 +133,31 @@ export const postsSlice = createSlice({
         );
       }
     },
+
+    updateFollowersCount: (state, action: PayloadAction<IFollowUnfollowResp>) => {
+      const  { followedUserId, followingUserId, isFollowed } = action.payload
+      
+      const postsOfFollowedUser = state.posts.filter(post => post.user._id === followedUserId)
+
+      postsOfFollowedUser.map(post => {
+        if(isFollowed) {
+          post.user.usersFollowed.push(followingUserId)
+          return post
+        } else {
+          post.user.usersFollowed = post.user.usersFollowed.filter(userId => userId !== followingUserId)
+          return post
+        }
+      })
+      // if(isFollowed) {
+      //   postsOfFollowedUser.map(post => post.user.usersFollowed.push(followingUserId))
+      // } else if(!isFollowed) {
+      //   postsOfFollowedUser.forEach(post => post.user.usersFollowed.push(followingUserId))
+      // }
+      // state.posts = [...state.posts, postsOfFollowedUser.]
+      // state.posts = state.posts.map(post => {
+      //   post.user.usersFollowed.push(userId => userId !== )
+      // })
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -177,6 +203,6 @@ export const postsSlice = createSlice({
   },
 });
 
-export const { updateCommentCount, updateLikeCount } = postsSlice.actions;
+export const { updateCommentCount, updateLikeCount, updateFollowersCount } = postsSlice.actions;
 
 export default postsSlice.reducer;

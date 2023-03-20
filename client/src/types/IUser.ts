@@ -7,4 +7,6 @@ export interface IUser {
   avatarUrl?: string;
   token?: string;
   postsCreated: number
+  usersFollowing: string[]
+  usersFollowed: string[]
 }

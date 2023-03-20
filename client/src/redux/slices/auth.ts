@@ -2,11 +2,13 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { RootState } from 'redux/store';
+import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
 import { ILoginRequest } from 'types/ILoginRequest';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { IUser } from 'types/IUser';
 import { clearCommentsSlice } from './comments';
+import { updateFollowersCount } from './posts';
 
 export const onLogin = createAsyncThunk(
   'auth/onLogin',
@@ -86,14 +88,23 @@ export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi
   return resp
 })
 
+export const follow_unfollow = createAsyncThunk('auth/follow_unfollow', async (followedUserId: string, thunkAPI) => {
+  const { data } = await instance.post<IFollowUnfollowResp>('auth/follow', { followedUserId });
+    
+  thunkAPI.dispatch(updateFollowersCount(data))
+  return data
+})
+
 export interface authState {
   data: null | IUser;
   status: string;
+  followStatus: string
 }
 
 const initialState: authState = {
   data: null,
   status: '',
+  followStatus: ''
 };
 
 export const authSlice = createSlice({
@@ -182,7 +193,26 @@ export const authSlice = createSlice({
           state.status = 'success';
           state.data = null;
         },
-      )
+        )
+
+        // FOLLOW AND UNFOLLOW 
+
+        .addCase(follow_unfollow.pending, (state) => {
+          // state.data = null;
+          state.followStatus = 'loading';
+        })
+        .addCase(
+          follow_unfollow.fulfilled,
+          (state, action: PayloadAction<IFollowUnfollowResp>) => {
+            if(action.payload) {
+              state.followStatus = 'success';
+              // state.data = action.payload;
+            }
+          },
+        )
+        .addCase(follow_unfollow.rejected, (state) => {
+          state.status = 'error';
+        })
   },
 });
 

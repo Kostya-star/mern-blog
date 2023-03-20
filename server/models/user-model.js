@@ -19,6 +19,14 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  usersFollowed: {
+    type: Array,
+    default: [],
+  },
+  usersFollowing: {
+    type: Array,
+    default: [],
+  },
 }, {
   timestamps: true
 })

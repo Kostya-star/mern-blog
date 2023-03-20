@@ -215,11 +215,46 @@ const deleteMe = async (req, res) => {
   }
 }
 
+const follow_unfollow = async (req, res) => {
+  try {
+    const followingUserId = req.body.userId
+    const followedUserId = req.body.followedUserId
+
+    const followingUser = await UserModel.findById(followingUserId)
+    const followedUser = await UserModel.findById(followedUserId)
+
+    if (!followedUser) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    const isFollowed = followedUser.usersFollowed.includes(followingUser._id)
+
+    if (isFollowed) {
+      await followedUser.updateOne({ $pull: { 'usersFollowed': followingUser._id } })
+      await followingUser.updateOne({ $pull: { 'usersFollowing': followedUser._id } })
+      res.json({ isFollowed: false, followingUserId, followedUserId });
+    } else {
+      await followedUser.updateOne({ $push: { 'usersFollowed': followingUser._id } })
+      await followingUser.updateOne({ $push: { 'usersFollowing': followedUser._id } })
+      res.json({ isFollowed: true, followingUserId, followedUserId });
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: 'Error occured when following a user'
+    })
+  }
+}
+
 export default {
   register,
   login,
   getMe,
   getUser,
   updateMe,
-  deleteMe
+  deleteMe,
+  follow_unfollow
 }

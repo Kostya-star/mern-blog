@@ -38,8 +38,8 @@ export const Home = () => {
   useEffect(() => {
     const handlePageScroll = () => {
       if (window.pageYOffset > 300 && !isScrollBtnVisible) {
-          setScrollBtnVisible(true);
-        } else if(window.pageYOffset < 300 && isScrollBtnVisible) {
+        setScrollBtnVisible(true);
+      } else if (window.pageYOffset < 300 && isScrollBtnVisible) {
         setScrollBtnVisible(false);
       }
     };
@@ -51,8 +51,8 @@ export const Home = () => {
   });
 
   const onClickScrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className={`home__wrapper ${!isComments && 'home__wrapper_shrink'}`}>
@@ -76,6 +76,7 @@ export const Home = () => {
             {postsStatus === 'success' &&
               posts?.map((post) => <PostItem key={post._id} post={post} />)}
           </div>
+
           <div className="home__content__sidebar">
             <div className="home__content__comments">
               {commentStatus === 'loading' && (
@@ -99,7 +100,6 @@ export const Home = () => {
           {postsStatus === 'success' &&
             posts?.map((post) => <PostItem key={post._id} post={post} />)}
         </div>
-
       )}
       {isScrollBtnVisible && (
         <div className="home__scrollUp">

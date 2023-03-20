@@ -46,21 +46,17 @@ export const ProfileAbout = () => {
 
   useEffect(() => {
     if (id) {
-      (async () => {
-        try {
+      try {
           setUserProfileLoading(true);
           dispatch(clearCommentsSlice());
-          const user = await dispatch(getUserById(id)).unwrap();
           dispatch(fetchPostsByUserId(id));
-          if (user) {
+          dispatch(getUserById(id)).unwrap().then(user => {
             setBrowsedUser(user);
-          }
+            setUserProfileLoading(false);
+          });
         } catch (error) {
           console.log(error);
-        } finally {
-          setUserProfileLoading(false);
         }
-      })();
     }
 
     return () => {
@@ -133,9 +129,7 @@ export const ProfileAbout = () => {
           <h1 className="profileAbout__noPosts">No posts of this user</h1>
         ) : (
           <div className="profileAbout__posts">
-            {postsStatus === 'success' &&
-              posts?.length &&
-              posts.map((post) => (
+            {posts.map((post) => (
                 <PostThumbnail
                   key={post._id}
                   post={post}

@@ -122,6 +122,7 @@ export const commentsSlice = createSlice({
     builder
       // FETCHING COMMENTS by post id
       .addCase(fetchCommentsByPostId.pending, (state) => {
+        state.isComments = true;
         state.comments = [];
         state.status = 'loading';
       })
@@ -134,7 +135,6 @@ export const commentsSlice = createSlice({
           state.status = 'success';
           state.comments = action.payload.comments;
           state.currentPost = action.payload.currentPost;
-          state.isComments = true;
         },
       )
       .addCase(fetchCommentsByPostId.rejected, (state) => {

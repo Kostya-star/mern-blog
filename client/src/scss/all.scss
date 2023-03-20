@@ -40,10 +40,12 @@
 .input {
   display: block;
   margin-bottom: 20px;
+  position: relative;
 
   &_error {
     color: tomato;
   }
+
 }
 
 form {

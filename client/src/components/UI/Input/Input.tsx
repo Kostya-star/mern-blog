@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, FocusEvent } from 'react';
 import s from './Input.module.scss'
-import { CSSProperties } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface InputProps {
   placeholder?: string

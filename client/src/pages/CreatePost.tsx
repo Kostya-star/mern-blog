@@ -1,6 +1,7 @@
 import { ReactComponent as UploadSVG } from 'assets/upload.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
+import { Loader } from 'components/UI/Loader/Loader';
 import { TextArea } from 'components/UI/TextArea/TextArea';
 import 'easymde/dist/easymde.min.css';
 import { useEffect, useRef, useState } from 'react';
@@ -43,10 +44,13 @@ export const CreatePost = () => {
     image: null,
   });
 
+  const [isLoading, setLoading] = useState(false)
+
   const imageRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (id) {
+      setLoading(true)
       dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
@@ -58,6 +62,7 @@ export const CreatePost = () => {
             tags: tags.join(' '),
             image: file as File,
           });
+          setLoading(false)
         });
     }
   }, []);
@@ -92,6 +97,14 @@ export const CreatePost = () => {
       imageRef.current.value = '';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="loader">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div className="createPost">

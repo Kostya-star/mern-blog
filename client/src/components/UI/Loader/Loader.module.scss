@@ -1,12 +1,18 @@
 .loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   border-radius: 50%;
   animation: rotate 1s infinite linear;
-  width: 150px;
-  height: 150px;
-  border: 25px dashed teal;
+  
+  &_big {
+    width: 150px;
+    height: 150px;
+    border: 25px dashed teal;
+  }
+
+  &_mini {
+    width: 20px;
+    height: 20px;
+    border: 3px dashed teal;
+  }
 }
 
 @keyframes rotate {

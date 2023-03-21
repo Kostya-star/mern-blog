@@ -68,8 +68,8 @@ export const Home = () => {
         <div className="home__content">
           <div className="home__content__posts">
             {postsStatus === 'loading' && (
-              <div className="loader">
-                <Loader />
+              <div className="loader_center">
+                <Loader className='loader_big'/>
               </div>
             )}
             {postsStatus === 'error' && <div>ERROR</div>}
@@ -80,8 +80,8 @@ export const Home = () => {
           <div className="home__content__sidebar">
             <div className="home__content__comments">
               {commentStatus === 'loading' && (
-                <div className="loader">
-                  <Loader />
+                <div className="loader_center">
+                  <Loader className='loader_big'/>
                 </div>
               )}
               {commentStatus === 'error' && <div>ERROR</div>}
@@ -92,8 +92,8 @@ export const Home = () => {
       ) : (
         <div className="home__content__posts">
           {postsStatus === 'loading' && (
-            <div className="loader">
-              <Loader />
+            <div className="loader_center">
+              <Loader className='loader_big'/>
             </div>
           )}
           {postsStatus === 'error' && <div>ERROR</div>}

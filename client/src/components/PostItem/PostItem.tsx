@@ -101,15 +101,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
               {!isUserFollowed &&
                 currentUser !== post.user._id &&
                 (followStatus === 'loading' ? (
-                  <div className={s.group__follow__loader}>
-                    <Loader
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        border: '3px dashed teal',
-                      }}
-                    />
-                  </div>
+                    <Loader className='loader_mini'/>
                 ) : (
                   <div
                     className={s.group__follow}

@@ -29,6 +29,7 @@ export const ProfileAbout = () => {
     commentsStatus,
     browsedUser,
     userProfileLoading,
+    followStatus
   } = useAppSelector(({ auth, posts, comments }) => ({
     currentUser: auth.data,
     posts: posts.posts,
@@ -37,20 +38,8 @@ export const ProfileAbout = () => {
     commentsStatus: comments.status,
     browsedUser: auth.browsedUser,
     userProfileLoading: auth.status,
+    followStatus: auth.followStatus
   }));
-
-  // const [isUserProfileLoading, setUserProfileLoading] = useState(false);
-  // const [browsedUser, setBrowsedUser] = useState<IUser>({
-  //   avatarUrl: '',
-  //   createdAt: '',
-  //   email: '',
-  //   fullName: '',
-  //   postsCreated: 0,
-  //   updatedAt: '',
-  //   _id: '',
-  //   usersFollowing: [],
-  //   usersFollowed: [],
-  // });
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
@@ -58,15 +47,9 @@ export const ProfileAbout = () => {
   useEffect(() => {
     if (id) {
       try {
-        // setUserProfileLoading(true);
         dispatch(clearCommentsSlice());
         dispatch(fetchPostsByUserId(id));
         dispatch(getUserById(id));
-        // .unwrap()
-        // .then((user) => {
-        //   setBrowsedUser(user);
-        //   setUserProfileLoading(false);
-        // });
       } catch (error) {
         console.log(error);
       }
@@ -117,13 +100,14 @@ export const ProfileAbout = () => {
   return (
     <div className="profileAbout">
       <div className="profileAbout__userData">
-        {userProfileLoading === 'loading' && <Loader />}
+        {userProfileLoading === 'loading' && <Loader className='loader_big'/>}
         {userProfileLoading === 'success' && browsedUser && (
           <ProfileCard
             browsedUser={browsedUser}
             onFollowUser={onFollowUser}
             isFollowed={isFollowed as boolean}
             isShowAvatarButtons={browsedUser._id !== currentUser?._id}
+            followStatus={followStatus}
           />
         )}
         {currentUser?._id === browsedUser?._id && (
@@ -142,8 +126,8 @@ export const ProfileAbout = () => {
       </div>
 
       {postsStatus === 'loading' && (
-        <div className="loader">
-          <Loader />
+        <div className="loader_center">
+          <Loader className='loader_big'/>
         </div>
       )}
       {postsStatus === 'success' &&

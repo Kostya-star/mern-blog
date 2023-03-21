@@ -44,13 +44,13 @@ export const CreatePost = () => {
     image: null,
   });
 
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setLoading] = useState(false);
 
   const imageRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (id) {
-      setLoading(true)
+      setLoading(true);
       dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
@@ -62,7 +62,7 @@ export const CreatePost = () => {
             tags: tags.join(' '),
             image: file as File,
           });
-          setLoading(false)
+          setLoading(false);
         });
     }
   }, []);
@@ -100,8 +100,8 @@ export const CreatePost = () => {
 
   if (isLoading) {
     return (
-      <div className="loader">
-        <Loader />
+      <div className="loader_center">
+        <Loader className='loader_big'/>
       </div>
     );
   }

@@ -1,12 +1,10 @@
-import s from './Loader.module.scss'
-import { FC, CSSProperties } from 'react';
+import { FC } from 'react';
+import s from './Loader.module.scss';
 
 interface ILoaderProps {
-  style?: CSSProperties
+  className: 'loader_big' | 'loader_mini';
 }
 
-export const Loader:FC<ILoaderProps> = ({ ...props }) => {
-  return (
-    <div {...props} className={s.loader}></div>
-  )
-}
+export const Loader: FC<ILoaderProps> = ({ className }) => {
+  return <div className={`${s.loader} ${s[className]}`}></div>;
+};

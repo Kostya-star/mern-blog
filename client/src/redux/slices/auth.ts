@@ -96,6 +96,12 @@ export const follow_unfollow = createAsyncThunk('auth/follow_unfollow', async (f
   return data
 })
 
+export const getUserFollowers = createAsyncThunk('auth/getUserFollowers', async (browsedUserId: string) => {
+  const resp = await instance.get<IUser[]>(`auth/followers/${browsedUserId}`)
+
+  return resp.data
+})
+
 export interface authState {
   data: null | IUser;
   status: string;

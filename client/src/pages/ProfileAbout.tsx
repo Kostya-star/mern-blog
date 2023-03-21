@@ -8,7 +8,7 @@ import { Modal } from 'components/UI/Modal/Modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { deleteUser, follow_unfollow, getUserById } from 'redux/slices/auth';
+import { deleteUser, follow_unfollow, getUserById, getUserFollowers } from 'redux/slices/auth';
 import { clearCommentsSlice } from 'redux/slices/comments';
 import { fetchPostsByUserId } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
@@ -91,6 +91,11 @@ export const ProfileAbout = () => {
     dispatch(follow_unfollow(followedUserId));
   };
 
+  const onShowFollowers = async (browsedUserId: string) => {
+    const followedUsers = await dispatch(getUserFollowers(browsedUserId)).unwrap()
+    console.log(followedUsers);
+  }
+
   const currentBrowsedFullPost = posts?.find(
     (post) => post._id === selectedPost?._id,
   );
@@ -104,10 +109,11 @@ export const ProfileAbout = () => {
         {userProfileLoading === 'success' && browsedUser && (
           <ProfileCard
             browsedUser={browsedUser}
-            onFollowUser={onFollowUser}
             isFollowed={isFollowed as boolean}
             isShowAvatarButtons={browsedUser._id !== currentUser?._id}
             followStatus={followStatus}
+            onFollowUser={onFollowUser}
+            onShowFollowers={onShowFollowers}
           />
         )}
         {currentUser?._id === browsedUser?._id && (

@@ -125,7 +125,7 @@ const getUser = async (req, res) => {
     }
 
     const { hashedPassword, ...userData } = user._doc
-    
+
     res.json(userData)
 
   } catch (error) {
@@ -185,7 +185,7 @@ const updateMe = async (req, res) => {
 const deleteMe = async (req, res) => {
   try {
     const { userId } = req.body
-    
+
     const user = await UserModel.findById(userId)
 
     if (!user) {
@@ -249,6 +249,30 @@ const follow_unfollow = async (req, res) => {
   }
 }
 
+const getUserFollowers = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const user = await UserModel.findById(id)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    const followedUsers = await UserModel.find({ _id: { $in: user.usersFollowed } })
+
+    res.json(followedUsers)
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error occured when getting user's followers"
+    })
+  }
+}
+
 export default {
   register,
   login,
@@ -256,5 +280,6 @@ export default {
   getUser,
   updateMe,
   deleteMe,
-  follow_unfollow
+  follow_unfollow,
+  getUserFollowers
 }

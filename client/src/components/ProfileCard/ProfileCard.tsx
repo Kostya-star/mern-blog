@@ -11,6 +11,7 @@ interface IProfileCardProps {
   isShowAvatarButtons: boolean;
   followStatus: string;
   onFollowUser: (userId: string) => void;
+  onShowFollowers: (browsedUserId: string) => void;
 }
 
 export const ProfileCard: FC<IProfileCardProps> = ({
@@ -19,6 +20,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   isShowAvatarButtons,
   followStatus,
   onFollowUser,
+  onShowFollowers,
 }) => {
   return (
     <div className={s.profileCard}>
@@ -46,13 +48,22 @@ export const ProfileCard: FC<IProfileCardProps> = ({
           )}
         </h4>
         <div className={s.profileCard__data__statistics}>
-          <div>{browsedUser?.postsCreated} posts</div>
+          <div>
+            <strong>{browsedUser?.postsCreated}</strong> posts
+          </div>
           {followStatus === 'loading' ? (
-            <Loader className='loader_mini'/>
+            <Loader className="loader_mini" />
           ) : (
-            <div onClick={}>{browsedUser?.usersFollowed?.length} followers</div>
+            <div
+              onClick={() => onShowFollowers(browsedUser._id)}
+              className={s.followers}
+            >
+              <strong>{browsedUser?.usersFollowed?.length}</strong> followers
+            </div>
           )}
-          <div>{browsedUser?.usersFollowing?.length} following</div>
+          <div>
+            <strong>{browsedUser?.usersFollowing?.length}</strong> following
+          </div>
         </div>
       </div>
     </div>

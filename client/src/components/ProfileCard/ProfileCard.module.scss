@@ -38,6 +38,10 @@
     &__statistics {
       display: flex;
       gap: 20px;
+
+      .followers {
+        cursor: pointer;
+      }
     }
   }
 }

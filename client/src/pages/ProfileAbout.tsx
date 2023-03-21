@@ -9,12 +9,14 @@ import { Modal } from 'components/UI/Modal/Modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  deleteUser,
-} from 'redux/slices/auth';
+import { deleteUser } from 'redux/slices/auth';
 import { clearCommentsSlice } from 'redux/slices/comments';
 import { fetchPostsByUserId } from 'redux/slices/posts';
-import { follow_unfollow, getUserFollowers, getUserProfileById } from 'redux/slices/userProfile';
+import {
+  follow_unfollow,
+  getUserFollowers,
+  getUserProfileById,
+} from 'redux/slices/userProfile';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
 import { IUser } from 'types/IUser';
@@ -67,10 +69,10 @@ export const ProfileAbout = () => {
         console.log(error);
       }
     }
-    
+
     return () => {
       dispatch(clearCommentsSlice());
-      onCloseFollowers()
+      onCloseFollowers();
     };
   }, [location.pathname]);
 
@@ -108,7 +110,7 @@ export const ProfileAbout = () => {
   const onShowFollowers = (userId: string) => {
     dispatch(getUserFollowers(userId)).then(() => {
       setFollowersModalVisible(true);
-    })
+    });
   };
 
   const onCloseFollowers = () => {
@@ -122,7 +124,7 @@ export const ProfileAbout = () => {
   const isBrowsedUserFollowed = profileUser?.usersFollowed.includes(
     currentUser?._id as string,
   );
-console.log(isFollowersModalVisible);
+  console.log(isFollowersModalVisible);
 
   return (
     <div className="profileAbout">
@@ -204,13 +206,14 @@ console.log(isFollowersModalVisible);
               onCloseModal={onCloseFollowers}
             >
               <div className="profileAbout__modal">
-                <div className="profileAbout__modal__card" onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="profileAbout__modal__card"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <h4>Followers</h4>
                   <hr />
 
-                  {!followers?.length && <div>No followers</div>}
-
-                  {followers?.length && (
+                  {followers?.length ? (
                     followers.map((follower) => {
                       const isFollowerFollowed =
                         follower.usersFollowed.includes(
@@ -235,6 +238,8 @@ console.log(isFollowersModalVisible);
                         </FOLLOWER_FOLLOWED>
                       );
                     })
+                  ) : (
+                    <div>No followers</div>
                   )}
                 </div>
               </div>

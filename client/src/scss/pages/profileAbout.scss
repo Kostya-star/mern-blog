@@ -46,5 +46,20 @@
       position: sticky;
       top: 20px;
     }
+
+    &__card {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 10px;
+      background-color: white;
+      border-radius: 10px;
+      overflow-y: auto;
+      max-height: 500px;
+      min-width: 300px;
+      hr {
+        margin: 0px;
+      }
+    }
   }
 }

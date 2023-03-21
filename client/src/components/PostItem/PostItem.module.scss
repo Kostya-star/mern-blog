@@ -65,23 +65,6 @@
           display: flex;
           gap: 20px;
 
-          &__follow {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 14px;
-            background-color: rgb(103, 185, 240);
-            color: white;
-            padding: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            svg {
-              width: 15px;
-              path {
-                fill: white
-              }
-            }
-          }
           .fullName {
             font-weight: 600;
             cursor: pointer;

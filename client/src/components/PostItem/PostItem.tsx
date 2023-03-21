@@ -16,8 +16,9 @@ import { deletePost, likePost } from 'redux/slices/posts';
 import { IPost } from 'types/IPost';
 import { createTimeSince } from 'utils/createTimeSince';
 import s from './PostItem.module.scss';
-import { follow_unfollow } from 'redux/slices/auth';
 import { Loader } from 'components/UI/Loader/Loader';
+import { Button } from 'components/UI/Button/Button';
+import { follow_unfollow } from 'redux/slices/userProfile';
 
 interface IPostItemProps {
   post: IPost;
@@ -28,9 +29,9 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { currentUser, followStatus } = useAppSelector(({ auth }) => ({
+  const { currentUser, followStatus } = useAppSelector(({ auth, profile }) => ({
     currentUser: auth.data?._id,
-    followStatus: auth.followStatus,
+    followStatus: profile.followers.status
   }));
 
   const [isShowText, setShowText] = useState(false);
@@ -52,7 +53,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   };
 
   const onFollowUser = async (followedUserId: string) => {
-    dispatch(follow_unfollow(followedUserId));
+    dispatch(follow_unfollow({ userId: followedUserId }));
   };
 
   const timeCreation = createTimeSince(new Date(post.createdAt));
@@ -103,13 +104,13 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
                 (followStatus === 'loading' ? (
                     <Loader className='loader_mini'/>
                 ) : (
-                  <div
-                    className={s.group__follow}
+                  <Button
+                    text='Follow'
+                    className='button_follow_mini'
                     onClick={() => onFollowUser(post.user._id)}
                   >
-                    Follow
                     <PlusSVG />
-                  </div>
+                  </Button>
                 ))}
             </div>
             <div className={s.time}>{timeCreation}</div>

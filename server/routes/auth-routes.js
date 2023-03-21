@@ -13,12 +13,8 @@ const upload = multer(imageStorageCreator(multer)) // multer({ storage })
 router.post('/register', upload.single('image'), registerValidator, checkValidationErrors, authController.register)
 router.post('/login', loginValidator, checkValidationErrors, authController.login)
 router.get('/me', checkAuth, authController.getMe)
-router.get('/:id', authController.getUser)
 
 router.put('/update', upload.single('image'), updateUserValidator, checkValidationErrors, checkAuth, authController.updateMe)
 router.delete('/delete', checkAuth, authController.deleteMe)
-
-router.post('/follow', checkAuth, authController.follow_unfollow)
-router.get('/followers/:id', authController.getUserFollowers)
 
 export default router

@@ -112,30 +112,6 @@ const getMe = async (req, res) => {
   }
 }
 
-const getUser = async (req, res) => {
-  try {
-    const { id } = req.params
-
-    const user = await UserModel.findById(id)
-
-    if (!user) {
-      return res.status(404).json({
-        message: 'The user is not found'
-      })
-    }
-
-    const { hashedPassword, ...userData } = user._doc
-
-    res.json(userData)
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'Error occured when updating a user'
-    })
-  }
-}
-
 const updateMe = async (req, res) => {
   try {
     const { userId, fullName, email, password } = req.body
@@ -215,71 +191,10 @@ const deleteMe = async (req, res) => {
   }
 }
 
-const follow_unfollow = async (req, res) => {
-  try {
-    const followingUserId = req.body.userId
-    const followedUserId = req.body.followedUserId
-
-    const followingUser = await UserModel.findById(followingUserId)
-    const followedUser = await UserModel.findById(followedUserId)
-
-    if (!followedUser) {
-      return res.status(404).json({
-        message: 'The user is not found'
-      })
-    }
-
-    const isFollowed = followedUser.usersFollowed.includes(followingUser._id)
-
-    if (isFollowed) {
-      await followedUser.updateOne({ $pull: { 'usersFollowed': followingUser._id } })
-      await followingUser.updateOne({ $pull: { 'usersFollowing': followedUser._id } })
-      res.json({ isFollowed: false, followingUserId, followedUserId });
-    } else {
-      await followedUser.updateOne({ $push: { 'usersFollowed': followingUser._id } })
-      await followingUser.updateOne({ $push: { 'usersFollowing': followedUser._id } })
-      res.json({ isFollowed: true, followingUserId, followedUserId });
-    }
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'Error occured when following a user'
-    })
-  }
-}
-
-const getUserFollowers = async (req, res) => {
-  try {
-    const { id } = req.params
-
-    const user = await UserModel.findById(id)
-
-    if (!user) {
-      return res.status(404).json({
-        message: 'The user is not found'
-      })
-    }
-
-    const followedUsers = await UserModel.find({ _id: { $in: user.usersFollowed } })
-
-    res.json(followedUsers)
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Error occured when getting user's followers"
-    })
-  }
-}
-
 export default {
   register,
   login,
   getMe,
-  getUser,
   updateMe,
   deleteMe,
-  follow_unfollow,
-  getUserFollowers
 }

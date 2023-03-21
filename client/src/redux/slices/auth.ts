@@ -59,12 +59,6 @@ export const onAuthMeThunk = createAsyncThunk(
   },
 );
 
-export const getUserById = createAsyncThunk('auth/getUserById', async(userId: string) => {
-  const resp = await instance.get<IUser>(`/auth/${userId}`)
-  
-  return resp.data
-}) 
-
 export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: FormData) => {
   try {
     const { data } = await instance.put<IUser>('auth/update', updatedUser)
@@ -88,32 +82,15 @@ export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi
   return resp
 })
 
-export const follow_unfollow = createAsyncThunk('auth/follow_unfollow', async (followedUserId: string, thunkAPI) => {
-  const { data } = await instance.post<IFollowUnfollowResp>('auth/follow', { followedUserId });
-    
-  thunkAPI.dispatch(updateFollowersForPosts(data))
-  thunkAPI.dispatch(updateBrowsedProfileFollowers(data))
-  return data
-})
-
-export const getUserFollowers = createAsyncThunk('auth/getUserFollowers', async (browsedUserId: string) => {
-  const resp = await instance.get<IUser[]>(`auth/followers/${browsedUserId}`)
-
-  return resp.data
-})
 
 export interface authState {
   data: null | IUser;
   status: string;
-  browsedUser: null | IUser;
-  followStatus: string
 }
 
 const initialState: authState = {
   data: null,
   status: '',
-  browsedUser: null,
-  followStatus: ''
 };
 
 export const authSlice = createSlice({
@@ -124,17 +101,6 @@ export const authSlice = createSlice({
       state.status = '';
       state.data = null;
     },
-    updateBrowsedProfileFollowers: (state, action: PayloadAction<IFollowUnfollowResp>) => {
-      const  { followedUserId, followingUserId, isFollowed } = action.payload
-
-      if(state.browsedUser) {
-        if(isFollowed) {
-          state.browsedUser.usersFollowed.push(followingUserId)
-        } else {
-          state.browsedUser = { ...state.browsedUser, usersFollowed: state.browsedUser.usersFollowed.filter(userId => userId !== followingUserId) }
-        }
-      }
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -214,45 +180,11 @@ export const authSlice = createSlice({
           state.data = null;
         },
         )
-
-        // FOLLOW AND UNFOLLOW 
-
-        .addCase(follow_unfollow.pending, (state) => {
-          // state.data = null;
-          state.followStatus = 'loading';
-        })
-        .addCase(
-          follow_unfollow.fulfilled,
-          (state, action: PayloadAction<IFollowUnfollowResp>) => {
-              state.followStatus = 'success';
-              // state.data = action.payload;
-          },
-        )
-        .addCase(follow_unfollow.rejected, (state) => {
-          state.followStatus = 'error';
-        })
-
-        //GET USER BY ID
-
-        .addCase(getUserById.pending, (state) => {
-          state.browsedUser = null;
-          state.status = 'loading';
-        })
-        .addCase(
-          getUserById.fulfilled,
-          (state, action: PayloadAction<IUser>) => {
-              state.status = 'success';
-              state.browsedUser = action.payload;
-          },
-        )
-        .addCase(getUserById.rejected, (state) => {
-          state.status = 'error';
-        })
   },
 });
 
 export const isAuthSelector = ({ auth }: RootState) => Boolean(auth.data);
 
-export const { logout, updateBrowsedProfileFollowers } = authSlice.actions;
+export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;

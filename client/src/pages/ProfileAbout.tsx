@@ -1,4 +1,5 @@
 import { Comments } from 'components/Comments/Comments';
+import { FOLLOWER_FOLLOWED } from 'components/FOLLOWER_FOLLOWED/FOLLOWER_FOLLOWED';
 import { PostItem } from 'components/PostItem/PostItem';
 import { PostThumbnail } from 'components/PostThumbnail/PostThumbnail';
 import { ProfileCard } from 'components/ProfileCard/ProfileCard';
@@ -8,9 +9,13 @@ import { Modal } from 'components/UI/Modal/Modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { deleteUser, follow_unfollow, getUserById, getUserFollowers } from 'redux/slices/auth';
+import {
+  deleteUser,
+} from 'redux/slices/auth';
 import { clearCommentsSlice } from 'redux/slices/comments';
 import { fetchPostsByUserId } from 'redux/slices/posts';
+import { follow_unfollow, getUserFollowers, getUserProfileById } from 'redux/slices/userProfile';
+import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
 import { IUser } from 'types/IUser';
 
@@ -27,36 +32,45 @@ export const ProfileAbout = () => {
     postsStatus,
     isComments,
     commentsStatus,
-    browsedUser,
-    userProfileLoading,
-    followStatus
-  } = useAppSelector(({ auth, posts, comments }) => ({
+    profileUser,
+    profileStatus,
+    followers,
+    followStatus,
+  } = useAppSelector(({ auth, posts, comments, profile }) => ({
     currentUser: auth.data,
     posts: posts.posts,
     postsStatus: posts.status,
     isComments: comments.isComments,
     commentsStatus: comments.status,
-    browsedUser: auth.browsedUser,
-    userProfileLoading: auth.status,
-    followStatus: auth.followStatus
+    profileUser: profile.profile.user,
+    profileStatus: profile.profile.status,
+    followers: profile.followers.users,
+    followStatus: profile.followers.status,
   }));
 
-  const [isModalVisible, setModalVisible] = useState(false);
+  // MODAL FOR POSTS AND COMMENTS
+
+  const [isPostsModalVisible, setPostsModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
+
+  // MODAL FOR FOLLOWERS
+
+  const [isFollowersModalVisible, setFollowersModalVisible] = useState(false);
 
   useEffect(() => {
     if (id) {
       try {
         dispatch(clearCommentsSlice());
+        dispatch(getUserProfileById(id));
         dispatch(fetchPostsByUserId(id));
-        dispatch(getUserById(id));
       } catch (error) {
         console.log(error);
       }
     }
-
+    
     return () => {
       dispatch(clearCommentsSlice());
+      onCloseFollowers()
     };
   }, [location.pathname]);
 
@@ -78,45 +92,53 @@ export const ProfileAbout = () => {
   };
 
   const onShowFullPost = (post: IPost) => {
-    setModalVisible(true);
+    setPostsModalVisible(true);
     setSelectedPost(post);
   };
 
   const onCloseFullPost = () => {
-    setModalVisible(false);
+    setPostsModalVisible(false);
     dispatch(clearCommentsSlice());
   };
 
-  const onFollowUser = (followedUserId: string) => {
-    dispatch(follow_unfollow(followedUserId));
+  const onFollowUser = (followPayload: IFollowUnfollowPayload) => {
+    dispatch(follow_unfollow(followPayload));
   };
 
-  const onShowFollowers = async (browsedUserId: string) => {
-    const followedUsers = await dispatch(getUserFollowers(browsedUserId)).unwrap()
-    console.log(followedUsers);
-  }
+  const onShowFollowers = (userId: string) => {
+    dispatch(getUserFollowers(userId)).then(() => {
+      setFollowersModalVisible(true);
+    })
+  };
+
+  const onCloseFollowers = () => {
+    setFollowersModalVisible(false);
+  };
 
   const currentBrowsedFullPost = posts?.find(
     (post) => post._id === selectedPost?._id,
   );
 
-  const isFollowed = browsedUser?.usersFollowed.includes(currentUser?._id as string)
+  const isBrowsedUserFollowed = profileUser?.usersFollowed.includes(
+    currentUser?._id as string,
+  );
+console.log(isFollowersModalVisible);
 
   return (
     <div className="profileAbout">
       <div className="profileAbout__userData">
-        {userProfileLoading === 'loading' && <Loader className='loader_big'/>}
-        {userProfileLoading === 'success' && browsedUser && (
+        {profileStatus === 'loading' && <Loader className="loader_big" />}
+        {profileStatus === 'success' && profileUser && (
           <ProfileCard
-            browsedUser={browsedUser}
-            isFollowed={isFollowed as boolean}
-            isShowAvatarButtons={browsedUser._id !== currentUser?._id}
+            profileUser={profileUser}
+            isFollowed={isBrowsedUserFollowed as boolean}
+            isShowAvatarButtons={profileUser._id !== currentUser?._id}
             followStatus={followStatus}
             onFollowUser={onFollowUser}
             onShowFollowers={onShowFollowers}
           />
         )}
-        {currentUser?._id === browsedUser?._id && (
+        {currentUser?._id === profileUser?._id && (
           <div className="profileAbout__deleteAccount">
             <Button
               text="Delete account"
@@ -133,7 +155,7 @@ export const ProfileAbout = () => {
 
       {postsStatus === 'loading' && (
         <div className="loader_center">
-          <Loader className='loader_big'/>
+          <Loader className="loader_big" />
         </div>
       )}
       {postsStatus === 'success' &&
@@ -149,8 +171,13 @@ export const ProfileAbout = () => {
               />
             ))}
 
-            {isModalVisible && currentBrowsedFullPost && (
-              <Modal isVisible={isModalVisible} onCloseModal={onCloseFullPost}>
+            {/* MODAL FOR POSTS & COMMENTS */}
+
+            {isPostsModalVisible && currentBrowsedFullPost && (
+              <Modal
+                isVisible={isPostsModalVisible}
+                onCloseModal={onCloseFullPost}
+              >
                 <div className="profileAbout__modal">
                   <div
                     className="profileAbout__modal__post"
@@ -169,6 +196,49 @@ export const ProfileAbout = () => {
                 </div>
               </Modal>
             )}
+
+            {/* MODAL FOR FOLLOWERS */}
+
+            <Modal
+              isVisible={isFollowersModalVisible}
+              onCloseModal={onCloseFollowers}
+            >
+              <div className="profileAbout__modal">
+                <div className="profileAbout__modal__card" onClick={(e) => e.stopPropagation()}>
+                  <h4>Followers</h4>
+                  <hr />
+
+                  {!followers?.length && <div>No followers</div>}
+
+                  {followers?.length && (
+                    followers.map((follower) => {
+                      const isFollowerFollowed =
+                        follower.usersFollowed.includes(
+                          currentUser?._id as string,
+                        );
+
+                      return (
+                        <FOLLOWER_FOLLOWED
+                          key={follower._id}
+                          follower={follower}
+                          isFollowerFollowed={isFollowerFollowed}
+                          currentUserId={currentUser?._id as string}
+                          followStatus={followStatus}
+                          onFollowUser={onFollowUser}
+                        >
+                          {profileUser?._id === currentUser?._id && (
+                            <Button
+                              text="Remove"
+                              className="button button_cancel"
+                            />
+                          )}
+                        </FOLLOWER_FOLLOWED>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </Modal>
           </div>
         ))}
     </div>

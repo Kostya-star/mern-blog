@@ -1,0 +1,24 @@
+.user {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  font-size: 13px;
+  &__data {
+    display: flex;
+    align-items: center;
+    &__avatar {
+      img, svg {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+    }
+
+    &__name {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  }
+}

@@ -2,20 +2,21 @@ import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Loader } from 'components/UI/Loader/Loader';
 import { FC } from 'react';
+import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IUser } from 'types/IUser';
 import s from './ProfileCard.module.scss';
 
 interface IProfileCardProps {
-  browsedUser: IUser;
+  profileUser: IUser;
   isFollowed: boolean;
   isShowAvatarButtons: boolean;
   followStatus: string;
-  onFollowUser: (userId: string) => void;
-  onShowFollowers: (browsedUserId: string) => void;
+  onFollowUser: (val: IFollowUnfollowPayload) => void;
+  onShowFollowers: (userId: string) => void;
 }
 
 export const ProfileCard: FC<IProfileCardProps> = ({
-  browsedUser,
+  profileUser,
   isFollowed,
   isShowAvatarButtons,
   followStatus,
@@ -25,7 +26,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   return (
     <div className={s.profileCard}>
       <div className={s.profileCard__avatar}>
-        <Avatar avatar={browsedUser?.avatarUrl as string} />
+        <Avatar avatar={profileUser?.avatarUrl as string} />
         {isShowAvatarButtons && (
           <div className={s.profileCard__avatar__buttons}>
             <Button
@@ -34,7 +35,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
                 isFollowed ? 'button_cancel' : 'button_follow'
               }`}
               disabled={followStatus === 'loading'}
-              onClick={() => onFollowUser(browsedUser._id)}
+              onClick={() => onFollowUser({ userId: profileUser._id })}
             />
             {/* <Button text="Message" className="button button_follow" /> */}
           </div>
@@ -42,27 +43,27 @@ export const ProfileCard: FC<IProfileCardProps> = ({
       </div>
       <div className={s.profileCard__data}>
         <h4>
-          {browsedUser?.fullName}{' '}
-          {browsedUser._id === '64010100736d71817f3d671f' && (
+          {profileUser?.fullName}{' '}
+          {profileUser._id === '64010100736d71817f3d671f' && (
             <strong>ADMIN</strong>
           )}
         </h4>
         <div className={s.profileCard__data__statistics}>
           <div>
-            <strong>{browsedUser?.postsCreated}</strong> posts
+            <strong>{profileUser?.postsCreated}</strong> posts
           </div>
           {followStatus === 'loading' ? (
             <Loader className="loader_mini" />
           ) : (
             <div
-              onClick={() => onShowFollowers(browsedUser._id)}
+              onClick={() => onShowFollowers(profileUser._id)}
               className={s.followers}
             >
-              <strong>{browsedUser?.usersFollowed?.length}</strong> followers
+              <strong>{profileUser?.usersFollowed?.length}</strong> followers
             </div>
           )}
           <div>
-            <strong>{browsedUser?.usersFollowing?.length}</strong> following
+            <strong>{profileUser?.usersFollowing?.length}</strong> following
           </div>
         </div>
       </div>

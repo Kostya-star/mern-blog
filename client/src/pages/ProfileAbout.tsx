@@ -124,7 +124,6 @@ export const ProfileAbout = () => {
   const isBrowsedUserFollowed = profileUser?.usersFollowed.includes(
     currentUser?._id as string,
   );
-  console.log(isFollowersModalVisible);
 
   return (
     <div className="profileAbout">
@@ -172,80 +171,73 @@ export const ProfileAbout = () => {
                 onShowFullPost={() => onShowFullPost(post)}
               />
             ))}
-
-            {/* MODAL FOR POSTS & COMMENTS */}
-
-            {isPostsModalVisible && currentBrowsedFullPost && (
-              <Modal
-                isVisible={isPostsModalVisible}
-                onCloseModal={onCloseFullPost}
-              >
-                <div className="profileAbout__modal">
-                  <div
-                    className="profileAbout__modal__post"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <PostItem post={currentBrowsedFullPost} />
-                  </div>
-                  {isComments && (
-                    <div
-                      className="profileAbout__modal__comments"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Comments />
-                    </div>
-                  )}
-                </div>
-              </Modal>
-            )}
-
-            {/* MODAL FOR FOLLOWERS */}
-
-            <Modal
-              isVisible={isFollowersModalVisible}
-              onCloseModal={onCloseFollowers}
-            >
-              <div className="profileAbout__modal">
-                <div
-                  className="profileAbout__modal__card"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <h4>Followers</h4>
-                  <hr />
-
-                  {followers?.length ? (
-                    followers.map((follower) => {
-                      const isFollowerFollowed =
-                        follower.usersFollowed.includes(
-                          currentUser?._id as string,
-                        );
-
-                      return (
-                        <FOLLOWER_FOLLOWED
-                          key={follower._id}
-                          follower={follower}
-                          isFollowerFollowed={isFollowerFollowed}
-                          currentUserId={currentUser?._id as string}
-                          followStatus={followStatus}
-                          onFollowUser={onFollowUser}
-                        >
-                          {profileUser?._id === currentUser?._id && (
-                            <Button
-                              text="Remove"
-                              className="button button_cancel"
-                            />
-                          )}
-                        </FOLLOWER_FOLLOWED>
-                      );
-                    })
-                  ) : (
-                    <div>No followers</div>
-                  )}
-                </div>
-              </div>
-            </Modal>
           </div>
         ))}
+
+      {/* MODAL FOR POSTS & COMMENTS */}
+
+      {currentBrowsedFullPost && (
+        <Modal isVisible={isPostsModalVisible} onCloseModal={onCloseFullPost}>
+          <div className="profileAbout__modal">
+            <div
+              className="profileAbout__modal__post"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <PostItem post={currentBrowsedFullPost} />
+            </div>
+            {isComments && (
+              <div
+                className="profileAbout__modal__comments"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Comments />
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL FOR FOLLOWERS */}
+
+      <Modal
+        isVisible={isFollowersModalVisible}
+        onCloseModal={onCloseFollowers}
+      >
+        <div className="profileAbout__modal">
+          <div
+            className="profileAbout__modal__card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4>Followers</h4>
+            <hr />
+
+            {followers?.length ? (
+              followers.map((follower) => {
+                const isFollowerFollowed = follower.usersFollowed.includes(
+                  currentUser?._id as string,
+                );
+
+                return (
+                  <FOLLOWER_FOLLOWED
+                    key={follower._id}
+                    follower={follower}
+                    isFollowerFollowed={isFollowerFollowed}
+                    currentUserId={currentUser?._id as string}
+                    followStatus={followStatus}
+                    onFollowUser={onFollowUser}
+                  >
+                    {profileUser?._id === currentUser?._id && (
+                      <Button text="Remove" className="button button_cancel" onClick={() => onRemoveFollower()}/>
+                    )}
+                  </FOLLOWER_FOLLOWED>
+                );
+              })
+            ) : (
+              <div>No followers</div>
+            )}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

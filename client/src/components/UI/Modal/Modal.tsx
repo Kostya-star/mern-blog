@@ -9,10 +9,9 @@ interface IModalProps {
 }
 
 export const Modal: FC<IModalProps> = ({ isVisible, onCloseModal, children }) => {
-  console.log(isVisible);
   
   return (
-    <div className={`${s.modal} ${isVisible && s.modal__visible}`} onClick={onCloseModal}>
+    <div className={`${s.modal} ${isVisible ? s.modal__visible : ''}`} onClick={onCloseModal}>
       <CloseSVG className={s.modal__closeSVG}/>
       <div className={s.modal__content} >{children}</div>
     </div>

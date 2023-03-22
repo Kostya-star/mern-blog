@@ -56,7 +56,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
     dispatch(follow_unfollow({ userId: followedUserId }));
   };
 
-  const timeCreation = createTimeSince(new Date(post.createdAt));
+  const timeCreation = createTimeSince(new Date(post?.createdAt));
   const isShowEditDelete = currentUser === post.user?._id;
   const isLiked = post.usersLiked.includes(currentUser as string);
   const isUserFollowed = post.user.usersFollowed.includes(

@@ -54,6 +54,12 @@ export const getUserFollowers = createAsyncThunk(
   },
 );
 
+export const removeFollower = createAsyncThunk('profile/removeFollower', async (followerId: string, thunkAPI) => {
+  const { data } = await instance.delete<{ deletedFollower: string }>(`profile/follower/${followerId}`)
+  thunkAPI.dispatch(deleteFollower(data.deletedFollower))
+  return data.deletedFollower
+})
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface profileState {
@@ -134,6 +140,14 @@ export const profileSlice = createSlice({
         }
       }
     },
+
+    deleteFollower: (state, action: PayloadAction<string>) => {
+      const deletedFollowerId = action.payload
+      state.followers.users = state.followers.users.filter(follower => follower._id !== deletedFollowerId)
+      if(state.profile.user?.usersFollowed) {
+        state.profile.user.usersFollowed = state.profile.user.usersFollowed.filter(followerId => followerId !== deletedFollowerId)
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -188,9 +202,26 @@ export const profileSlice = createSlice({
       .addCase(getUserFollowers.rejected, (state) => {
         state.followers.status = 'error';
       })
+
+      // DELETE USER'S FOLLOWER
+
+      .addCase(removeFollower.pending, (state) => {
+        // state.data = null;
+        state.followers.status = 'loading';
+      })
+      .addCase(
+        removeFollower.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.followers.status = 'success';
+          // state.followers.users = action.payload;
+        },
+      )
+      .addCase(removeFollower.rejected, (state) => {
+        state.followers.status = 'error';
+      })
   },
 });
 
-export const { updateProfileFollowers, updateModalFollowers } = profileSlice.actions;
+export const { updateProfileFollowers, updateModalFollowers, deleteFollower } = profileSlice.actions;
 
 export default profileSlice.reducer;

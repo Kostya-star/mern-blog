@@ -16,6 +16,7 @@ import {
   follow_unfollow,
   getUserFollowers,
   getUserProfileById,
+  removeFollower,
 } from 'redux/slices/userProfile';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
@@ -117,6 +118,10 @@ export const ProfileAbout = () => {
     setFollowersModalVisible(false);
   };
 
+  const onRemoveFollower = (followerId: string) => {
+    dispatch(removeFollower(followerId))
+  }
+
   const currentBrowsedFullPost = posts?.find(
     (post) => post._id === selectedPost?._id,
   );
@@ -213,21 +218,23 @@ export const ProfileAbout = () => {
 
             {followers?.length ? (
               followers.map((follower) => {
-                const isFollowerFollowed = follower.usersFollowed.includes(
-                  currentUser?._id as string,
-                );
 
                 return (
                   <FOLLOWER_FOLLOWED
                     key={follower._id}
-                    follower={follower}
-                    isFollowerFollowed={isFollowerFollowed}
+                    user={follower}
+                    // isFollowerFollowed={isFollowerFollowed}
                     currentUserId={currentUser?._id as string}
                     followStatus={followStatus}
                     onFollowUser={onFollowUser}
                   >
                     {profileUser?._id === currentUser?._id && (
-                      <Button text="Remove" className="button button_cancel" onClick={() => onRemoveFollower()}/>
+                      <Button
+                        text="Remove"
+                        className="button button_cancel"
+                        disabled={followStatus === 'loading'}
+                        onClick={() => onRemoveFollower(follower._id)}
+                      />
                     )}
                   </FOLLOWER_FOLLOWED>
                 );

@@ -88,8 +88,38 @@ const getUserFollowers = async (req, res) => {
   }
 }
 
+const deleteUserFollower = async(req, res) => {
+  try {
+    const { userId } = req.body
+    const { id } = req.params
+
+    const user = await UserModel.findById(userId)
+    const follower = await UserModel.findById(id)
+
+    if(!follower) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    await user.updateOne({ $pull: { 'usersFollowed': follower._id } })
+    await follower.updateOne({ $pull: { 'usersFollowing': user._id } })
+
+    res.json({
+      deletedFollower: follower._id
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error occured when deleting user's follower"
+    })
+  }
+}
+
 export default {
   getUser,
   follow_unfollow,
-  getUserFollowers
+  getUserFollowers,
+  deleteUserFollower
 }

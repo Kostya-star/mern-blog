@@ -9,9 +9,9 @@ import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { Loader } from 'components/UI/Loader/Loader';
 
 interface IFOLLOWER_FOLLOWEDProps {
-  follower: IUser;
+  user: IUser;
   children: ReactNode;
-  isFollowerFollowed: boolean;
+  // isFollowerFollowed: boolean;
   currentUserId: string;
   followStatus: string;
   onFollowUser: (val: IFollowUnfollowPayload) => void;
@@ -19,31 +19,34 @@ interface IFOLLOWER_FOLLOWEDProps {
 
 export const FOLLOWER_FOLLOWED: FC<IFOLLOWER_FOLLOWEDProps> = ({
   children,
-  follower,
-  isFollowerFollowed,
+  user,
+  // isFollowerFollowed,
   currentUserId,
   followStatus,
   onFollowUser,
 }) => {
   const navigate = useNavigate();
   const onRedirectAboutProfile = () => {
-    navigate(`/profile/about/${follower._id}`);
+    navigate(`/profile/about/${user._id}`);
   };
+
+  const isFollowerFollowed = user.usersFollowed.includes(currentUserId);
+
 
   return (
     <div className={s.user}>
       <div className={s.user__data}>
         <div className={s.user__data__avatar}>
           <Avatar
-            avatar={follower.avatarUrl as string}
+            avatar={user.avatarUrl as string}
             onClick={onRedirectAboutProfile}
           />
         </div>
         <span className={s.user__data__name} onClick={onRedirectAboutProfile}>
-          {follower.fullName}
+          {user.fullName}
         </span>
         {!isFollowerFollowed &&
-          currentUserId !== follower._id &&
+          currentUserId !== user._id &&
           (followStatus === 'loading' ? (
             <Loader className="loader_mini" />
           ) : (
@@ -51,7 +54,7 @@ export const FOLLOWER_FOLLOWED: FC<IFOLLOWER_FOLLOWEDProps> = ({
               text="Follow"
               className="button_follow_mini"
               onClick={() =>
-                onFollowUser({ userId: follower._id, isFollowersModal: true })
+                onFollowUser({ userId: user._id, isFollowersModal: true })
               }
             >
               <PlusSVG />

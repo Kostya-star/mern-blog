@@ -2,14 +2,10 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { RootState } from 'redux/store';
-import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
-import { ILoginRequest } from 'types/ILoginRequest';
-import { IRegisterRequest } from 'types/IRegisterRequest';
-import { IUpdateUserReq } from 'types/IUpdateUserReq';
-import { clearCommentsSlice } from './comments';
-import { updateFollowersForPosts } from './posts';
-import { IUser } from '../../types/IUser';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
+import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
+import { IUser } from '../../types/IUser';
+import { updateFollowersForPosts } from './posts';
 
 export const getUserProfileById = createAsyncThunk(
   'profile/getUserProfileById',
@@ -23,7 +19,6 @@ export const getUserProfileById = createAsyncThunk(
 export const follow_unfollow = createAsyncThunk(
   'profile/follow_unfollow',
   async (followPayload: IFollowUnfollowPayload, thunkAPI) => {
-
     const { data } = await instance.post<IFollowUnfollowResp>(
       'profile/follow',
       { followedUserId: followPayload.userId },
@@ -63,10 +58,13 @@ export const removeFollower = createAsyncThunk(
   },
 );
 
-export const getUserFollowings = createAsyncThunk('profile/getUserFollowing', async(userId: string) => {
-  const resp = await instance.get<IUser[]>(`profile/followings/${userId}`)
-  return resp.data
-})
+export const getUserFollowings = createAsyncThunk(
+  'profile/getUserFollowing',
+  async (userId: string) => {
+    const resp = await instance.get<IUser[]>(`profile/followings/${userId}`);
+    return resp.data;
+  },
+);
 
 type Status = 'loading' | 'success' | 'error' | '';
 
@@ -145,11 +143,15 @@ export const profileSlice = createSlice({
             state.profile.user?.usersFollowing.push(followedUserId);
           }
         } else {
-          followedUser.usersFollowed = followedUser.usersFollowed.filter(userId => userId !== followingUserId)
+          followedUser.usersFollowed = followedUser.usersFollowed.filter(
+            (userId) => userId !== followingUserId,
+          );
           if (state.profile.user?._id === authedUserId && state.profile.user) {
-            state.profile.user.usersFollowing = state.profile.user.usersFollowing.filter(userId => userId !== followedUser?._id);
+            state.profile.user.usersFollowing =
+              state.profile.user.usersFollowing.filter(
+                (userId) => userId !== followedUser?._id,
+              );
           }
-
         }
       }
     },
@@ -253,7 +255,7 @@ export const profileSlice = createSlice({
       )
       .addCase(getUserFollowings.rejected, (state) => {
         state.followers.status = 'error';
-      })
+      });
   },
 });
 

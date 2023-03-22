@@ -11,9 +11,9 @@ import imageRoutes from './routes/image-routes.js'
 import { imageStorageCreator } from './utils/imageStorageCreator.js'
 import cors from 'cors'
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
+const app = express();
 
 app.use(express.json())
 // app.use(express.urlencoded({ extended: true }));

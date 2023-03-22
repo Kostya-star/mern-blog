@@ -13,6 +13,7 @@ interface IProfileCardProps {
   followStatus: string;
   onFollowUser: (val: IFollowUnfollowPayload) => void;
   onShowFollowers: (userId: string) => void;
+  onShowFollowing: (userId: string) => void
 }
 
 export const ProfileCard: FC<IProfileCardProps> = ({
@@ -22,6 +23,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   followStatus,
   onFollowUser,
   onShowFollowers,
+  onShowFollowing
 }) => {
   return (
     <div className={s.profileCard}>
@@ -62,7 +64,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
               <strong>{profileUser?.usersFollowed?.length}</strong> followers
             </div>
           )}
-          <div>
+          <div onClick={() => onShowFollowing(profileUser._id)} className={s.following}>
             <strong>{profileUser?.usersFollowing?.length}</strong> following
           </div>
         </div>

@@ -15,12 +15,18 @@ import { fetchPostsByUserId } from 'redux/slices/posts';
 import {
   follow_unfollow,
   getUserFollowers,
+  getUserFollowings,
   getUserProfileById,
   removeFollower,
 } from 'redux/slices/userProfile';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
 import { IUser } from 'types/IUser';
+
+interface IFollowersModal {
+  followers?: boolean;
+  followings?: boolean;
+}
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -39,6 +45,7 @@ export const ProfileAbout = () => {
     profileStatus,
     followers,
     followStatus,
+    // followings
   } = useAppSelector(({ auth, posts, comments, profile }) => ({
     currentUser: auth.data,
     posts: posts.posts,
@@ -49,6 +56,7 @@ export const ProfileAbout = () => {
     profileStatus: profile.profile.status,
     followers: profile.followers.users,
     followStatus: profile.followers.status,
+    // followings: profile.following.users
   }));
 
   // MODAL FOR POSTS AND COMMENTS
@@ -58,7 +66,10 @@ export const ProfileAbout = () => {
 
   // MODAL FOR FOLLOWERS
 
-  const [isFollowersModalVisible, setFollowersModalVisible] = useState(false);
+  // const [isFollowersModalVisible, setFollowersModalVisible] = useState(false);
+  // const [isFollowingModalVisible, setFollowingModalVisible] = useState(false);
+  const [isFollowersModalVisible, setFollowersModalVisible] =
+    useState<null | IFollowersModal>(null);
 
   useEffect(() => {
     if (id) {
@@ -73,7 +84,7 @@ export const ProfileAbout = () => {
 
     return () => {
       dispatch(clearCommentsSlice());
-      onCloseFollowers();
+      onCloseFollowersModal();
     };
   }, [location.pathname]);
 
@@ -110,17 +121,24 @@ export const ProfileAbout = () => {
 
   const onShowFollowers = (userId: string) => {
     dispatch(getUserFollowers(userId)).then(() => {
-      setFollowersModalVisible(true);
+      // setFollowersModalVisible(true);
+      setFollowersModalVisible({ followers: true });
     });
   };
 
-  const onCloseFollowers = () => {
-    setFollowersModalVisible(false);
+  const onCloseFollowersModal = () => {
+    setFollowersModalVisible(null);
+  };
+
+  const onShowFollowing = (userId: string) => {
+    dispatch(getUserFollowings(userId)).then(() => {
+      setFollowersModalVisible({ followings: true });
+    });
   };
 
   const onRemoveFollower = (followerId: string) => {
-    dispatch(removeFollower(followerId))
-  }
+    dispatch(removeFollower(followerId));
+  };
 
   const currentBrowsedFullPost = posts?.find(
     (post) => post._id === selectedPost?._id,
@@ -142,6 +160,7 @@ export const ProfileAbout = () => {
             followStatus={followStatus}
             onFollowUser={onFollowUser}
             onShowFollowers={onShowFollowers}
+            onShowFollowing={onShowFollowing}
           />
         )}
         {currentUser?._id === profileUser?._id && (
@@ -202,23 +221,28 @@ export const ProfileAbout = () => {
         </Modal>
       )}
 
-      {/* MODAL FOR FOLLOWERS */}
+      {/* FOLLOWERS AND FOLLOWINGS MODAL */}
 
       <Modal
-        isVisible={isFollowersModalVisible}
-        onCloseModal={onCloseFollowers}
+        isVisible={
+          isFollowersModalVisible?.followers ||
+          isFollowersModalVisible?.followings ||
+          null
+        }
+        onCloseModal={onCloseFollowersModal}
       >
         <div className="profileAbout__modal">
           <div
             className="profileAbout__modal__card"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4>Followers</h4>
+            <h4>
+              {isFollowersModalVisible?.followers ? 'Followers' : 'Following'}
+            </h4>
             <hr />
 
             {followers?.length ? (
               followers.map((follower) => {
-
                 return (
                   <FOLLOWER_FOLLOWED
                     key={follower._id}
@@ -228,12 +252,22 @@ export const ProfileAbout = () => {
                     followStatus={followStatus}
                     onFollowUser={onFollowUser}
                   >
-                    {profileUser?._id === currentUser?._id && (
+                    {isFollowersModalVisible?.followers &&
+                      profileUser?._id === currentUser?._id && (
+                        <Button
+                          text="Remove"
+                          className="button button_cancel"
+                          disabled={followStatus === 'loading'}
+                          onClick={() => onRemoveFollower(follower._id)}
+                        />
+                      )}
+                    {/* {isFollowersModalVisible?.followings && currentUser?.usersFollowing.includes(follower._id) && ( */}
+                    {isFollowersModalVisible?.followings && follower.usersFollowed.includes(currentUser?._id as string)  && (
                       <Button
-                        text="Remove"
+                        text="Following"
                         className="button button_cancel"
                         disabled={followStatus === 'loading'}
-                        onClick={() => onRemoveFollower(follower._id)}
+                        onClick={() => onFollowUser({ userId: follower._id, isFollowersModal: true })}
                       />
                     )}
                   </FOLLOWER_FOLLOWED>

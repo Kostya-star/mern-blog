@@ -4,7 +4,7 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg'
 
 interface IModalProps {
   children: ReactNode;
-  isVisible: boolean;
+  isVisible: boolean | null;
   onCloseModal: () => void
 }
 

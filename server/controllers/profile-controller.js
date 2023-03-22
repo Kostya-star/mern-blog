@@ -117,9 +117,34 @@ const deleteUserFollower = async(req, res) => {
   }
 }
 
+const getUserFollowings = async(req, res) => {
+  try {
+    const { id } = req.params
+
+    const user = await UserModel.findById(id)
+
+    if(!user) {
+      return res.status(404).json({
+        message: 'The user is not found'
+      })
+    }
+
+    const userFollowings = await UserModel.find({ _id: { $in: user.usersFollowing } })
+
+    res.json(userFollowings)
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Error occured when getting user's followings"
+    })
+  }
+}
+
 export default {
   getUser,
   follow_unfollow,
   getUserFollowers,
-  deleteUserFollower
+  deleteUserFollower,
+  getUserFollowings
 }

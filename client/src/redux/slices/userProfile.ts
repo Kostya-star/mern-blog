@@ -23,19 +23,18 @@ export const getUserProfileById = createAsyncThunk(
 export const follow_unfollow = createAsyncThunk(
   'profile/follow_unfollow',
   async (followPayload: IFollowUnfollowPayload, thunkAPI) => {
-    console.log(followPayload);
-    
+
     const { data } = await instance.post<IFollowUnfollowResp>(
       'profile/follow',
       { followedUserId: followPayload.userId },
     );
 
-    const authedUserId = (thunkAPI.getState() as RootState).auth.data?._id
+    const authedUserId = (thunkAPI.getState() as RootState).auth.data?._id;
 
-    if(!followPayload.isFollowersModal) {
+    if (!followPayload.isFollowersModal) {
       thunkAPI.dispatch(updateFollowersForPosts(data));
       thunkAPI.dispatch(updateProfileFollowers(data));
-    } else if(followPayload.isFollowersModal) {
+    } else if (followPayload.isFollowersModal) {
       thunkAPI.dispatch(updateModalFollowers({ data, authedUserId }));
     }
     return data;
@@ -45,19 +44,28 @@ export const follow_unfollow = createAsyncThunk(
 export const getUserFollowers = createAsyncThunk(
   'profile/getUserFollowers',
   async (browsedUserId: string) => {
-    
     const resp = await instance.get<IUser[]>(
       `profile/followers/${browsedUserId}`,
-      );
-      
+    );
+
     return resp.data;
   },
 );
 
-export const removeFollower = createAsyncThunk('profile/removeFollower', async (followerId: string, thunkAPI) => {
-  const { data } = await instance.delete<{ deletedFollower: string }>(`profile/follower/${followerId}`)
-  thunkAPI.dispatch(deleteFollower(data.deletedFollower))
-  return data.deletedFollower
+export const removeFollower = createAsyncThunk(
+  'profile/removeFollower',
+  async (followerId: string, thunkAPI) => {
+    const { data } = await instance.delete<{ deletedFollower: string }>(
+      `profile/follower/${followerId}`,
+    );
+    thunkAPI.dispatch(deleteFollower(data.deletedFollower));
+    return data.deletedFollower;
+  },
+);
+
+export const getUserFollowings = createAsyncThunk('profile/getUserFollowing', async(userId: string) => {
+  const resp = await instance.get<IUser[]>(`profile/followings/${userId}`)
+  return resp.data
 })
 
 type Status = 'loading' | 'success' | 'error' | '';
@@ -71,10 +79,10 @@ export interface profileState {
     users: IUser[];
     status: Status;
   };
-  following: {
-    users: IUser[];
-    status: Status;
-  };
+  // following: {
+  //   users: IUser[];
+  //   status: Status;
+  // };
 }
 
 const initialState: profileState = {
@@ -86,10 +94,10 @@ const initialState: profileState = {
     users: [],
     status: '',
   },
-  following: {
-    users: [],
-    status: '',
-  },
+  // following: {
+  //   users: [],
+  //   status: '',
+  // },
 };
 
 export const profileSlice = createSlice({
@@ -117,37 +125,47 @@ export const profileSlice = createSlice({
     },
     updateModalFollowers: (
       state,
-      action: PayloadAction<{ data: IFollowUnfollowResp, authedUserId: string | undefined }>,
+      action: PayloadAction<{
+        data: IFollowUnfollowResp;
+        authedUserId: string | undefined;
+      }>,
     ) => {
-      const { followedUserId, followingUserId, isFollowed } = action.payload.data;
-      const { authedUserId } = action.payload
+      const { followedUserId, followingUserId, isFollowed } =
+        action.payload.data;
+      const { authedUserId } = action.payload;
 
-      let followedUser = state.followers.users.find(user => user._id === followedUserId)
+      let followedUser = state.followers.users.find(
+        (user) => user._id === followedUserId,
+      );
 
-      if(followedUser) {
+      if (followedUser) {
         if (isFollowed) {
           followedUser?.usersFollowed.push(followingUserId);
-          if(state.profile.user?._id === authedUserId) {
-            state.profile.user?.usersFollowing.push(followedUserId)
+          if (state.profile.user?._id === authedUserId) {
+            state.profile.user?.usersFollowing.push(followedUserId);
           }
         } else {
-          followedUser = {
-            ...followedUser,
-            usersFollowed: followedUser.usersFollowed.filter(
-              (userId) => userId !== followingUserId,
-            ),
-          };
+          followedUser.usersFollowed = followedUser.usersFollowed.filter(userId => userId !== followingUserId)
+          if (state.profile.user?._id === authedUserId && state.profile.user) {
+            state.profile.user.usersFollowing = state.profile.user.usersFollowing.filter(userId => userId !== followedUser?._id);
+          }
+
         }
       }
     },
 
     deleteFollower: (state, action: PayloadAction<string>) => {
-      const deletedFollowerId = action.payload
-      state.followers.users = state.followers.users.filter(follower => follower._id !== deletedFollowerId)
-      if(state.profile.user?.usersFollowed) {
-        state.profile.user.usersFollowed = state.profile.user.usersFollowed.filter(followerId => followerId !== deletedFollowerId)
+      const deletedFollowerId = action.payload;
+      state.followers.users = state.followers.users.filter(
+        (follower) => follower._id !== deletedFollowerId,
+      );
+      if (state.profile.user?.usersFollowed) {
+        state.profile.user.usersFollowed =
+          state.profile.user.usersFollowed.filter(
+            (followerId) => followerId !== deletedFollowerId,
+          );
       }
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -189,7 +207,7 @@ export const profileSlice = createSlice({
       // GET USER'S FOLLOWERS
 
       .addCase(getUserFollowers.pending, (state) => {
-        // state.data = null;
+        state.followers.users = [];
         state.followers.status = 'loading';
       })
       .addCase(
@@ -219,9 +237,27 @@ export const profileSlice = createSlice({
       .addCase(removeFollower.rejected, (state) => {
         state.followers.status = 'error';
       })
+
+      // GET USER'S FOLLOWINGS
+
+      .addCase(getUserFollowings.pending, (state) => {
+        state.followers.users = [];
+        state.followers.status = 'loading';
+      })
+      .addCase(
+        getUserFollowings.fulfilled,
+        (state, action: PayloadAction<IUser[]>) => {
+          state.followers.status = 'success';
+          state.followers.users = action.payload;
+        },
+      )
+      .addCase(getUserFollowings.rejected, (state) => {
+        state.followers.status = 'error';
+      })
   },
 });
 
-export const { updateProfileFollowers, updateModalFollowers, deleteFollower } = profileSlice.actions;
+export const { updateProfileFollowers, updateModalFollowers, deleteFollower } =
+  profileSlice.actions;
 
 export default profileSlice.reducer;

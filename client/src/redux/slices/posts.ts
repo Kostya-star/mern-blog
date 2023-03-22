@@ -66,11 +66,14 @@ export const likePost = createAsyncThunk(
   },
 );
 
-export const fetchPostsByUserId = createAsyncThunk('posts/fetchPostsByUserId', async (userId: string) => {
-  const resp = await instance.get<IPost[]>(`/posts/user/${userId}`)
+export const fetchPostsByUserId = createAsyncThunk(
+  'posts/fetchPostsByUserId',
+  async (userId: string) => {
+    const resp = await instance.get<IPost[]>(`/posts/user/${userId}`);
 
-  return resp.data
-})
+    return resp.data;
+  },
+);
 
 export interface PostsState {
   posts: IPost[];
@@ -112,7 +115,7 @@ export const postsSlice = createSlice({
               (user) => user === userId,
             );
             // if (firstUserId !== -1) {
-              post.usersCommented.splice(firstUserId, 1);
+            post.usersCommented.splice(firstUserId, 1);
             // }
           }
         }
@@ -134,21 +137,28 @@ export const postsSlice = createSlice({
       }
     },
 
-    updateFollowersForPosts: (state, action: PayloadAction<IFollowUnfollowResp>) => {
-      const  { followedUserId, followingUserId, isFollowed } = action.payload
-      
-      const postsOfFollowedUser = state.posts.filter(post => post.user._id === followedUserId)
+    updateFollowersForPosts: (
+      state,
+      action: PayloadAction<IFollowUnfollowResp>,
+    ) => {
+      const { followedUserId, followingUserId, isFollowed } = action.payload;
 
-      postsOfFollowedUser.map(post => {
-        if(isFollowed) {
-          post.user.usersFollowed.push(followingUserId)
-          return post
+      const postsOfFollowedUser = state.posts.filter(
+        (post) => post.user._id === followedUserId,
+      );
+
+      postsOfFollowedUser.map((post) => {
+        if (isFollowed) {
+          post.user.usersFollowed.push(followingUserId);
+          return post;
         } else {
-          post.user.usersFollowed = post.user.usersFollowed.filter(userId => userId !== followingUserId)
-          return post
+          post.user.usersFollowed = post.user.usersFollowed.filter(
+            (userId) => userId !== followingUserId,
+          );
+          return post;
         }
-      })
-    }
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -194,6 +204,7 @@ export const postsSlice = createSlice({
   },
 });
 
-export const { updateCommentCount, updateLikeCount, updateFollowersForPosts } = postsSlice.actions;
+export const { updateCommentCount, updateLikeCount, updateFollowersForPosts } =
+  postsSlice.actions;
 
 export default postsSlice.reducer;

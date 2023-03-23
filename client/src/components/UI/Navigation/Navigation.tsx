@@ -7,7 +7,6 @@ import 'scss/buttons.scss';
 import { Button } from '../Button/Button';
 import s from './Navigation.module.scss';
 import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
-import { ReactComponent as UserEditSVG } from 'assets/user-edit.svg';
 import { ReactComponent as UserAboutSVG } from 'assets/about-profile.svg';
 import { ReactComponent as SignOutSVG } from 'assets/sign-out.svg';
 import { useRef, useState, useEffect } from 'react';
@@ -93,11 +92,11 @@ export const Navigation = () => {
                           About me <UserAboutSVG />
                         </li>
                       </Link>
-                      <Link to='/profile/edit'>
+                      {/* <Link to='/profile/edit'>
                         <li>
                           Edit me<UserEditSVG />
                         </li>
-                      </Link>
+                      </Link> */}
                     <Link to="/login">
                       <li onClick={onLogoutHandle}>
                         Sign out <SignOutSVG />

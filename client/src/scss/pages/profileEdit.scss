@@ -3,6 +3,17 @@
   padding: 20px;
   border-radius: 20px;
 
+  &__buttonBack {
+    button {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 5px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+  }
+
   &__content {
     display: flex;
     flex-direction: column;

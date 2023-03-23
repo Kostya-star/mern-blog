@@ -6,9 +6,11 @@ import { base64ToFile } from 'utils/base64ToFile';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
 import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
+import { ReactComponent as ArrowLeftSVG } from 'assets/arrow-left.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
+import { useNavigate } from 'react-router-dom';
 
 interface IUserUpdatedValues {
   fullName: string;
@@ -44,6 +46,7 @@ const validationSchema = Yup.object().shape({
 
 export const ProfileEdit = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const currentUser = useAppSelector(({ auth }) => auth.data);
 
   const initialValues = {
@@ -110,6 +113,15 @@ export const ProfileEdit = () => {
 
   return (
     <div className="profileEdit">
+      <div className="profileEdit__buttonBack">
+        <Button
+          text="Go Back"
+          className="button button_cancel"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeftSVG />
+        </Button>
+      </div>
       <div className="profileEdit__content">
         {/* <h2 className="profileEdit__top">Edit profile</h2> */}
         <Formik
@@ -274,7 +286,6 @@ export const ProfileEdit = () => {
               </Form>
             );
           }}
-          
         </Formik>
       </div>
     </div>

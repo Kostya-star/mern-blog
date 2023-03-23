@@ -21,6 +21,9 @@
   &_cancel {
     background-color: rgb(200, 199, 199);
     border: none;
+    &:hover {
+      background-color: rgb(159, 158, 158);
+    }
   }
 
   &_delete {
@@ -39,6 +42,9 @@
     background-color: rgb(103, 185, 240);
     color: white;
     border: none;
+    &:hover {
+      background-color: rgb(68, 156, 214);
+    }
   }
   &_follow_mini {
     display: flex;
@@ -57,5 +63,9 @@
         fill: white
       }
     }
+    &:hover {
+      background-color: rgb(68, 156, 214);
+    }
+
   }
 }

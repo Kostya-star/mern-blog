@@ -155,7 +155,7 @@ export const ProfileAbout = () => {
           <ProfileCard
             profileUser={profileUser}
             isFollowed={isBrowsedUserFollowed as boolean}
-            isShowAvatarButtons={profileUser._id !== currentUser?._id}
+            currentUserId={currentUser?._id as string}
             followStatus={followStatus}
             onFollowUser={onFollowUser}
             onShowFollowers={onShowFollowers}

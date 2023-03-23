@@ -2,15 +2,18 @@ import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Loader } from 'components/UI/Loader/Loader';
 import { FC } from 'react';
+import { Link } from 'react-router-dom';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IUser } from 'types/IUser';
 import s from './ProfileCard.module.scss';
+import { ReactComponent as UserEditSVG } from 'assets/user-edit.svg';
+
 
 interface IProfileCardProps {
   profileUser: IUser;
   isFollowed: boolean;
-  isShowAvatarButtons: boolean;
   followStatus: string;
+  currentUserId: string
   onFollowUser: (val: IFollowUnfollowPayload) => void;
   onShowFollowers: (userId: string) => void;
   onShowFollowing: (userId: string) => void;
@@ -19,8 +22,8 @@ interface IProfileCardProps {
 export const ProfileCard: FC<IProfileCardProps> = ({
   profileUser,
   isFollowed,
-  isShowAvatarButtons,
   followStatus,
+  currentUserId,
   onFollowUser,
   onShowFollowers,
   onShowFollowing,
@@ -38,7 +41,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
               <strong>ADMIN</strong>
             )}
           </h4>
-          {isShowAvatarButtons &&
+          {profileUser._id !== currentUserId &&
             (followStatus === 'loading' ? (
               <Loader className="loader_mini" />
             ) : (
@@ -53,6 +56,14 @@ export const ProfileCard: FC<IProfileCardProps> = ({
                 {/* <Button text="Message" className="button button_follow" /> */}
               </>
             ))}
+            {
+              profileUser._id === currentUserId && (
+                <Link to='/profile/edit'>
+                <Button text='Edit profile' className='button button_cancel' />
+              </Link>
+
+              )
+            }
         </div>
         <div className={s.profileCard__data__statistics}>
           <div>

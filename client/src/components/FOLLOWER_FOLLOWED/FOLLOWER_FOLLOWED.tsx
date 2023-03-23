@@ -47,7 +47,7 @@ export const FOLLOWER_FOLLOWED: FC<IFOLLOWER_FOLLOWEDProps> = ({
         </span>
         {!isFollowerFollowed &&
           currentUserId !== user._id &&
-          (followStatus === 'loading' ? (
+          (followStatus === 'loading' ?(
             <Loader className="loader_mini" />
           ) : (
             <Button

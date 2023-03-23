@@ -13,7 +13,7 @@ interface IProfileCardProps {
   followStatus: string;
   onFollowUser: (val: IFollowUnfollowPayload) => void;
   onShowFollowers: (userId: string) => void;
-  onShowFollowing: (userId: string) => void
+  onShowFollowing: (userId: string) => void;
 }
 
 export const ProfileCard: FC<IProfileCardProps> = ({
@@ -23,22 +23,27 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   followStatus,
   onFollowUser,
   onShowFollowers,
-  onShowFollowing
+  onShowFollowing,
 }) => {
   return (
-    <div className={s.profileCard}>
-      <div className={s.profileCard__avatar}>
+    <div className={s.profileCard} >
+      <div className={s.profileCard__avatar} >
         <Avatar avatar={profileUser?.avatarUrl as string} />
         {isShowAvatarButtons && (
           <div className={s.profileCard__avatar__buttons}>
-            <Button
-              text={isFollowed ? 'Unfollow' : 'Follow'}
-              className={`button ${
-                isFollowed ? 'button_cancel' : 'button_follow'
-              }`}
-              disabled={followStatus === 'loading'}
-              onClick={() => onFollowUser({ userId: profileUser._id })}
-            />
+            {
+              followStatus === 'loading' 
+                ? <Loader className='loader_mini'/>
+                :
+                <Button
+                  text={isFollowed ? 'Unfollow' : 'Follow'}
+                  className={`button ${
+                    isFollowed ? 'button_cancel' : 'button_follow'
+                  }`}
+                  // disabled={followStatus === 'loading'}
+                  onClick={() => onFollowUser({ userId: profileUser._id })}
+                />
+            }
             {/* <Button text="Message" className="button button_follow" /> */}
           </div>
         )}
@@ -54,17 +59,16 @@ export const ProfileCard: FC<IProfileCardProps> = ({
           <div>
             <strong>{profileUser?.postsCreated}</strong> posts
           </div>
-          {followStatus === 'loading' ? (
-            <Loader className="loader_mini" />
-          ) : (
-            <div
-              onClick={() => onShowFollowers(profileUser._id)}
-              className={s.followers}
-            >
-              <strong>{profileUser?.usersFollowed?.length}</strong> followers
-            </div>
-          )}
-          <div onClick={() => onShowFollowing(profileUser._id)} className={s.following}>
+          <div
+            onClick={() => onShowFollowers(profileUser._id)}
+            className={s.followers}
+          >
+            <strong>{profileUser?.usersFollowed?.length}</strong> followers
+          </div>
+          <div
+            onClick={() => onShowFollowing(profileUser._id)}
+            className={s.following}
+          >
             <strong>{profileUser?.usersFollowing?.length}</strong> following
           </div>
         </div>

@@ -71,6 +71,8 @@ export const ProfileAbout = () => {
   const [isFollowersModalVisible, setFollowersModalVisible] =
     useState<null | IFollowersModal>(null);
 
+  const [isModalLoading, setModalLoading] = useState(false)
+
   useEffect(() => {
     if (id) {
       try {
@@ -120,19 +122,22 @@ export const ProfileAbout = () => {
   };
 
   const onShowFollowers = (userId: string) => {
+    setFollowersModalVisible({ followers: true });
+    setModalLoading(true)
     dispatch(getUserFollowers(userId)).then(() => {
-      // setFollowersModalVisible(true);
-      setFollowersModalVisible({ followers: true });
+      setModalLoading(false)
     });
   };
-
+  
   const onCloseFollowersModal = () => {
     setFollowersModalVisible(null);
   };
 
   const onShowFollowing = (userId: string) => {
+    setFollowersModalVisible({ followings: true });
+    setModalLoading(true)
     dispatch(getUserFollowings(userId)).then(() => {
-      setFollowersModalVisible({ followings: true });
+      setModalLoading(false)
     });
   };
 
@@ -241,7 +246,11 @@ export const ProfileAbout = () => {
             </h4>
             <hr />
 
-            {followers?.length ? (
+            {
+              isModalLoading  
+              ? <div className='loader_center'><Loader className='loader_mini'/></div> 
+              :
+            followers?.length ? (
               followers.map((follower) => {
                 return (
                   <FOLLOWER_FOLLOWED
@@ -261,12 +270,15 @@ export const ProfileAbout = () => {
                           onClick={() => onRemoveFollower(follower._id)}
                         />
                       )}
-                    {/* {isFollowersModalVisible?.followings && currentUser?.usersFollowing.includes(follower._id) && ( */}
                     {isFollowersModalVisible?.followings && follower.usersFollowed.includes(currentUser?._id as string)  && (
+                      followStatus === 'loading'
+                      // follower?.isFollowLoading
+                      ? <Loader className='loader_mini'/>
+                      :
                       <Button
                         text="Following"
                         className="button button_cancel"
-                        disabled={followStatus === 'loading'}
+                        // disabled={followStatus === 'loading'}
                         onClick={() => onFollowUser({ userId: follower._id, isFollowersModal: true })}
                       />
                     )}
@@ -275,7 +287,8 @@ export const ProfileAbout = () => {
               })
             ) : (
               <div>No followers</div>
-            )}
+            )
+            }
           </div>
         </div>
       </Modal>

@@ -191,15 +191,24 @@ export const profileSlice = createSlice({
 
       // FOLLOW AND UNFOLLOW
 
-      .addCase(follow_unfollow.pending, (state) => {
-        // state.data = null;
+      .addCase(follow_unfollow.pending, (state, { meta }) => {
         state.followers.status = 'loading';
+        const { userId } = meta.arg
+
+        let followedUnfollowedUser = state.followers.users.find(user => user._id === userId)
+
+        // followedUnfollowedUser.isFollowLoading = true
+        // console.log(followedUnfollowedUser?.fullName);
+        
+        
       })
       .addCase(
         follow_unfollow.fulfilled,
         (state, action: PayloadAction<IFollowUnfollowResp>) => {
           state.followers.status = 'success';
-          // state.data = action.payload;
+          
+          // state.followers.users.find(user => user._id === action.payload.followedUserId).isFollowLoading = false
+          
         },
       )
       .addCase(follow_unfollow.rejected, (state) => {

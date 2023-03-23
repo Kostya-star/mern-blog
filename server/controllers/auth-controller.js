@@ -170,7 +170,8 @@ const deleteMe = async (req, res) => {
       })
     }
 
-    await user.delete()
+    await UserModel.updateMany({ usersFollowed: userId }, { $pull: { usersFollowed: userId } })
+    await UserModel.updateMany({ usersFollowing: userId }, { $pull: { usersFollowing: userId } })
 
     await PostModel.deleteMany({ user: userId })
     await CommentModel.deleteMany({ user: userId })
@@ -178,6 +179,8 @@ const deleteMe = async (req, res) => {
     await PostModel.updateMany({ usersLiked: userId }, { $pull: { usersLiked: userId } })
     await PostModel.updateMany({ usersCommented: userId }, { $pull: { usersCommented: userId } })
     await CommentModel.updateMany({ usersLiked: userId }, { $pull: { usersLiked: userId } })
+
+    await user.delete()
 
     res.json({
       success: true

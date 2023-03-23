@@ -19,14 +19,10 @@ import {
   getUserProfileById,
   removeFollower,
 } from 'redux/slices/userProfile';
+import { IFollowersModal } from 'types/IFollowersModal';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
 import { IUser } from 'types/IUser';
-
-interface IFollowersModal {
-  followers?: boolean;
-  followings?: boolean;
-}
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -66,12 +62,10 @@ export const ProfileAbout = () => {
 
   // MODAL FOR FOLLOWERS
 
-  // const [isFollowersModalVisible, setFollowersModalVisible] = useState(false);
-  // const [isFollowingModalVisible, setFollowingModalVisible] = useState(false);
   const [isFollowersModalVisible, setFollowersModalVisible] =
     useState<null | IFollowersModal>(null);
 
-  const [isModalLoading, setModalLoading] = useState(false)
+  const [isModalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -123,21 +117,21 @@ export const ProfileAbout = () => {
 
   const onShowFollowers = (userId: string) => {
     setFollowersModalVisible({ followers: true });
-    setModalLoading(true)
+    setModalLoading(true);
     dispatch(getUserFollowers(userId)).then(() => {
-      setModalLoading(false)
+      setModalLoading(false);
     });
   };
-  
+
   const onCloseFollowersModal = () => {
     setFollowersModalVisible(null);
   };
 
   const onShowFollowing = (userId: string) => {
     setFollowersModalVisible({ followings: true });
-    setModalLoading(true)
+    setModalLoading(true);
     dispatch(getUserFollowings(userId)).then(() => {
-      setModalLoading(false)
+      setModalLoading(false);
     });
   };
 
@@ -246,49 +240,28 @@ export const ProfileAbout = () => {
             </h4>
             <hr />
 
-            {
-              isModalLoading  
-              ? <div className='loader_center'><Loader className='loader_mini'/></div> 
-              :
-            followers?.length ? (
+            {isModalLoading ? (
+              <div className="loader_center">
+                <Loader className="loader_mini" />
+              </div>
+            ) : followers?.length ? (
               followers.map((follower) => {
                 return (
                   <FOLLOWER_FOLLOWED
                     key={follower._id}
                     user={follower}
-                    // isFollowerFollowed={isFollowerFollowed}
+                    modal={isFollowersModalVisible}
+                    profileUserId={profileUser?._id as string}
                     currentUserId={currentUser?._id as string}
                     followStatus={followStatus}
+                    onRemoveFollower={onRemoveFollower}
                     onFollowUser={onFollowUser}
-                  >
-                    {isFollowersModalVisible?.followers &&
-                      profileUser?._id === currentUser?._id && (
-                        <Button
-                          text="Remove"
-                          className="button button_cancel"
-                          disabled={followStatus === 'loading'}
-                          onClick={() => onRemoveFollower(follower._id)}
-                        />
-                      )}
-                    {isFollowersModalVisible?.followings && follower.usersFollowed.includes(currentUser?._id as string)  && (
-                      followStatus === 'loading'
-                      // follower?.isFollowLoading
-                      ? <Loader className='loader_mini'/>
-                      :
-                      <Button
-                        text="Following"
-                        className="button button_cancel"
-                        // disabled={followStatus === 'loading'}
-                        onClick={() => onFollowUser({ userId: follower._id, isFollowersModal: true })}
-                      />
-                    )}
-                  </FOLLOWER_FOLLOWED>
+                  />
                 );
               })
             ) : (
               <div>No followers</div>
-            )
-            }
+            )}
           </div>
         </div>
       </Modal>

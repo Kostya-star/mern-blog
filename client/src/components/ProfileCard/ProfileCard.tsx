@@ -26,35 +26,34 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   onShowFollowing,
 }) => {
   return (
-    <div className={s.profileCard} >
-      <div className={s.profileCard__avatar} >
+    <div className={s.profileCard}>
+      <div className={s.profileCard__avatar}>
         <Avatar avatar={profileUser?.avatarUrl as string} />
-        {isShowAvatarButtons && (
-          <div className={s.profileCard__avatar__buttons}>
-            {
-              followStatus === 'loading' 
-                ? <Loader className='loader_mini'/>
-                :
+      </div>
+      <div className={s.profileCard__data}>
+        <div className={s.profileCard__data__top}>
+          <h4>
+            {profileUser?.fullName}{' '}
+            {profileUser._id === '64010100736d71817f3d671f' && (
+              <strong>ADMIN</strong>
+            )}
+          </h4>
+          {isShowAvatarButtons &&
+            (followStatus === 'loading' ? (
+              <Loader className="loader_mini" />
+            ) : (
+              <>
                 <Button
                   text={isFollowed ? 'Unfollow' : 'Follow'}
                   className={`button ${
                     isFollowed ? 'button_cancel' : 'button_follow'
                   }`}
-                  // disabled={followStatus === 'loading'}
                   onClick={() => onFollowUser({ userId: profileUser._id })}
                 />
-            }
-            {/* <Button text="Message" className="button button_follow" /> */}
-          </div>
-        )}
-      </div>
-      <div className={s.profileCard__data}>
-        <h4>
-          {profileUser?.fullName}{' '}
-          {profileUser._id === '64010100736d71817f3d671f' && (
-            <strong>ADMIN</strong>
-          )}
-        </h4>
+                {/* <Button text="Message" className="button button_follow" /> */}
+              </>
+            ))}
+        </div>
         <div className={s.profileCard__data__statistics}>
           <div>
             <strong>{profileUser?.postsCreated}</strong> posts

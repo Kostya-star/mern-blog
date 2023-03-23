@@ -44,15 +44,15 @@ const follow_unfollow = async (req, res) => {
       })
     }
 
-    const isFollowed = followedUser.usersFollowed.includes(followingUser._id)
+    const isFollowed = followedUser.usersFollowed.includes(followingUserId)
 
     if (isFollowed) {
-      await followedUser.updateOne({ $pull: { 'usersFollowed': followingUser._id } })
-      await followingUser.updateOne({ $pull: { 'usersFollowing': followedUser._id } })
+      await followedUser.updateOne({ $pull: { 'usersFollowed': followingUserId } })
+      await followingUser.updateOne({ $pull: { 'usersFollowing': followedUserId } })
       res.json({ isFollowed: false, followingUserId, followedUserId });
     } else {
-      await followedUser.updateOne({ $push: { 'usersFollowed': followingUser._id } })
-      await followingUser.updateOne({ $push: { 'usersFollowing': followedUser._id } })
+      await followedUser.updateOne({ $push: { 'usersFollowed': followingUserId } })
+      await followingUser.updateOne({ $push: { 'usersFollowing': followedUserId } })
       res.json({ isFollowed: true, followingUserId, followedUserId });
     }
 

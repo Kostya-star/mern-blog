@@ -1,12 +1,13 @@
 .profileAbout {
-  
+
   &__userData {
     position: relative;
     border-radius: 20px;
     padding: 20px;
-    background-color: rgb(169, 229, 196);
+    // background-color: rgb(169, 229, 196);
     display: flex;
-    justify-content: center;
+    padding-left: 100px;
+    // justify-content: start;
     // flex-direction: column;
     // align-items: center;
   }
@@ -36,10 +37,12 @@
     display: flex;
     justify-content: center;
     gap: 20px;
+
     &__post {
       width: 600px;
       height: fit-content;
     }
+
     &__comments {
       width: 400px;
       height: fit-content;
@@ -57,6 +60,7 @@
       overflow-y: auto;
       max-height: 500px;
       min-width: 300px;
+
       hr {
         margin: 0px;
       }

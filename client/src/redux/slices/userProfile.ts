@@ -2,6 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { RootState } from 'redux/store';
+import { IFollower } from 'types/IFollower';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
 import { IUser } from '../../types/IUser';
@@ -74,13 +75,9 @@ export interface profileState {
     status: Status;
   };
   followers: {
-    users: IUser[];
+    users: IFollower[];
     status: Status;
   };
-  // following: {
-  //   users: IUser[];
-  //   status: Status;
-  // };
 }
 
 const initialState: profileState = {
@@ -92,10 +89,6 @@ const initialState: profileState = {
     users: [],
     status: '',
   },
-  // following: {
-  //   users: [],
-  //   status: '',
-  // },
 };
 
 export const profileSlice = createSlice({
@@ -193,22 +186,31 @@ export const profileSlice = createSlice({
 
       .addCase(follow_unfollow.pending, (state, { meta }) => {
         state.followers.status = 'loading';
-        const { userId } = meta.arg
 
-        let followedUnfollowedUser = state.followers.users.find(user => user._id === userId)
+        // implement loader for each user in modals
+        const { userId } = meta.arg;
+        let followedUnfollowedUser = state.followers.users.find(
+          (user) => user._id === userId,
+        );
 
-        // followedUnfollowedUser.isFollowLoading = true
-        // console.log(followedUnfollowedUser?.fullName);
-        
-        
+        if (followedUnfollowedUser) {
+          followedUnfollowedUser.isFollowLoading = true;
+        }
       })
       .addCase(
         follow_unfollow.fulfilled,
         (state, action: PayloadAction<IFollowUnfollowResp>) => {
           state.followers.status = 'success';
-          
-          // state.followers.users.find(user => user._id === action.payload.followedUserId).isFollowLoading = false
-          
+
+          // implement loader for each user in modals
+          const { followedUserId } = action.payload;
+          const followedUnfollowedUser = state.followers.users.find(
+            (user) => user._id === followedUserId,
+          );
+
+          if (followedUnfollowedUser) {
+            followedUnfollowedUser.isFollowLoading = false;
+          }
         },
       )
       .addCase(follow_unfollow.rejected, (state) => {

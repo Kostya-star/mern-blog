@@ -46,5 +46,16 @@
         cursor: pointer;
       }
     }
+
+    &__top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      button {
+        font-size: 15px;
+        padding: 7px 15px;
+        border-radius: 10px;
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 .modal {
-  display: none;
+  // transform: scale(0);
+  // display: none;
   position: fixed;
   overflow-y: auto;
   top: 0;
@@ -7,14 +8,26 @@
   left: 0;
   right: 0;
   background-color: rgba($color: gray, $alpha: .5);
-  z-index: 20;
+  z-index: 100;
+  transition: .5s;
+  pointer-events: none;
+  opacity: 0;
   &__visible {
-    display: block;
+    // display: block;
+    opacity: 1;
+    pointer-events: all;
+    // transform: scale(1);
   }
   &__content {
     // width: 600px;
     // margin: 0 auto;
     padding: 30px 0;
+    transform: scale(0.5);
+    transition: .4s all;
+
+    &__active {
+      transform: scale(1);
+    }
   }
   &__closeSVG {
     position: fixed;

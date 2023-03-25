@@ -17,6 +17,7 @@ import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
 import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
 import { ReactComponent as AttachSVG } from 'assets/attach.svg';
 import { Loader } from 'components/UI/Loader/Loader';
+import { Modal } from 'components/UI/Modal/Modal';
 
 interface ICommentsProps {}
 
@@ -35,7 +36,7 @@ export const Comments: FC<ICommentsProps> = () => {
   const [commentText, setCommentText] = useState({ id: '', text: '' });
   const [isCommHidden, setCommHidden] = useState(false);
   const [commentImage, setCommentImage] = useState<File | Blob | null>(null);
-  const [showFullCommImage, setShowFullCommImage] = useState<File | Blob | null>(null);
+  const [fullCommentImage, setFullCommentImage] = useState('');
   const [isCommLoading, setCommLoading] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -117,6 +118,7 @@ export const Comments: FC<ICommentsProps> = () => {
                   creationTime={creationTime}
                   setCommentText={setCommentText}
                   setCommentImage={setCommentImage}
+                  onShowFullImage={setFullCommentImage}
                 />
               );
             })
@@ -197,6 +199,14 @@ export const Comments: FC<ICommentsProps> = () => {
           </div>
         </>
       )}
+      <Modal
+        isVisible={Boolean(fullCommentImage)}
+        onCloseModal={() => setFullCommentImage('')}
+      >
+        <div className={s.modal__fullImage}>
+          <img src={fullCommentImage} alt="full img" />
+        </div>
+      </Modal>
     </div>
   );
 };

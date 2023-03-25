@@ -103,4 +103,17 @@
       gap: 15px;
     }
   }
+
+}
+
+.modal {
+  &__fullImage {
+  display: flex;
+  justify-content: center;
+  // padding-top: 50px;
+    img {
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+  }
 }

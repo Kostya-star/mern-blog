@@ -17,6 +17,7 @@ interface ICommentItemProps {
   creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
   setCommentImage: (imgFile: Blob | null) => void;
+  onShowFullImage: (imgBase64: string) => void
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
@@ -25,6 +26,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
   creationTime,
   setCommentText,
   setCommentImage,
+  onShowFullImage
 }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -70,8 +72,10 @@ export const CommentItem: FC<ICommentItemProps> = ({
         />
         <div className={s.comment__body}>
           <span onClick={onRedirectAboutProfile}>{comment?.user.fullName}</span>
-          {comment.text && <p>{comment.text}</p>}
-          {comment.imageUrl && <img src={comment.imageUrl} alt="comment img" />}
+          <div className={s.comment__body__text}>
+            {comment.text && <p>{comment.text}</p>}
+            {comment.imageUrl && <img src={comment.imageUrl} onClick={() => onShowFullImage(comment.imageUrl)} alt="comment img" />}
+          </div>
         </div>
       </div>
       <div className={s.comment__footer}>

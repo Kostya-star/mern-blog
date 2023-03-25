@@ -25,8 +25,9 @@ export const fetchCommentsByPostId = createAsyncThunk(
 
 export const createComment = createAsyncThunk(
   'comments/createComment',
-  async (newComment: ICreateCommentRequest, thunkApi) => {
+  async (newComment: FormData, thunkApi) => {
     const resp = await instance.post<IComment>('/comments', newComment);
+
     thunkApi.dispatch(
       updateCommentCount({
         postId: resp.data.post,
@@ -40,10 +41,12 @@ export const createComment = createAsyncThunk(
 
 export const updateComment = createAsyncThunk(
   'comments/updateComment',
-  async (updatedComment: IUpdateCommentReq) => {
+  async (updatedComment: FormData) => {
+    const commentId = updatedComment.get('id');
+
     const resp = await instance.patch<IComment>(
-      `/comments/${updatedComment.id}`,
-      { text: updatedComment.text },
+      `/comments/${commentId}`,
+      updatedComment,
     );
     return resp.data;
   },
@@ -161,9 +164,11 @@ export const commentsSlice = createSlice({
         (state, action: PayloadAction<IComment>) => {
           state.status = 'success';
 
+          const updatedComm = action.payload;
+
           state.comments = state.comments.map((comment) => {
-            if (comment._id === action.payload._id) {
-              return { ...comment, text: action.payload.text };
+            if (comment._id === updatedComm._id) {
+              return updatedComm;
             }
 
             return comment;

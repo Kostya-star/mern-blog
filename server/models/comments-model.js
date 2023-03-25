@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const CommentSchema = new mongoose.Schema({
   text: {
     type: String,
-    required: true,
-    // unique: true
+    required: function() {
+      !this.imageUrl
+    },
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +20,13 @@ const CommentSchema = new mongoose.Schema({
   usersLiked: {
     type: Array,
     default: []
-  }
+  },
+  imageUrl: {
+    type: String,
+    required: function() {
+      !this.text
+    },
+  },
 }, {
   timestamps: true
 })

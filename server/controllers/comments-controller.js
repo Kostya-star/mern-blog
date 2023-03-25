@@ -1,5 +1,6 @@
 import CommentModel from "../models/comments-model.js"
 import PostModel from '../models/post-model.js'
+import { getBase64 } from "../utils/getBase64.js"
 
 const getComments = async (req, res) => {
   try {
@@ -38,11 +39,19 @@ const getCommentsByPostId = async (req, res) => {
 const createComment = async (req, res) => {
   try {
     const { postId, text, userId } = req.body
+    const image = req.file
+
+    if (!text && !image) {
+      return res.status(400).json({
+        message: 'Text or image are required'
+      })
+    }
 
     const comment = new CommentModel({
-      text,
+      text: text || '',
       user: userId,
-      post: postId
+      post: postId,
+      imageUrl: image ? getBase64(image) : ''
     })
 
     await PostModel.findByIdAndUpdate(
@@ -68,10 +77,20 @@ const updateComment = async (req, res) => {
   try {
     const { id } = req.params
     const { text } = req.body
+    const image = req.file
+
+    if (!text && !image) {
+      return res.status(400).json({
+        message: 'Text or image are required'
+      })
+    }
 
     const comment = await CommentModel.findByIdAndUpdate(
       { _id: id },
-      { text },
+      {
+        text,
+        imageUrl: image ? getBase64(image) : ''
+      },
       { new: true }
     )
 
@@ -96,13 +115,13 @@ const deleteComment = async (req, res) => {
     const post = await PostModel.findById(comment.post);
 
     const index = post.usersCommented.findIndex((user) => user.toString() === userId.toString());
+    
+    await comment.delete()
 
     if (index !== -1) {
       post.usersCommented.splice(index, 1);
       await post.save();
     }
-
-    await comment.delete()
 
     res.json({ id, postId: comment.post, userId: comment.user })
 

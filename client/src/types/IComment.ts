@@ -8,4 +8,5 @@ export interface IComment {
   user: IUser
   usersLiked: string[]
   post: string //postId
+  imageUrl: string
 }

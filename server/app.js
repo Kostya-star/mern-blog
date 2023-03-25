@@ -9,6 +9,7 @@ import profileRouters from './routes/profile-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
 import { imageStorageCreator } from './utils/imageStorageCreator.js'
+// import fileUploader from 'express-fileupload'
 import cors from 'cors'
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(express.json())
 export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
 
 app.use(cors())
+// app.use(fileUploader())
 app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
 app.use('/comments', commentsRouters)

@@ -62,11 +62,40 @@
     &__group {
       width: 100%;
 
-      textarea {
-        font-size: 16px;
-        font-weight: 500;
-        border-radius: 10px;
+      .textarea {
+        position: relative;
+        
+        textarea {
+          font-size: 16px;
+          font-weight: 500;
+          border-radius: 10px;
+        }
+
+        svg {
+          position: absolute;
+          right: 5px;
+          top: 5px;
+          width: 15px;
+          cursor: pointer;
+          path {
+            fill: gray
+          }
+        }
       }
+      &__image {
+        position: relative;
+        width: fit-content;
+        img {
+          width: 100px;
+          height: 100px;
+          object-fit: cover;
+        }
+        svg {
+          position: absolute;
+          background-color: white;
+        }
+      }
+
     }
 
     &__buttons {

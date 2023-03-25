@@ -9,12 +9,14 @@ import { deleteComment, likeComment } from 'redux/slices/comments';
 import { IComment } from 'types/IComment';
 import s from './CommentItem.module.scss';
 import { useNavigate } from 'react-router-dom';
+import { base64ToFile } from 'utils/base64ToFile';
 
 interface ICommentItemProps {
   comment: IComment;
   commRef: LegacyRef<HTMLDivElement>;
   creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
+  setCommentImage: (imgFile: Blob | null) => void;
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
@@ -22,23 +24,31 @@ export const CommentItem: FC<ICommentItemProps> = ({
   commRef,
   creationTime,
   setCommentText,
+  setCommentImage,
 }) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const { isLiked, likeCount, isShowEditDelete } = useAppSelector(({ auth }) => ({
-    isLiked: comment.usersLiked.includes(auth.data?._id as string),
-    likeCount: comment.usersLiked.length,
-    isShowEditDelete: comment.user._id === auth.data?._id
-  }))
-
+  const { isLiked, likeCount, isShowEditDelete } = useAppSelector(
+    ({ auth }) => ({
+      isLiked: comment.usersLiked.includes(auth.data?._id as string),
+      likeCount: comment.usersLiked.length,
+      isShowEditDelete: comment.user._id === auth.data?._id,
+    }),
+  );
 
   const onLikeComment = (commId: string) => {
-      dispatch(likeComment(commId));
+    dispatch(likeComment(commId));
   };
 
   const onDeleteComment = (commId: string) => {
     dispatch(deleteComment(commId));
+  };
+
+  const onEditComment = () => {
+    setCommentText({ id: comment._id, text: comment.text });
+    const file = base64ToFile(comment.imageUrl);
+    setCommentImage(file);
   };
 
   const onRedirectAboutProfile = () => {
@@ -50,18 +60,18 @@ export const CommentItem: FC<ICommentItemProps> = ({
       <div className={s.comment}>
         {isShowEditDelete && (
           <div className={s.comment__edit_delete}>
-            <EditSVG
-              onClick={() =>
-                setCommentText({ id: comment._id, text: comment.text })
-              }
-            />
+            <EditSVG onClick={onEditComment} />
             <CloseSVG onClick={() => onDeleteComment(comment._id)} />
           </div>
         )}
-        <Avatar avatar={comment.user?.avatarUrl as string} onClick={onRedirectAboutProfile}/>
+        <Avatar
+          avatar={comment.user?.avatarUrl as string}
+          onClick={onRedirectAboutProfile}
+        />
         <div className={s.comment__body}>
-          <p onClick={onRedirectAboutProfile}>{comment?.user.fullName}</p>
-          <p>{comment.text}</p>
+          <span onClick={onRedirectAboutProfile}>{comment?.user.fullName}</span>
+          {comment.text && <p>{comment.text}</p>}
+          {comment.imageUrl && <img src={comment.imageUrl} alt="comment img" />}
         </div>
       </div>
       <div className={s.comment__footer}>

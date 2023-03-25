@@ -29,8 +29,8 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { currentUser, followStatus } = useAppSelector(({ auth, profile }) => ({
-    currentUser: auth.data?._id,
+  const { currentUserId, followStatus } = useAppSelector(({ auth, profile }) => ({
+    currentUserId: auth.data?._id,
     followStatus: profile.followers.status
   }));
 
@@ -57,10 +57,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   };
 
   const timeCreation = createTimeSince(new Date(post?.createdAt));
-  const isShowEditDelete = currentUser === post.user?._id;
-  const isLiked = post.usersLiked.includes(currentUser as string);
+  const isShowEditDelete = currentUserId === post.user?._id;
+  const isLiked = post.usersLiked.includes(currentUserId as string);
   const isUserFollowed = post.user.usersFollowed.includes(
-    currentUser as string,
+    currentUserId as string,
   );
 
   return (
@@ -100,7 +100,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
                 {post.user?.fullName}
               </span>
               {!isUserFollowed &&
-                currentUser !== post.user._id &&
+                currentUserId !== post.user._id &&
                 (followStatus === 'loading' ? (
                     <Loader className='loader_mini'/>
                 ) : (

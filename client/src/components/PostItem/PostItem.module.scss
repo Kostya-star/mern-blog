@@ -3,28 +3,23 @@
 .post {
   position: relative;
 
+
   .post__popupButtons {
-    display: none;
-  }
+    display: flex;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    gap: 20px;
+    border-radius: 10px;
+    background-color: white;
+    padding: 10px;
 
-  &:hover {
-    .post__popupButtons {
-      display: flex;
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      gap: 20px;
-      border-radius: 10px;
-      background-color: white;
-      padding: 10px;
+    svg {
+      cursor: pointer;
 
-      svg {
-        cursor: pointer;
-
-        &:hover {
-          background-color: rgb(173, 170, 170);
-          border-radius: 5px;
-        }
+      &:hover {
+        background-color: rgb(173, 170, 170);
+        border-radius: 5px;
       }
     }
   }

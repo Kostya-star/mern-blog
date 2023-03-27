@@ -7,6 +7,8 @@ import { IPost } from 'types/IPost';
 import { IUser } from './../../types/IUser';
 import { clearCommentsSlice } from './comments';
 import { IFollowUnfollowResp } from './../../types/IFollowUnfollowResp';
+import { INewPostRequest } from 'types/INewPostRequest';
+import { IUpdatePostRequest } from 'types/IUpdatePostRequest';
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
@@ -34,7 +36,7 @@ export const fetchPost = createAsyncThunk(
 
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async (newPost: FormData) => {
+  async (newPost: INewPostRequest) => {
     const resp = await instance.post<IPost>('/posts', newPost);
 
     return resp;
@@ -43,8 +45,14 @@ export const createPost = createAsyncThunk(
 
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
-  async (formData: FormData) => {
-    return await instance.patch(`/posts/edit`, formData);
+  async ({
+    updatedPost,
+    postId,
+  }: {
+    updatedPost: IUpdatePostRequest;
+    postId: string;
+  }) => {
+    return await instance.patch(`/posts/${postId}`, updatedPost);
   },
 );
 

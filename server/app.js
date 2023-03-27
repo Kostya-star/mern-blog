@@ -9,7 +9,6 @@ import profileRouters from './routes/profile-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
 import { imageStorageCreator } from './utils/imageStorageCreator.js'
-// import fileUploader from 'express-fileupload'
 import cors from 'cors'
 
 dotenv.config();
@@ -20,7 +19,14 @@ app.use(express.json())
 // app.use(express.urlencoded({ extended: true }));
 
 
-export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
+// export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
+
+const multerMid = multer({
+  storage: multer.memoryStorage(),
+    // limits: {
+  //   fileSize: 5 * 1024 * 1024,
+  // },
+})
 
 app.use(cors())
 // app.use(fileUploader())
@@ -29,7 +35,7 @@ app.use('/posts', postsRouters)
 app.use('/comments', commentsRouters)
 app.use('/profile', profileRouters)
 app.use('/tags', tagsRouters)
-// app.use('/upload', upload.single('image'), imageRoutes)
+app.use('/upload', multerMid.single('file'), imageRoutes)
 // app.use('/uploads', express.static('uploads'))
 
 const PORT = process.env.PORT || 5000

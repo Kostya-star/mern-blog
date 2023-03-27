@@ -56,8 +56,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
   const onRedirectAboutProfile = () => {
     navigate(`/profile/about/${comment.user._id}`);
   };
-
-  const image = base64ToFile(comment.imageUrl)
+console.log(comment.imageUrl);
 
   return (
     <div className={s.comment__wrapper} ref={commRef}>

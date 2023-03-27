@@ -1,6 +1,7 @@
 import CommentModel from "../models/comments-model.js"
 import PostModel from '../models/post-model.js'
 import { getBase64 } from "../utils/getBase64.js"
+import { uploadImageGoogleCloud } from "../utils/uploadImageGoogleCloud.js"
 
 const getComments = async (req, res) => {
   try {
@@ -47,11 +48,17 @@ const createComment = async (req, res) => {
       })
     }
 
+    let imageUrl = ''
+
+    if(image) {
+      imageUrl = await uploadImageGoogleCloud(image)
+    }
+
     const comment = new CommentModel({
       text: text || '',
       user: userId,
       post: postId,
-      imageUrl: image ? getBase64(image) : ''
+      imageUrl: imageUrl
     })
 
     await PostModel.findByIdAndUpdate(

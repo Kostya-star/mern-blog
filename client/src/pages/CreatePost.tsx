@@ -4,10 +4,11 @@ import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
 import { TextArea } from 'components/UI/TextArea/TextArea';
 import 'easymde/dist/easymde.min.css';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import SimpleMDE from 'react-simplemde-editor';
 import { useAppDispatch } from 'redux/hooks';
+import { uploadFile } from 'redux/slices/files';
 import { createPost, fetchPost, updatePost } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
 import { base64ToFile } from 'utils/base64ToFile';
@@ -26,9 +27,9 @@ const options = {
   },
 };
 
-interface INewPost extends Omit<INewPostRequest, 'tags' | 'imageUrl'> {
+interface INewPost extends Omit<INewPostRequest, 'tags'> {
   tags: string;
-  image: null | File;
+  fileUrl: string;
 }
 
 export const CreatePost = () => {
@@ -36,12 +37,13 @@ export const CreatePost = () => {
   const dispatch = useAppDispatch();
 
   const { id } = useParams();
+  const isEditing = Boolean(id);
 
   const [newPost, setNewPost] = useState<INewPost>({
     title: '',
     tags: '',
     text: '',
-    image: null,
+    fileUrl: '',
   });
 
   const [isLoading, setLoading] = useState(false);
@@ -54,35 +56,32 @@ export const CreatePost = () => {
       dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
-          const file = base64ToFile(imageUrl);
 
           setNewPost({
             title,
             text,
             tags: tags.join(' '),
-            image: file as File,
+            fileUrl: imageUrl,
           });
           setLoading(false);
         });
     }
   }, []);
 
-  const isEditing = Boolean(id);
-
   const onSubmitNewPost = async () => {
     try {
-      const formData = new FormData();
-      formData.append('title', newPost.title);
-      formData.append('tags', newPost.tags.trim());
-      formData.append('text', newPost.text);
-      formData.append('image', newPost.image || '');
-      formData.append('postId', id as string);
-
+      // const formData = new FormData();
+      // formData.append('title', newPost.title);
+      // formData.append('tags', newPost.tags.trim());
+      // formData.append('text', newPost.text);
+      // formData.append('image', newPost.fileUrl || '');
+      // formData.append('postId', id as string);
+      
       if (isEditing) {
-        await dispatch(updatePost(formData)).unwrap();
+        await dispatch(updatePost({ updatedPost: newPost, postId: id as string })).unwrap();
         navigate(`/`);
       } else {
-        await dispatch(createPost(formData)).unwrap();
+        await dispatch(createPost(newPost)).unwrap();
         navigate(`/`);
       }
     } catch (error) {
@@ -92,11 +91,28 @@ export const CreatePost = () => {
   };
 
   const onDeleteImage = () => {
-    setNewPost({ ...newPost, image: null });
+    setNewPost({ ...newPost, fileUrl: '' });
     if (imageRef.current) {
       imageRef.current.value = '';
     }
   };
+
+  const onUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if(file) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
+        
+        setNewPost({
+          ...newPost,
+          fileUrl: url,
+        })
+      })
+
+    }
+  }
 
   if (isLoading) {
     return (
@@ -109,7 +125,7 @@ export const CreatePost = () => {
   return (
     <div className="createPost">
       <div className="createPost__content">
-        {newPost.image ? (
+        {newPost.fileUrl ? (
           <>
             <Button
               text="Delete"
@@ -118,8 +134,8 @@ export const CreatePost = () => {
             />
             <img
               className="createPost__content__img"
-              src={URL.createObjectURL(newPost.image)}
-              alt="Uploaded"
+              src={newPost.fileUrl}
+              alt="Uploaded img"
             />
           </>
         ) : (
@@ -136,12 +152,7 @@ export const CreatePost = () => {
         <input
           ref={imageRef}
           type="file"
-          onChange={(e) =>
-            setNewPost({
-              ...newPost,
-              image: e.target.files?.[0] as File,
-            })
-          }
+          onChange={onUploadFile}
           hidden
         />
 

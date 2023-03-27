@@ -2,6 +2,7 @@ import PostModel from "../models/post-model.js"
 import { getBase64 } from './../utils/getBase64.js';
 import CommentModel from '../models/comments-model.js'
 import UserModel from "../models/user-model.js";
+import { uploadImageGoogleCloud } from "../utils/uploadImageGoogleCloud.js";
 
 const getAllPosts = async (req, res) => {
   try {
@@ -57,21 +58,15 @@ const getOnePost = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { title, text, tags, userId } = req.body
+    const { title, text, tags, userId, fileUrl } = req.body
     const image = req.file
-
-    let imageUrl = ''
-
-    if (image) {
-      imageUrl = getBase64(image)
-    }
 
     const post = new PostModel({
       title,
       text,
       tags: tags.split(' '),
       user: userId,
-      imageUrl,
+      imageUrl: fileUrl,
     })
 
     await post.save()
@@ -94,13 +89,16 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
   try {
-    const { title, text, tags, postId, userId } = req.body
-    const image = req.file
+    const { title, text, tags, userId, fileUrl } = req.body
 
-    let imageUrl = ''
+    const { postId } = req.params
 
-    if (image) {
-      imageUrl = getBase64(image)
+    const post = await PostModel.findById(postId)
+
+    if(!post) {
+      return res.json({
+        message: 'The post is not found'
+      })
     }
 
     await PostModel.updateOne({
@@ -111,7 +109,7 @@ const updatePost = async (req, res) => {
         text,
         tags: tags.split(' '),
         user: userId,
-        imageUrl
+        imageUrl: fileUrl
       })
 
     res.json({

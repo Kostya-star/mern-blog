@@ -1,6 +1,6 @@
 export interface INewPostRequest {
   title: string;
-  tags: string[];
+  tags: string;
   text: string;
-  imageUrl: FormData;
+  fileUrl: string;
 }

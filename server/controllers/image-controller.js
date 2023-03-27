@@ -1,43 +1,29 @@
-import PostModel from '../models/post-model.js'
-import fs from 'fs'
+import { uploadImageGoogleCloud } from "../utils/uploadImageGoogleCloud.js";
 
-const uploadImage = async (req, res) => {
+const uploadFile = async (req, res) => {
   try {
-    // const buffer = {
-    //   data: fs.readFileSync(req.file.path),
-    //   contentType: req.file.mimetype
-    // }
-    
-    // const base64Image = Buffer.from(buffer.data).toString('base64');
-    // const imageUrl = `data:${buffer.contentType};base64,${base64Image}`;
+    const file = req.file
 
-    // const user = new PostModel({
-    //     title: 'testtt',
-    //     text: 'testtt',
-    //     tags: 'testtt',
-    //     user: '640236b2eb37e3f7d885ce12',
-    //     imageUrl
-    //   })
+    if(!file) {
+      return res.json({
+        message: 'File is not found'
+      })
+    }
 
-    //   const base64Image = Buffer.from(user.imageUrl.data).toString('base64');
-    //   const imageUrl = `data:${user.imageUrl.contentType};base64,${base64Image}`;
+  const url = await uploadImageGoogleCloud(file)
 
-    await user.save()
-    res.json({
-      user
-    })
+  res.json({
+    url
+  })
 
-    // res.json({
-    //   url: `/uploads/${req.file.originalname}`
-    // })
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: 'Error when uploading the image'
+      message: 'Error when uploading the file'
     })
   }
 }
 
 export default {
-  uploadImage
+  uploadFile
 }

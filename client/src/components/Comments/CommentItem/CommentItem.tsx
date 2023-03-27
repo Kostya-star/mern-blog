@@ -17,7 +17,7 @@ interface ICommentItemProps {
   creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
   setCommentImage: (imgFile: Blob | null) => void;
-  onShowFullImage: (imgBase64: string) => void
+  onShowFullImage: (imgBase64: string) => void;
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
@@ -26,7 +26,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
   creationTime,
   setCommentText,
   setCommentImage,
-  onShowFullImage
+  onShowFullImage,
 }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -57,6 +57,8 @@ export const CommentItem: FC<ICommentItemProps> = ({
     navigate(`/profile/about/${comment.user._id}`);
   };
 
+  const image = base64ToFile(comment.imageUrl)
+
   return (
     <div className={s.comment__wrapper} ref={commRef}>
       <div className={s.comment}>
@@ -74,7 +76,13 @@ export const CommentItem: FC<ICommentItemProps> = ({
           <span onClick={onRedirectAboutProfile}>{comment?.user.fullName}</span>
           <div className={s.comment__body__text}>
             {comment.text && <p>{comment.text}</p>}
-            {comment.imageUrl && <img src={comment.imageUrl} onClick={() => onShowFullImage(comment.imageUrl)} alt="comment img" />}
+            {comment.imageUrl && (
+              <img
+                src={comment.imageUrl}
+                onClick={() => onShowFullImage(comment.imageUrl)}
+                alt="comment img"
+              />
+            )}
           </div>
         </div>
       </div>

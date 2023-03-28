@@ -1,6 +1,6 @@
 import { Storage } from '@google-cloud/storage'
 import dotenv from'dotenv'
-dotenv.config();
+dotenv.config()
 
 const storage = new Storage({
   credentials: {

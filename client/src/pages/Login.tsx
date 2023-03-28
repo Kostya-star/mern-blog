@@ -1,6 +1,7 @@
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
+import { Loader } from 'components/UI/Loader/Loader';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +25,9 @@ export const Login = () => {
   const dispatch = useAppDispatch();
   const isAuth = useAppSelector(isAuthSelector);
 
-  const [serverError, setServerError] = useState('')
+  const authStatus = useAppSelector(({ auth }) => auth.status);
+
+  const [serverError, setServerError] = useState('');
 
   const onLoginSubmit = async (
     values: ILoginRequest,
@@ -32,14 +35,13 @@ export const Login = () => {
   ) => {
     try {
       const resp = await dispatch(onLogin(values)).unwrap();
-  
+
       if (resp?.token) {
         window.localStorage.setItem('token', resp.token);
         navigate('/');
       }
-      
     } catch (error: any) {
-      setServerError(error.message)
+      setServerError(error.message);
     }
 
     // actions.setSubmitting(true)
@@ -97,16 +99,22 @@ export const Login = () => {
                 />
               </div>
 
-              {
-                serverError && <div className='input input_error'>{serverError}</div>
-              }
+              {serverError && (
+                <div className="input input_error">{serverError}</div>
+              )}
 
-              <Button
-                text="Sign in"
-                className="button button_colored"
-                style={{ width: '100%' }}
-                disabled={!isValid || isSubmitting}
-              />
+              {authStatus === 'loading' ? (
+                <div className="loader_center">
+                  <Loader className="loader_mini" />
+                </div>
+              ) : (
+                <Button
+                  text="Sign in"
+                  className="button button_colored"
+                  style={{ width: '100%' }}
+                  disabled={!isValid || isSubmitting}
+                />
+              )}
             </Form>
           )}
         </Formik>

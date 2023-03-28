@@ -45,6 +45,26 @@
     &_shrink {
       max-width: 60%;
     }
+
+    &__add {
+      padding: 3px 4px 1px 5px;
+      border: 2px solid $blue_dark;
+      border-radius: 50%;
+      svg {
+        path {
+          fill: $blue_dark
+        }
+      }
+      
+      &:hover {
+        background-color: $blue_light;
+        svg {
+          path {
+            fill: white
+          }
+        }
+      }
+    }
   }
 
   &__scrollUp {

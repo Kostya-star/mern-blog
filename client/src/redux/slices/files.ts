@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IUploadFileResp } from 'types/IUploadFileResp';
 
@@ -11,15 +11,37 @@ export const uploadFile = createAsyncThunk(
   },
 );
 
-export interface FilesState {}
+type Status = 'loading' | 'success' | 'error' | ''
 
-const initialState: FilesState = {};
+export interface FilesState {
+  status: Status
+}
+
+const initialState: FilesState = {
+  status: ''
+};
 
 export const filesSlice = createSlice({
   name: 'files',
   initialState,
   reducers: {},
-  extraReducers: () => {},
+  extraReducers: (builder) => {
+    builder
+    // onLoginThunk
+      .addCase(uploadFile.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        uploadFile.fulfilled,
+        (state) => {
+          state.status = 'success';
+        },
+      )
+      .addCase(uploadFile.rejected, (state) => {
+        state.status = 'error';
+      })
+
+  },
 });
 
 export const {} = filesSlice.actions;

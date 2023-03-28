@@ -7,7 +7,6 @@ import { ILoginRequest } from 'types/ILoginRequest';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { clearCommentsSlice } from './comments';
-import { updateFollowersForPosts } from './posts';
 import { IUser } from './../../types/IUser';
 
 export const onLogin = createAsyncThunk(

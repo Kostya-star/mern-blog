@@ -1,17 +1,18 @@
 import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
+import { InputPassword } from 'components/UI/InputPassword/InputPassword';
+import { Loader } from 'components/UI/Loader/Loader';
 import { ErrorMessage, Form, Formik } from 'formik';
-import { useRef, useState, ChangeEvent } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { onRegister } from 'redux/slices/auth';
+import { uploadFile } from 'redux/slices/files';
 import 'scss/all.scss';
 import { IRegisterRequest } from 'types/IRegisterRequest';
 import * as Yup from 'yup';
-import { useAppDispatch } from './../redux/hooks';
-import { InputPassword } from 'components/UI/InputPassword/InputPassword';
-import { uploadFile } from 'redux/slices/files';
-import { ReactComponent as CloseSVG } from 'assets/close.svg';
 
 const initialValues = {
   fullName: '',
@@ -34,9 +35,16 @@ export const Register = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const { authStatus, fileUploadStatus } = useAppSelector(
+    ({ auth, files }) => ({
+      authStatus: auth.status,
+      fileUploadStatus: files.status,
+    }),
+  );
+
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const[serverError, setServerError] = useState('')
+  const [serverError, setServerError] = useState('');
 
   const onRegisterSubmit = async (values: IRegisterRequest) => {
     try {
@@ -47,23 +55,27 @@ export const Register = () => {
         navigate('/');
       }
     } catch (error: any) {
-      setServerError(error.message)
+      setServerError(error.message);
     }
   };
 
-  const onUploadAvatar = (e: ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, val: any) => void) => {
-    const file = e.target.files?.[0]
-    if(file) {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('isRegistering', true.toString())
+  const onUploadAvatar = (
+    e: ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, val: any) => void,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('isRegistering', true.toString());
 
-      dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
-        setFieldValue('avatarUrl', url)
-      })
+      dispatch(uploadFile(formData))
+        .unwrap()
+        .then(({ url }) => {
+          setFieldValue('avatarUrl', url);
+        });
     }
-  }
-
+  };
 
   return (
     <div className="auth">
@@ -83,20 +95,23 @@ export const Register = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-
-            
             return (
               <Form onSubmit={handleSubmit}>
-                <div
-                  className="auth__avatar"
-                >
-                  {values.avatarUrl ? (
+                <div className="auth__avatar">
+                  {fileUploadStatus === 'loading' ? (
+                    <Loader className="loader_big" />
+                  ) : values.avatarUrl ? (
                     <div className="auth__avatar__image">
-                      <CloseSVG onClick={() => setFieldValue('avatarUrl', '')}/>
+                      <CloseSVG
+                        onClick={() => setFieldValue('avatarUrl', '')}
+                      />
                       <img src={values.avatarUrl} alt="avatar" />
                     </div>
                   ) : (
-                    <div className="auth__avatar__default" onClick={() => fileRef.current?.click()}>
+                    <div
+                      className="auth__avatar__default"
+                      onClick={() => fileRef.current?.click()}
+                    >
                       <AvatarPlusSVG />
                       Add photo
                     </div>
@@ -157,12 +172,18 @@ export const Register = () => {
                 {serverError && (
                   <div className="input input_error">{serverError}</div>
                 )}
-                <Button
-                  text="Sign up"
-                  className="button button_colored"
-                  style={{ width: '100%' }}
-                  disabled={!isValid || isSubmitting}
-                />
+                {authStatus === 'loading' ? (
+                  <div className="loader_center">
+                    <Loader className="loader_mini" />
+                  </div>
+                ) : (
+                  <Button
+                    text="Sign up"
+                    className="button button_colored"
+                    style={{ width: '100%' }}
+                    disabled={!isValid || isSubmitting}
+                  />
+                )}
               </Form>
             );
           }}

@@ -1,16 +1,15 @@
+import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
 import { Categories } from 'components/Categories/Categories';
 import { Comments } from 'components/Comments/Comments';
 import { PostItem } from 'components/PostItem/PostItem';
 import { Button } from 'components/UI/Button/Button';
+import { Loader } from 'components/UI/Loader/Loader';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { isAuthSelector } from 'redux/slices/auth';
-import { fetchComments } from 'redux/slices/comments';
-import { fetchPosts } from 'redux/slices/posts';
-import { fetchTags } from 'redux/slices/tags';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
-import { Loader } from 'components/UI/Loader/Loader';
+import { isAuthSelector } from 'redux/slices/auth';
+import { fetchPosts } from 'redux/slices/posts';
+import { ReactComponent as PlusSVG } from 'assets/plus.svg'
 
 export const Home = () => {
   const dispatch = useAppDispatch();
@@ -60,7 +59,10 @@ export const Home = () => {
         <Categories />
         {isAuth && (
           <Link to="/add-post">
-            <Button text="Add post" className="button button_colored" />
+            <div className="home__navbar__add">
+              <PlusSVG />
+            </div>
+            {/* <Button text="Add post" className="button button_colored" /> */}
           </Link>
         )}
       </div>
@@ -69,7 +71,7 @@ export const Home = () => {
           <div className="home__content__posts">
             {postsStatus === 'loading' && (
               <div className="loader_center">
-                <Loader className='loader_big'/>
+                <Loader className="loader_big" />
               </div>
             )}
             {postsStatus === 'error' && <div>ERROR</div>}
@@ -81,7 +83,7 @@ export const Home = () => {
             <div className="home__content__comments">
               {commentStatus === 'loading' && (
                 <div className="loader_center">
-                  <Loader className='loader_big'/>
+                  <Loader className="loader_big" />
                 </div>
               )}
               {commentStatus === 'error' && <div>ERROR</div>}
@@ -93,7 +95,7 @@ export const Home = () => {
         <div className="home__content__posts">
           {postsStatus === 'loading' && (
             <div className="loader_center">
-              <Loader className='loader_big'/>
+              <Loader className="loader_big" />
             </div>
           )}
           {postsStatus === 'error' && <div>ERROR</div>}

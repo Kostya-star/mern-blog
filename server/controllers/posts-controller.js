@@ -1,5 +1,4 @@
 import PostModel from "../models/post-model.js"
-import { getBase64 } from './../utils/getBase64.js';
 import CommentModel from '../models/comments-model.js'
 import UserModel from "../models/user-model.js";
 import { uploadImageGoogleCloud } from "../utils/uploadImageGoogleCloud.js";

@@ -11,7 +11,6 @@ import { useAppDispatch } from 'redux/hooks';
 import { uploadFile } from 'redux/slices/files';
 import { createPost, fetchPost, updatePost } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
-import { base64ToFile } from 'utils/base64ToFile';
 
 const options = {
   spellChecker: false,

@@ -3,7 +3,6 @@ import UserModel from '../models/user-model.js';
 import PostModel from '../models/post-model.js';
 import CommentModel from '../models/comments-model.js';
 import tokenService from '../services/token-service.js';
-import { getBase64 } from '../utils/getBase64.js';
 
 const register = async (req, res) => {
   try {

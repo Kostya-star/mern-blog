@@ -2,7 +2,6 @@ import { ErrorMessage, Form, Formik } from 'formik';
 import { useState, useRef, ChangeEvent } from 'react';
 import { useAppSelector } from 'redux/hooks';
 import { updateUser } from 'redux/slices/auth';
-import { base64ToFile } from 'utils/base64ToFile';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
 import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';

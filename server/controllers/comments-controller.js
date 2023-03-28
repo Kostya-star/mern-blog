@@ -1,6 +1,5 @@
 import CommentModel from "../models/comments-model.js"
 import PostModel from '../models/post-model.js'
-import { getBase64 } from "../utils/getBase64.js"
 import { uploadImageGoogleCloud } from "../utils/uploadImageGoogleCloud.js"
 
 const getComments = async (req, res) => {

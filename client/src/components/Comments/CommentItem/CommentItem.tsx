@@ -9,7 +9,6 @@ import { deleteComment, likeComment } from 'redux/slices/comments';
 import { IComment } from 'types/IComment';
 import s from './CommentItem.module.scss';
 import { useNavigate } from 'react-router-dom';
-import { base64ToFile } from 'utils/base64ToFile';
 
 interface ICommentItemProps {
   comment: IComment;

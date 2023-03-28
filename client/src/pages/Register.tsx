@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
 import { uploadFile } from 'redux/slices/files';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 
 const initialValues = {
   fullName: '',
@@ -88,23 +89,24 @@ export const Register = () => {
               <Form onSubmit={handleSubmit}>
                 <div
                   className="auth__avatar"
-                  onClick={() => fileRef.current?.click()}
                 >
                   {values.avatarUrl ? (
-                    <img
-                      src={values.avatarUrl}
-                      alt="avatar"
-                    />
+                    <div className="auth__avatar__image">
+                      <CloseSVG onClick={() => setFieldValue('avatarUrl', '')}/>
+                      <img src={values.avatarUrl} alt="avatar" />
+                    </div>
                   ) : (
-                    <AvatarPlusSVG />
+                    <div className="auth__avatar__default" onClick={() => fileRef.current?.click()}>
+                      <AvatarPlusSVG />
+                      Add photo
+                    </div>
                   )}
-                  Add photo
                   <input
                     ref={fileRef}
                     type="file"
+                    key={values.avatarUrl}
                     name="avatarUrl"
                     onChange={(e) => onUploadAvatar(e, setFieldValue)}
-                    // onBlur={handleBlur}
                     hidden
                   />
                 </div>
@@ -152,10 +154,9 @@ export const Register = () => {
                     className="input_error"
                   />
                 </div>
-                {
-                  serverError &&
-                  <div className='input input_error'>{serverError}</div>
-                }
+                {serverError && (
+                  <div className="input input_error">{serverError}</div>
+                )}
                 <Button
                   text="Sign up"
                   className="button button_colored"

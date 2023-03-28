@@ -11,24 +11,49 @@
     margin-bottom: 20px;
     color: gray;
     cursor: pointer;
-    &:hover {
-      color: black;
+    &__default {
+      display: flex;
+      flex-direction: column;
       svg {
+        // width: 136px;
         path {
-          fill: black;
+          fill: gray
+        }
+      }
+      &:hover {
+        color: black;
+        svg {
+          path {
+            fill: black;
+          }
         }
       }
     }
-    svg {
-      width: 136px;
-      path {
-        fill: gray
+
+    &__image {
+      position: relative;
+      svg {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 25px;
+        background-color: black;
+        border-radius: 7px;
+        path {
+          fill: white
+        }
+        &:hover {
+          path {
+            fill: white;
+          }
+          transform: scale(.9);
+        }
       }
     }
     img {
       width: 250px;
       height: 250px;
-      border-radius: 40px;
+      border-radius: 10px;
     }
   }
 

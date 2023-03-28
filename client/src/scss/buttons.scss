@@ -10,12 +10,18 @@
     color: white;
     background-color: $blue_dark;
     border: none;
+    &:hover {
+      background-color: rgb(99, 183, 231);
+    }
   }
-
+  
   &_transparent {
     color: $blue_dark;
     background-color: white;
     border: 1px solid $blue_dark;
+    &:hover {
+      background-color: rgb(190, 237, 241);
+    }
   }
 
   &_cancel {

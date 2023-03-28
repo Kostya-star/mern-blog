@@ -16,7 +16,7 @@ interface ICommentItemProps {
   commRef: LegacyRef<HTMLDivElement>;
   creationTime: string;
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
-  setCommentImage: (imgFile: Blob | null) => void;
+  setCommentImage: (imgUrl: string) => void;
   onShowFullImage: (imgBase64: string) => void;
 }
 
@@ -49,14 +49,12 @@ export const CommentItem: FC<ICommentItemProps> = ({
 
   const onEditComment = () => {
     setCommentText({ id: comment._id, text: comment.text });
-    const file = base64ToFile(comment.imageUrl);
-    setCommentImage(file);
+    setCommentImage(comment.imageUrl);
   };
 
   const onRedirectAboutProfile = () => {
     navigate(`/profile/about/${comment.user._id}`);
   };
-console.log(comment.imageUrl);
 
   return (
     <div className={s.comment__wrapper} ref={commRef}>

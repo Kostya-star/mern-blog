@@ -11,13 +11,15 @@ import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
 import { useNavigate } from 'react-router-dom';
+import { uploadFile } from 'redux/slices/files';
+import { Avatar } from 'components/Avatar/Avatar';
 
 interface IUserUpdatedValues {
   fullName: string;
   email: string;
   password: string;
   confirmPassword: string;
-  avatarUrl: File;
+  avatarUrl: string;
   isPassword: boolean;
 }
 
@@ -54,31 +56,27 @@ export const ProfileEdit = () => {
     email: currentUser?.email,
     password: '',
     confirmPassword: '',
-    avatarUrl: 0,
+    avatarUrl: currentUser?.avatarUrl,
     isPassword: false,
   };
 
   const inputFileRef = useRef<HTMLInputElement>(null);
 
-  const [image, setImage] = useState<File | null>(
-    currentUser?.avatarUrl
-      ? (base64ToFile(currentUser.avatarUrl) as File)
-      : null,
-  );
+  // const [image, setImage] = useState(currentUser?.avatarUrl);
 
   const [serverError, setServerError] = useState('');
 
   const onUpdateUserProfile = async (values: IUserUpdatedValues) => {
     try {
-      const { fullName, email, password } = values;
+      // const { fullName, email, password, avatarUrl } = values;
 
-      const formData = new FormData();
-      formData.append('fullName', fullName);
-      formData.append('email', email);
-      formData.append('password', password);
-      formData.append('image', image || '');
+      // const formData = new FormData();
+      // formData.append('fullName', fullName);
+      // formData.append('email', email);
+      // formData.append('password', password);
+      // formData.append('image', image || '');
 
-      const resp = await dispatch(updateUser(formData)).unwrap();
+      const resp = await dispatch(updateUser(values)).unwrap();
 
       if (resp) {
         setServerError('');
@@ -89,16 +87,21 @@ export const ProfileEdit = () => {
     }
   };
 
-  const onUploadImage = (
+  const onUploadImage = async (
     event: ChangeEvent<HTMLInputElement>,
     setFieldValue: (field: string, val: any) => void,
   ) => {
     event.preventDefault();
 
     const file = event.target?.files?.[0];
-    if (file) {
-      setImage(file);
-      setFieldValue('avatarUrl', null);
+
+    if(file) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      await dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
+        setFieldValue('avatarUrl', url);
+      })
     }
   };
 
@@ -108,7 +111,6 @@ export const ProfileEdit = () => {
   ) => {
     e.preventDefault();
     setFieldValue('avatarUrl', '');
-    setImage(null);
   };
 
   return (
@@ -142,18 +144,12 @@ export const ProfileEdit = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            // console.log(values);
+            console.log(values);
             return (
               <Form onSubmit={handleSubmit}>
                 <div className="profileEdit__form">
                   <div className="profileEdit__form__image">
-                    {image && (
-                      <img
-                        src={URL.createObjectURL(image as File)}
-                        alt="avatar"
-                      />
-                    )}
-                    {!image && <AvatarDefaultSVG />}
+                    <Avatar avatar={values.avatarUrl}/>
                     <Button
                       text="Change photo"
                       className="button button_transparent"

@@ -1,6 +1,3 @@
-export interface IUpdateUserReq {
-  fullName: string,
-  email: string,
-  password: string,
-  avatar: File | string,
-}
+import { IRegisterRequest } from "./IRegisterRequest";
+
+export interface IUpdateUserReq extends IRegisterRequest {}

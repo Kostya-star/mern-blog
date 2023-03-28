@@ -3,9 +3,8 @@ import jwt from 'jsonwebtoken'
 
 export const checkAuth = async (req, res, next) => {
   try {
-    const isUserRegistering = JSON.parse(req.body.isRegistering)
-    
-    if(isUserRegistering) {
+    // skip token check if the user isnt registered and uploading their avatar when registering
+    if(req.body.isRegistering) {
       return next()
     }
 

@@ -7,25 +7,17 @@ import { getBase64 } from '../utils/getBase64.js';
 
 const register = async (req, res) => {
   try {
-    const { fullName, email, password } = req.body
-    const image = req.file
-
+    const { fullName, email, password, avatarUrl } = req.body
+    
     const userDb = await UserModel.findOne({ email })
 
     if (userDb) {
       return res.status(400).json({
         message: 'This email is already registered'
       })
-      // throw new Error('the user already exists')
     }
 
     const hashedPass = await bcrypt.hash(password, 5)
-
-    let avatarUrl = ''
-
-    if (image) {
-      avatarUrl = getBase64(image)
-    }
 
     const user = new UserModel({
       fullName,
@@ -114,8 +106,7 @@ const getMe = async (req, res) => {
 
 const updateMe = async (req, res) => {
   try {
-    const { userId, fullName, email, password } = req.body
-    const image = req.file
+    const { userId, fullName, email, password, avatarUrl } = req.body
 
     const user = await UserModel.findById(userId)
 
@@ -131,19 +122,13 @@ const updateMe = async (req, res) => {
       hashedPass = await bcrypt.hash(password, 5)
     }
 
-    let avatarUrl = ''
-
-    if (image) {
-      avatarUrl = getBase64(image)
-    }
-
     const updatedUser = await UserModel.findOneAndUpdate(
       { _id: userId },
       {
         fullName,
         email,
         hashedPassword: hashedPass || user.hashedPassword,
-        avatarUrl: avatarUrl || ''
+        avatarUrl
       },
       { new: true }
     )

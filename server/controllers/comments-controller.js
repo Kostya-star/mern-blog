@@ -39,26 +39,19 @@ const getCommentsByPostId = async (req, res) => {
 
 const createComment = async (req, res) => {
   try {
-    const { postId, text, userId } = req.body
-    const image = req.file
+    const { postId, text, userId, imageUrl } = req.body
 
-    if (!text && !image) {
+    if (!text && !imageUrl) {
       return res.status(400).json({
         message: 'Text or image are required'
       })
     }
 
-    let imageUrl = ''
-
-    if(image) {
-      imageUrl = await uploadImageGoogleCloud(image)
-    }
-
     const comment = new CommentModel({
-      text: text || '',
+      text: text,
       user: userId,
       post: postId,
-      imageUrl: imageUrl
+      imageUrl
     })
 
     await PostModel.findByIdAndUpdate(
@@ -83,10 +76,9 @@ const createComment = async (req, res) => {
 const updateComment = async (req, res) => {
   try {
     const { id } = req.params
-    const { text } = req.body
-    const image = req.file
+    const { text, imageUrl } = req.body
 
-    if (!text && !image) {
+    if (!text && !imageUrl) {
       return res.status(400).json({
         message: 'Text or image are required'
       })
@@ -96,7 +88,7 @@ const updateComment = async (req, res) => {
       { _id: id },
       {
         text,
-        imageUrl: image ? getBase64(image) : ''
+        imageUrl
       },
       { new: true }
     )

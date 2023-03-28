@@ -25,7 +25,7 @@ export const fetchCommentsByPostId = createAsyncThunk(
 
 export const createComment = createAsyncThunk(
   'comments/createComment',
-  async (newComment: FormData, thunkApi) => {
+  async (newComment: ICreateCommentRequest, thunkApi) => {
     const resp = await instance.post<IComment>('/comments', newComment);
 
     thunkApi.dispatch(
@@ -41,12 +41,11 @@ export const createComment = createAsyncThunk(
 
 export const updateComment = createAsyncThunk(
   'comments/updateComment',
-  async (updatedComment: FormData) => {
-    const commentId = updatedComment.get('id');
+  async ({ comment, commId }: { comment: IUpdateCommentReq, commId: string }) => {
 
     const resp = await instance.patch<IComment>(
-      `/comments/${commentId}`,
-      updatedComment,
+      `/comments/${commId}`,
+      comment,
     );
     return resp.data;
   },

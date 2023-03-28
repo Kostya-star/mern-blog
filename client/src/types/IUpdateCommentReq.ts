@@ -1,4 +1,3 @@
-export interface IUpdateCommentReq {
-  id: string;
-  text: string;
-}
+import { ICreateCommentRequest } from 'types/ICreateCommentRequest';
+
+export interface IUpdateCommentReq extends ICreateCommentRequest {}

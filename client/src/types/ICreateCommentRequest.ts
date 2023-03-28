@@ -1,4 +1,5 @@
 export interface ICreateCommentRequest {
+  text?: string;
   postId: string;
-  text: string;
+  imageUrl?: string
 }

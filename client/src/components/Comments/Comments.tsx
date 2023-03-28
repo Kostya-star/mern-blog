@@ -1,7 +1,13 @@
+import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
+import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
+import { ReactComponent as AttachSVG } from 'assets/attach.svg';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
+import { Loader } from 'components/UI/Loader/Loader';
+import { Modal } from 'components/UI/Modal/Modal';
 import { TextArea } from 'components/UI/TextArea/TextArea';
-import { FC, useRef, useState, ChangeEvent } from 'react';
+import { ChangeEvent, FC, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import {
@@ -9,15 +15,10 @@ import {
   createComment,
   updateComment,
 } from 'redux/slices/comments';
+import { uploadFile } from 'redux/slices/files';
 import { createTimeSince } from 'utils/createTimeSince';
 import { MemoizedCommentItem } from './CommentItem/CommentItem';
 import s from './Comments.module.scss';
-import { ReactComponent as CloseSVG } from 'assets/close.svg';
-import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
-import { ReactComponent as ArrowUpSVG } from 'assets/arrow-up.svg';
-import { ReactComponent as AttachSVG } from 'assets/attach.svg';
-import { Loader } from 'components/UI/Loader/Loader';
-import { Modal } from 'components/UI/Modal/Modal';
 
 interface ICommentsProps {}
 
@@ -35,7 +36,7 @@ export const Comments: FC<ICommentsProps> = () => {
 
   const [commentText, setCommentText] = useState({ id: '', text: '' });
   const [isCommHidden, setCommHidden] = useState(false);
-  const [commentImage, setCommentImage] = useState<File | Blob | null>(null);
+  const [commentImage, setCommentImage] = useState<string>('');
   const [fullCommentImage, setFullCommentImage] = useState('');
   const [isCommLoading, setCommLoading] = useState(false);
 
@@ -46,21 +47,22 @@ export const Comments: FC<ICommentsProps> = () => {
   const onSubmitComment = async () => {
     setCommLoading(true);
 
-    const formData = new FormData();
-    formData.append('text', commentText.text.trim() || '');
-    formData.append('postId', postId);
-    formData.append('image', commentImage || '');
+    const comment = {
+      text: commentText.text.trim() || '',
+      postId,
+      imageUrl: commentImage,
+    };
 
     if (commentText.id) {
-      formData.append('id', commentText.id);
-
-      dispatch(updateComment(formData)).then(() => setCommLoading(false));
+      dispatch(updateComment({ comment, commId: commentText.id })).then(() =>
+        setCommLoading(false),
+      );
       setCommentText({ id: '', text: '' });
-      setCommentImage(null);
+      setCommentImage('');
       return;
     }
 
-    dispatch(createComment(formData)).then(() => {
+    dispatch(createComment(comment)).then(() => {
       const parentNode = sidebarCommentsRef.current?.parentNode as HTMLElement;
       if (parentNode) {
         parentNode.scrollTop = parentNode.scrollHeight;
@@ -68,7 +70,7 @@ export const Comments: FC<ICommentsProps> = () => {
       setCommLoading(false);
     });
     setCommentText({ id: '', text: '' });
-    setCommentImage(null);
+    setCommentImage('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -82,17 +84,24 @@ export const Comments: FC<ICommentsProps> = () => {
     setCommHidden(!isCommHidden);
   };
 
-  const onUploadCommentImage = (e: ChangeEvent<HTMLInputElement>) => {
+  const onUploadCommentImage = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (file) {
-      setCommentImage(file);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      await dispatch(uploadFile(formData))
+        .unwrap()
+        .then(({ url }) => {
+          setCommentImage(url);
+        });
     }
   };
 
   const onCancelUpdateComm = () => {
     setCommentText({ id: '', text: '' });
-    setCommentImage(null);
+    setCommentImage('');
   };
 
   return (
@@ -147,18 +156,15 @@ export const Comments: FC<ICommentsProps> = () => {
                 <input
                   ref={commentFileRef}
                   type="file"
-                  key={(commentImage as File)?.name}
+                  key={commentImage}
                   onChange={onUploadCommentImage}
                   hidden
                 />
 
                 {commentImage && (
                   <div className={s.comments__create__group__image}>
-                    <img
-                      src={URL.createObjectURL(commentImage)}
-                      alt="comm img"
-                    />
-                    <CloseSVG onClick={() => setCommentImage(null)} />
+                    <img src={commentImage} alt="comm img" />
+                    <CloseSVG onClick={() => setCommentImage('')} />
                   </div>
                 )}
               </div>

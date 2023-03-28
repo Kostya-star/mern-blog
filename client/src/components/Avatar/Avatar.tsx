@@ -9,11 +9,10 @@ interface IAvatarProps {
 }
 
 export const Avatar: FC<IAvatarProps> = ({ avatar, onClick }) => {
-  const file = base64ToFile(avatar);
   return (
     <div className={`${s.avatar} ${onClick && s.isClickable}`} onClick={onClick}>
-      {file ? (
-        <img src={URL.createObjectURL(file)} alt="avatar" />
+      {avatar ? (
+        <img src={avatar} alt="avatar" />
       ) : (
         <AvatarDefaultSVG />
       )}

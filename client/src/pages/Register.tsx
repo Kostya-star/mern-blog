@@ -16,7 +16,7 @@ const initialValues = {
   fullName: '',
   email: '',
   password: '',
-  avatar: '',
+  avatarUrl: '',
 };
 
 const validationSchema = Yup.object({
@@ -39,13 +39,7 @@ export const Register = () => {
 
   const onRegisterSubmit = async (values: IRegisterRequest) => {
     try {
-      const formData = new FormData();
-      formData.append('image', values.avatar || '');
-      formData.append('email', values.email);
-      formData.append('fullName', values.fullName);
-      formData.append('password', values.password);
-
-      const resp = await dispatch(onRegister(formData)).unwrap();
+      const resp = await dispatch(onRegister(values)).unwrap();
 
       if (resp?.token) {
         window.localStorage.setItem('token', resp.token);
@@ -55,6 +49,20 @@ export const Register = () => {
       setServerError(error.message)
     }
   };
+
+  const onUploadAvatar = (e: ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, val: any) => void) => {
+    const file = e.target.files?.[0]
+    if(file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('isRegistering', true.toString())
+
+      dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
+        setFieldValue('avatarUrl', url)
+      })
+    }
+  }
+
 
   return (
     <div className="auth">
@@ -75,27 +83,16 @@ export const Register = () => {
             isSubmitting,
           }) => {
 
-            const onUploadAvatar = (e: ChangeEvent<HTMLInputElement>) => {
-              const file = e.target.files?.[0]
-              if(file) {
-                const formData = new FormData()
-                formData.append('file', file)
-                formData.append('isRegistering', true.toString())
-
-                dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
-                  setFieldValue('avatar', url)
-                })
-              }
-            }
+            
             return (
               <Form onSubmit={handleSubmit}>
                 <div
                   className="auth__avatar"
                   onClick={() => fileRef.current?.click()}
                 >
-                  {values.avatar ? (
+                  {values.avatarUrl ? (
                     <img
-                      src={values.avatar}
+                      src={values.avatarUrl}
                       alt="avatar"
                     />
                   ) : (
@@ -106,7 +103,7 @@ export const Register = () => {
                     ref={fileRef}
                     type="file"
                     name="avatarUrl"
-                    onChange={onUploadAvatar}
+                    onChange={(e) => onUploadAvatar(e, setFieldValue)}
                     // onBlur={handleBlur}
                     hidden
                   />

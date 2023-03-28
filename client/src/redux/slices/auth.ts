@@ -32,9 +32,9 @@ export const onLogin = createAsyncThunk(
 
 export const onRegister = createAsyncThunk(
   'auth/onRegister',
-  async (formData: FormData) => {
+  async (newUser: IRegisterRequest) => {
     try {
-      const resp = await instance.post<IUser>('/auth/register', formData);
+      const resp = await instance.post<IUser>('/auth/register', newUser);
       return resp.data;
 
     } catch (serverErr: any) {
@@ -59,7 +59,7 @@ export const onAuthMeThunk = createAsyncThunk(
   },
 );
 
-export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: FormData) => {
+export const updateUser = createAsyncThunk('auth/updateUser', async (updatedUser: IUpdateUserReq) => {
   try {
     const { data } = await instance.put<IUser>('auth/update', updatedUser)
     return data

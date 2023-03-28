@@ -7,7 +7,7 @@ const storage = new Storage({
     client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
     private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY
   },
-  projectId: 'mern-blog-381912',
+  projectId: 'mern-blog-381912'
 })
 
 export default storage

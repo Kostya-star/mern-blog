@@ -2,7 +2,7 @@ import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { ErrorMessage, Form, Formik } from 'formik';
-import { useRef, useState } from 'react';
+import { useRef, useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { onRegister } from 'redux/slices/auth';
 import 'scss/all.scss';
@@ -10,12 +10,13 @@ import { IRegisterRequest } from 'types/IRegisterRequest';
 import * as Yup from 'yup';
 import { useAppDispatch } from './../redux/hooks';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
+import { uploadFile } from 'redux/slices/files';
 
 const initialValues = {
   fullName: '',
   email: '',
   password: '',
-  avatar: null as null | File,
+  avatar: '',
 };
 
 const validationSchema = Yup.object({
@@ -59,11 +60,6 @@ export const Register = () => {
     <div className="auth">
       <div className="auth__content">
         <h1>Create an account</h1>
-        {/* <div className="auth__avatar" onClick={() => fileRef.current?.click()}>
-          <AvatarPlusSVG />
-          Add photo
-          <input ref={fileRef} type="file" hidden/>
-        </div> */}
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -78,6 +74,19 @@ export const Register = () => {
             setFieldValue,
             isSubmitting,
           }) => {
+
+            const onUploadAvatar = (e: ChangeEvent<HTMLInputElement>) => {
+              const file = e.target.files?.[0]
+              if(file) {
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('isRegistering', true.toString())
+
+                dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
+                  setFieldValue('avatar', url)
+                })
+              }
+            }
             return (
               <Form onSubmit={handleSubmit}>
                 <div
@@ -85,10 +94,8 @@ export const Register = () => {
                   onClick={() => fileRef.current?.click()}
                 >
                   {values.avatar ? (
-                    // <img src={`http://localhost:5000${values.avatarUrl}`} alt="avatar" />
-                    // <img src={`${process.env.REACT_APP_API_URL}${values.avatar}`} alt="avatar" />
                     <img
-                      src={URL.createObjectURL(values.avatar)}
+                      src={values.avatar}
                       alt="avatar"
                     />
                   ) : (
@@ -99,9 +106,7 @@ export const Register = () => {
                     ref={fileRef}
                     type="file"
                     name="avatarUrl"
-                    onChange={(e) =>
-                      setFieldValue('avatar', e.target.files?.[0])
-                    }
+                    onChange={onUploadAvatar}
                     // onBlur={handleBlur}
                     hidden
                   />

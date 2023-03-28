@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken'
 
 export const checkAuth = async (req, res, next) => {
   try {
+    const isUserRegistering = JSON.parse(req.body.isRegistering)
+    
+    if(isUserRegistering) {
+      return next()
+    }
+
     const token = req.headers.authorization.split(' ')[1]
     if (!token) {
       throw Error

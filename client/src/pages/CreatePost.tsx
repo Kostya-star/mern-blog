@@ -27,11 +27,6 @@ const options = {
   },
 };
 
-interface INewPost extends Omit<INewPostRequest, 'tags'> {
-  tags: string;
-  fileUrl: string;
-}
-
 export const CreatePost = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -39,11 +34,11 @@ export const CreatePost = () => {
   const { id } = useParams();
   const isEditing = Boolean(id);
 
-  const [newPost, setNewPost] = useState<INewPost>({
+  const [newPost, setNewPost] = useState<INewPostRequest>({
     title: '',
     tags: '',
     text: '',
-    fileUrl: '',
+    imageUrl: '',
   });
 
   const [isLoading, setLoading] = useState(false);
@@ -61,7 +56,7 @@ export const CreatePost = () => {
             title,
             text,
             tags: tags.join(' '),
-            fileUrl: imageUrl,
+            imageUrl,
           });
           setLoading(false);
         });
@@ -70,13 +65,6 @@ export const CreatePost = () => {
 
   const onSubmitNewPost = async () => {
     try {
-      // const formData = new FormData();
-      // formData.append('title', newPost.title);
-      // formData.append('tags', newPost.tags.trim());
-      // formData.append('text', newPost.text);
-      // formData.append('image', newPost.fileUrl || '');
-      // formData.append('postId', id as string);
-      
       if (isEditing) {
         await dispatch(updatePost({ updatedPost: newPost, postId: id as string })).unwrap();
         navigate(`/`);
@@ -91,7 +79,7 @@ export const CreatePost = () => {
   };
 
   const onDeleteImage = () => {
-    setNewPost({ ...newPost, fileUrl: '' });
+    setNewPost({ ...newPost, imageUrl: '' });
     if (imageRef.current) {
       imageRef.current.value = '';
     }
@@ -107,7 +95,7 @@ export const CreatePost = () => {
         
         setNewPost({
           ...newPost,
-          fileUrl: url,
+          imageUrl: url,
         })
       })
 
@@ -125,7 +113,7 @@ export const CreatePost = () => {
   return (
     <div className="createPost">
       <div className="createPost__content">
-        {newPost.fileUrl ? (
+        {newPost.imageUrl ? (
           <>
             <Button
               text="Delete"
@@ -134,7 +122,7 @@ export const CreatePost = () => {
             />
             <img
               className="createPost__content__img"
-              src={newPost.fileUrl}
+              src={newPost.imageUrl}
               alt="Uploaded img"
             />
           </>

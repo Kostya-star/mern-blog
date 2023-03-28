@@ -58,15 +58,14 @@ const getOnePost = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { title, text, tags, userId, fileUrl } = req.body
-    const image = req.file
+    const { title, text, tags, userId, imageUrl } = req.body
 
     const post = new PostModel({
       title,
       text,
       tags: tags.split(' '),
       user: userId,
-      imageUrl: fileUrl,
+      imageUrl,
     })
 
     await post.save()
@@ -89,7 +88,7 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
   try {
-    const { title, text, tags, userId, fileUrl } = req.body
+    const { title, text, tags, userId, imageUrl } = req.body
 
     const { postId } = req.params
 
@@ -109,7 +108,7 @@ const updatePost = async (req, res) => {
         text,
         tags: tags.split(' '),
         user: userId,
-        imageUrl: fileUrl
+        imageUrl
       })
 
     res.json({

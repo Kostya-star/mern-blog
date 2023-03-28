@@ -5,10 +5,10 @@ import authRouters from './routes/auth-routes.js'
 import tagsRouters from './routes/tags-routes.js'
 import postsRouters from './routes/posts-routes.js'
 import commentsRouters from './routes/comments-routes.js'
-import profileRouters from './routes/profile-routes.js';
-import multer from 'multer';
-import imageRoutes from './routes/image-routes.js';
-import cors from 'cors';
+import profileRouters from './routes/profile-routes.js'
+import multer from 'multer'
+import imageRoutes from './routes/image-routes.js'
+import cors from 'cors'
 
 dotenv.config();
 

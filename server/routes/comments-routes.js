@@ -1,9 +1,6 @@
 import { Router } from 'express';
 import commentsController from '../controllers/comments-controller.js';
 import { checkAuth } from '../utils/checkAuth.js';
-import { imageStorageCreator } from '../utils/imageStorageCreator.js';
-// import { checkValidationErrors } from '../utils/checkValidationErrors.js';
-// import { postValidator } from './../validations/post-validator.js';
 
 const router = Router()
 

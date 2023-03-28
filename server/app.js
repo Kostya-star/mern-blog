@@ -8,7 +8,6 @@ import commentsRouters from './routes/comments-routes.js'
 import profileRouters from './routes/profile-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
-import { imageStorageCreator } from './utils/imageStorageCreator.js'
 import cors from 'cors'
 
 dotenv.config();
@@ -19,7 +18,6 @@ app.use(express.json())
 // app.use(express.urlencoded({ extended: true }));
 
 
-// export const upload = multer(imageStorageCreator(multer)) // multer({ storage })
 
 const multerMid = multer({
   storage: multer.memoryStorage(),
@@ -29,7 +27,6 @@ const multerMid = multer({
 })
 
 app.use(cors())
-// app.use(fileUploader())
 app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
 app.use('/comments', commentsRouters)
@@ -52,6 +49,3 @@ const start = async () => {
 }
 
 start()
-// .then(() => {
-//   app.listen(PORT, () => console.log(`Server started on PORT${PORT}`))
-// })

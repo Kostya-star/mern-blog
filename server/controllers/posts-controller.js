@@ -62,7 +62,7 @@ const createPost = async (req, res) => {
     const post = new PostModel({
       title,
       text,
-      tags: tags.split(' '),
+      tags: tags ? tags?.split(' ') : [],
       user: userId,
       imageUrl,
     })
@@ -105,7 +105,7 @@ const updatePost = async (req, res) => {
       {
         title,
         text,
-        tags: tags.split(' '),
+        tags: tags?.split(' '),
         user: userId,
         imageUrl
       })

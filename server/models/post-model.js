@@ -7,7 +7,7 @@ const PostSchema = new mongoose.Schema({
   },
   text: {
     type: String,
-    required: true,
+    // required: true,
     // unique: true
   },
   tags: {
@@ -18,10 +18,6 @@ const PostSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
-  // commentCount: {
-  //   type: Number,
-  //   default: 0
-  // },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

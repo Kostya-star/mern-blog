@@ -33,7 +33,7 @@ export const CreatePost = () => {
   const { id } = useParams();
   const isEditing = Boolean(id);
 
-  const fileUploadStatus = useAppSelector(({ files }) => files.status)
+  const fileUploadStatus = useAppSelector(({ files }) => files.status);
 
   const [newPost, setNewPost] = useState<INewPostRequest>({
     title: '',
@@ -52,7 +52,6 @@ export const CreatePost = () => {
       dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
-
           setNewPost({
             title,
             text,
@@ -67,10 +66,10 @@ export const CreatePost = () => {
   const onSubmitNewPost = async () => {
     try {
       if (isEditing) {
-        await dispatch(updatePost({ updatedPost: newPost, postId: id as string })).unwrap();
+        await dispatch(updatePost({ newPost, postId: id as string }));
         navigate(`/`);
       } else {
-        await dispatch(createPost(newPost)).unwrap();
+        await dispatch(createPost(newPost));
         navigate(`/`);
       }
     } catch (error) {
@@ -87,26 +86,26 @@ export const CreatePost = () => {
   };
 
   const onUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if(file) {
-      const formData = new FormData()
-      formData.append('file', file)
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
 
-      dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
-        
-        setNewPost({
-          ...newPost,
-          imageUrl: url,
-        })
-      })
-
+      dispatch(uploadFile(formData))
+        .unwrap()
+        .then(({ url }) => {
+          setNewPost({
+            ...newPost,
+            imageUrl: url,
+          });
+        });
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="loader_center">
-        <Loader className='loader_big'/>
+        <Loader className="loader_big" />
       </div>
     );
   }
@@ -114,11 +113,11 @@ export const CreatePost = () => {
   return (
     <div className="createPost">
       <div className="createPost__content">
-        {
-          fileUploadStatus === 'loading'
-          ? <div className='loader_center'><Loader className='loader_big'/></div>
-          :
-        newPost.imageUrl ? (
+        {fileUploadStatus === 'loading' ? (
+          <div className="loader_center">
+            <Loader className="loader_big" />
+          </div>
+        ) : newPost.imageUrl ? (
           <>
             <Button
               text="Delete"
@@ -141,14 +140,8 @@ export const CreatePost = () => {
               <UploadSVG />
             </Button>
           </div>
-        )
-        }
-        <input
-          ref={imageRef}
-          type="file"
-          onChange={onUploadFile}
-          hidden
-        />
+        )}
+        <input ref={imageRef} type="file" onChange={onUploadFile} hidden />
 
         <TextArea
           placeholder="Post title..."
@@ -174,9 +167,6 @@ export const CreatePost = () => {
           }
         />
         <hr />
-        {!newPost.tags && (
-          <div className="createPost__requiredErr">* Required</div>
-        )}
       </div>
       <div className="markdown__wrapper">
         <SimpleMDE
@@ -185,20 +175,17 @@ export const CreatePost = () => {
           onChange={(value) => setNewPost({ ...newPost, text: value })}
           options={options}
         />
-        {!newPost.text && (
-          <div className="createPost__requiredErr">* Required</div>
-        )}
       </div>
       <div className="createPost__content__buttons">
         <Button
           text={isEditing ? 'Edit' : 'Publish'}
           className={`button ${
-            !newPost.title || !newPost.tags || !newPost.text
+            !newPost.title
               ? 'button_disabled'
               : 'button_colored'
           }`}
           onClick={onSubmitNewPost}
-          disabled={!newPost.title || !newPost.tags || !newPost.text}
+          disabled={!newPost.title}
         />
         <Button
           text="Cancel"

@@ -102,21 +102,10 @@
       }
 
       &__dropdown {
-        display: flex;
-        justify-content: end;
+        text-align: right;
         color: $blue_light;
-        padding-right: 50px;
-
-        p {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          cursor: pointer;
-        }
-
-        svg {
-          width: 15px;
-        }
+        text-decoration: underline dotted 3px;
+        cursor: pointer;
       }
 
       &__statistics {

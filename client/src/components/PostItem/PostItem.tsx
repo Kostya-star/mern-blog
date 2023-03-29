@@ -102,11 +102,11 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
               {!isUserFollowed &&
                 currentUserId !== post.user._id &&
                 (followStatus === 'loading' ? (
-                    <Loader className='loader_mini'/>
+                  <Loader className="loader_mini" />
                 ) : (
                   <Button
-                    text='Follow'
-                    className='button_follow_mini'
+                    text="Follow"
+                    className="button_follow_mini"
                     onClick={() => onFollowUser(post.user._id)}
                   >
                     <PlusSVG />
@@ -126,36 +126,34 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
 
           {/* POST TAGS */}
 
-          <div className={s.post__content__body__tags}>
-            {post.tags?.map((tag, ind) => (
-              <Link to={`/tags/${tag}`} key={ind}>
-                <span>#{tag}</span>
-              </Link>
-            ))}
-          </div>
+          {post?.tags.length ? (
+            <div className={s.post__content__body__tags}>
+              {post.tags.map((tag, ind) => (
+                <Link to={`/tags/${tag}`} key={ind}>
+                  <span>#{tag}</span>
+                </Link>
+              ))}
+            </div>
+          )
+          : null
+        }
 
           {/* POST TEXT DESCRIPTION */}
 
-          <div className={s.post__content__body__dropdown}>
-            <p onClick={() => setShowText(!isShowText)}>
-              {isShowText ? (
-                <>
-                  <span>Close text</span>
-                  <ArrowUpSVG />
-                </>
-              ) : (
-                <>
-                  <span>Show text</span>
-                  <ArrowDownSVG />
-                </>
-              )}
-            </p>
-          </div>
-          {isShowText && (
-            <div className={s.post__content__body__text}>
-              <ReactMarkdown children={post.text} />
+        {
+          post.text && 
+          <>
+            <div className={s.post__content__body__dropdown} onClick={() => setShowText(!isShowText)}>
+              details
             </div>
-          )}
+            
+            { isShowText && (
+              <div className={s.post__content__body__text}>
+                <ReactMarkdown children={post.text} />
+              </div>
+            )}
+          </>
+        }
 
           {/* POST COMMENTS AND LIKES */}
 

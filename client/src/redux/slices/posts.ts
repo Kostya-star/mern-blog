@@ -46,13 +46,13 @@ export const createPost = createAsyncThunk(
 export const updatePost = createAsyncThunk(
   'posts/updatePost',
   async ({
-    updatedPost,
+    newPost,
     postId,
   }: {
-    updatedPost: IUpdatePostRequest;
+    newPost: IUpdatePostRequest;
     postId: string;
   }) => {
-    return await instance.patch(`/posts/${postId}`, updatedPost);
+    return await instance.patch(`/posts/${postId}`, newPost);
   },
 );
 

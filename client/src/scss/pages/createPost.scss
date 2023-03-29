@@ -32,7 +32,8 @@
     }
 
     hr {
-      border: 1px solid $blue_dark
+      border: 1px solid $blue_dark;
+      margin: 0;
     }
 
     &__img {

@@ -1,4 +1,5 @@
 import dotenv from'dotenv'
+dotenv.config();
 import express from 'express'
 import mongoose from 'mongoose'
 import authRouters from './routes/auth-routes.js'
@@ -8,9 +9,8 @@ import commentsRouters from './routes/comments-routes.js'
 import profileRouters from './routes/profile-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
-import cors from 'cors'
+import cors from 'cors';
 
-dotenv.config();
 
 const app = express();
 

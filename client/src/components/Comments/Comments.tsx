@@ -38,14 +38,14 @@ export const Comments: FC<ICommentsProps> = () => {
   const [isCommHidden, setCommHidden] = useState(false);
   const [commentImage, setCommentImage] = useState<string>('');
   const [fullCommentImage, setFullCommentImage] = useState('');
-  const [isCommLoading, setCommLoading] = useState(false);
+  const [isCommCreating, setCommCreating] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sidebarCommentsRef = useRef<HTMLDivElement>(null);
   const commentFileRef = useRef<HTMLInputElement>(null);
 
   const onSubmitComment = async () => {
-    setCommLoading(true);
+    setCommCreating(true);
 
     const comment = {
       text: commentText.text.trim() || '',
@@ -55,7 +55,7 @@ export const Comments: FC<ICommentsProps> = () => {
 
     if (commentText.id) {
       dispatch(updateComment({ comment, commId: commentText.id })).then(() =>
-        setCommLoading(false),
+      setCommCreating(false),
       );
       setCommentText({ id: '', text: '' });
       setCommentImage('');
@@ -67,7 +67,7 @@ export const Comments: FC<ICommentsProps> = () => {
       if (parentNode) {
         parentNode.scrollTop = parentNode.scrollHeight;
       }
-      setCommLoading(false);
+      setCommCreating(false);
     });
     setCommentText({ id: '', text: '' });
     setCommentImage('');
@@ -85,6 +85,7 @@ export const Comments: FC<ICommentsProps> = () => {
   };
 
   const onUploadCommentImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    setCommCreating(true)
     const file = e.target.files?.[0];
 
     if (file) {
@@ -95,6 +96,7 @@ export const Comments: FC<ICommentsProps> = () => {
         .unwrap()
         .then(({ url }) => {
           setCommentImage(url);
+          setCommCreating(false)
         });
     }
   };
@@ -170,12 +172,12 @@ export const Comments: FC<ICommentsProps> = () => {
               </div>
 
               <div className={s.comments__create__buttons}>
-                {isCommLoading && (
+                {isCommCreating && (
                   <div className="loader_center">
                     <Loader className="loader_mini" />
                   </div>
                 )}
-                {!isCommLoading && (
+                {!isCommCreating && (
                   <Button
                     className={`button ${
                       ((commentText.text && !/^\s*$/.test(commentText.text)) ||

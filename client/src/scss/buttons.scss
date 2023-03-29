@@ -36,6 +36,9 @@
     background-color: #d32f2f;
     color: white;
     border: none;
+    &:hover {
+      background-color: #ff2200;
+    }
   }
 
   &_disabled {

@@ -7,7 +7,7 @@ import 'easymde/dist/easymde.min.css';
 import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import SimpleMDE from 'react-simplemde-editor';
-import { useAppDispatch } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { uploadFile } from 'redux/slices/files';
 import { createPost, fetchPost, updatePost } from 'redux/slices/posts';
 import { INewPostRequest } from 'types/INewPostRequest';
@@ -16,8 +16,8 @@ const options = {
   spellChecker: false,
   maxHeight: '400px',
   autofocus: true,
-  hideIcons: ['side-by-side', 'fullscreen'] as any,
-  placeholder: 'Введите текст...',
+  hideIcons: ['side-by-side', 'fullscreen', 'preview'] as any,
+  placeholder: "What's on your mind?",
   status: false,
   autosave: {
     enabled: true,
@@ -32,6 +32,8 @@ export const CreatePost = () => {
 
   const { id } = useParams();
   const isEditing = Boolean(id);
+
+  const fileUploadStatus = useAppSelector(({ files }) => files.status)
 
   const [newPost, setNewPost] = useState<INewPostRequest>({
     title: '',
@@ -112,7 +114,11 @@ export const CreatePost = () => {
   return (
     <div className="createPost">
       <div className="createPost__content">
-        {newPost.imageUrl ? (
+        {
+          fileUploadStatus === 'loading'
+          ? <div className='loader_center'><Loader className='loader_big'/></div>
+          :
+        newPost.imageUrl ? (
           <>
             <Button
               text="Delete"
@@ -135,7 +141,8 @@ export const CreatePost = () => {
               <UploadSVG />
             </Button>
           </div>
-        )}
+        )
+        }
         <input
           ref={imageRef}
           type="file"

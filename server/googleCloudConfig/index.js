@@ -1,5 +1,6 @@
 import { Storage } from '@google-cloud/storage'
-import dotenv from'dotenv'
+import dotenv from 'dotenv'
+import cron from 'node-cron'
 import CommentsModel from '../models/comments-model.js'
 import PostModel from '../models/post-model.js'
 import UserModel from '../models/user-model.js'
@@ -25,16 +26,14 @@ async function cleanUpUnusedImages() {
 
   // Получаем список всех файлов в бакете
   const [files] = await storage.bucket(bucketName).getFiles();
-
-  // Создаем массивы для хранения ссылок на изображения и имен файлов
+  // Создаем массив для хранения ссылок на изображения
   const imageUrls = [];
-  const fileNames = [];
 
-  // Проходимся по всем постам и комментариям в базе данных, собираем ссылки на изображения
+  // Проходимся по всем постам && комментариям && юзерам в базе данных, собираем ссылки на изображения
   const postsImagesUrl = await PostModel.find().select('imageUrl');;
   const commentsImagesUrl = await CommentsModel.find().select('imageUrl');;
   const userAvatarsUrl = await UserModel.find().select('avatarUrl')
-  
+
   postsImagesUrl.forEach(p => {
     imageUrls.push(p.imageUrl);
   });
@@ -47,25 +46,25 @@ async function cleanUpUnusedImages() {
     imageUrls.push(u.avatarUrl)
   })
 
-  // Проходимся по списку файлов в бакете, собираем имена файлов
-  files.forEach(file => {
-    fileNames.push(file.name);
-  });
+  // создаем функцию которая будет вырезать id картинки из file.name
+  const getFileIdFromFileName = (fileName) => {
+    const startIndex = fileName.indexOf('ID::') + 4
+    const endIndex = fileName.indexOf('::ID-')
+    return fileName.substring(startIndex, endIndex)
+  }
 
-  // Находим все имена файлов, которые не соответствуют ссылкам на изображения в базе данных
-  const unusedFiles = fileNames.filter(fileName => !imageUrls.includes(fileName));
+  // находим все неиспользуемые файлы
+  const unusedFiles = files.filter(file => {
+    const fileId = getFileIdFromFileName(file.name)
+    return !imageUrls.some(url => url?.includes(fileId))
+  })
+  console.log('function cleanup');
 
-  // console.log(fileNames);
-
-  // Удаляем все неиспользуемые файлы с бакета
-  // unusedFiles.forEach(async fileName => {
-  //   const file = storage.bucket(bucketName).file(fileName);
-  //   await file.delete();
-  //   console.log(`Deleted file ${fileName}`);
-  // });
+  // удаляем все unused files
+  await Promise.all(unusedFiles.map(file => file.delete()));
 }
 
-// Вызываем функцию каждые 2 часа
-// setInterval(cleanUpUnusedImages, 2 * 60 * 60 * 1000);
-
-cleanUpUnusedImages()
+// функция будет удалять неиспользуемые файлы каждый час 
+cron.schedule('0 * * * *', () => {
+  cleanUpUnusedImages()
+})

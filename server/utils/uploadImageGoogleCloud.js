@@ -1,6 +1,7 @@
 import util from 'util'
 import gc from '../googleCloudConfig/index.js'
 import { format } from 'url';
+import { mongoose } from 'mongoose';
 
 const bucket = gc.bucket('mern-blog') // should be your bucket name
 
@@ -15,16 +16,18 @@ const bucket = gc.bucket('mern-blog') // should be your bucket name
 
 export const uploadImageGoogleCloud = (file) => new Promise((resolve, reject) => {
   const { originalname, buffer } = file
-  // const blob = bucket.file(originalname.replace(/ /g, "_"))
-  const blob = bucket.file(originalname)
+
+  const imageId = new mongoose.Types.ObjectId()
+
+  const blob = bucket.file(`ID::${imageId}::ID-${originalname}`)
+
   const blobStream = blob.createWriteStream({
     resumable: false
   })
-  blobStream.on('finish', () => {
-    const publicUrl = format(
-      `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-    )
-    resolve(publicUrl)
+  blobStream.on('finish', async () => {
+    const imageUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+
+    resolve(imageUrl)
   })
   .on('error', () => {
     reject(`Unable to upload image, something went wrong`)

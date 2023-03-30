@@ -6,6 +6,7 @@ export const uploadFile = createAsyncThunk(
   'images/uploadFile',
   async (formData: FormData) => {
     const resp = await instance.post<IUploadFileResp>('/upload/file', formData);
+console.log(resp.data);
 
     return resp.data;
   },

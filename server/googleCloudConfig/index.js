@@ -55,13 +55,7 @@ async function cleanUpUnusedImages() {
   // Находим все имена файлов, которые не соответствуют ссылкам на изображения в базе данных
   const unusedFiles = fileNames.filter(fileName => !imageUrls.includes(fileName));
 
-  const urls = files.map(file => {
-    const encodedFilename = encodeURIComponent(file.name)
-  
-    return `https://storage.googleapis.com/${bucketName}/${encodedFilename}`;
-  });
-  const matchedImages = urls.filter(url => !imageUrls.includes(url))
-  console.log(matchedImages);
+  // console.log(fileNames);
 
   // Удаляем все неиспользуемые файлы с бакета
   // unusedFiles.forEach(async fileName => {

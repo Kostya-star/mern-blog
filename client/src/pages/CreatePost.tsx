@@ -45,6 +45,7 @@ export const CreatePost = () => {
   const [isLoading, setLoading] = useState(false);
 
   const imageRef = useRef<HTMLInputElement | null>(null);
+console.log(newPost);
 
   useEffect(() => {
     if (id) {
@@ -52,10 +53,14 @@ export const CreatePost = () => {
       dispatch(fetchPost({ id }))
         .unwrap()
         .then(({ title, text, tags, imageUrl }) => {
+          const tagsString = Array.isArray(tags) && tags.length === 1 && tags[0].trim() === '' 
+          ? ''
+          : tags.join(' ');
+          
           setNewPost({
             title,
             text,
-            tags: tags.join(' '),
+            tags: tagsString,
             imageUrl,
           });
           setLoading(false);

@@ -1,14 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
+import { AxiosError } from 'axios';
 import { IUploadFileResp } from 'types/IUploadFileResp';
 
 export const uploadFile = createAsyncThunk(
   'images/uploadFile',
   async (formData: FormData) => {
-    const resp = await instance.post<IUploadFileResp>('/upload/file', formData);
-console.log(resp.data);
-
-    return resp.data;
+    try {
+      const resp = await instance.post<IUploadFileResp | undefined>('/upload/file', formData);
+      
+      console.log(resp);
+      return resp.data;
+      
+    } catch (error: any) {
+      const serverErr = error.response?.data
+      throw new Error(serverErr.message)
+    }
   },
 );
 

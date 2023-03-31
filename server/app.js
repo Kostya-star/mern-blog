@@ -21,9 +21,18 @@ app.use(express.json())
 
 const multerMid = multer({
   storage: multer.memoryStorage(),
-    // limits: {
-  //   fileSize: 5 * 1024 * 1024,
+  // limits: {
+  //   fileSize: 10 * 1024 * 1024, // 10 MB
   // },
+  // fileFilter: (req, file, cb) => {
+  //   if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+  //     return cb(new Error('Only images are allowed.'), false)
+  //   }
+  //   if (file.size > 10 * 1024 * 1024) {
+  //     return cb(new Error("File can't be larger than 10MB."), false)
+  //   }
+  //   cb(null, true)
+  // }
 })
 
 app.use(cors())

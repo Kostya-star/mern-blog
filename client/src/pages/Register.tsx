@@ -1,5 +1,6 @@
 import { ReactComponent as AvatarPlusSVG } from 'assets/avatar_plus.svg';
 import { ReactComponent as CloseSVG } from 'assets/close.svg';
+import { AxiosError } from 'axios';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
@@ -59,21 +60,25 @@ export const Register = () => {
     }
   };
 
-  const onUploadAvatar = (
+  const onUploadAvatar = async (
     e: ChangeEvent<HTMLInputElement>,
     setFieldValue: (field: string, val: any) => void,
   ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('isRegistering', true.toString());
-
-      dispatch(uploadFile(formData))
-        .unwrap()
-        .then(({ url }) => {
-          setFieldValue('avatarUrl', url);
-        });
+    try {
+      const file = e.target.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('isRegistering', true.toString());
+  
+        const data = await dispatch(uploadFile(formData)).unwrap()
+        if(data) {
+          setFieldValue('avatarUrl', data.url);
+          setServerError('')
+        };
+      }
+    } catch (error: any) {
+      setServerError(error.message)
     }
   };
 

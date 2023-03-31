@@ -8,10 +8,7 @@ export const uploadFile = createAsyncThunk(
   async (formData: FormData) => {
     try {
       const resp = await instance.post<IUploadFileResp | undefined>('/upload/file', formData);
-      
-      console.log(resp);
       return resp.data;
-      
     } catch (error: any) {
       const serverErr = error.response?.data
       throw new Error(serverErr.message)

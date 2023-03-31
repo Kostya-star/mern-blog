@@ -43,9 +43,9 @@ export const CreatePost = () => {
   });
 
   const [isLoading, setLoading] = useState(false);
+  const [imageError, setImageError] = useState('')
 
   const imageRef = useRef<HTMLInputElement | null>(null);
-console.log(newPost);
 
   useEffect(() => {
     if (id) {
@@ -90,20 +90,24 @@ console.log(newPost);
     }
   };
 
-  const onUploadFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      dispatch(uploadFile(formData))
-        .unwrap()
-        .then(({ url }) => {
+  const onUploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = e.target.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+  
+        const data = await dispatch(uploadFile(formData)).unwrap()
+        if(data) {
           setNewPost({
             ...newPost,
-            imageUrl: url,
+            imageUrl: data.url,
           });
-        });
+          setImageError('')
+        }
+      }
+    } catch (error: any) {
+      setImageError(error.message);
     }
   };
 
@@ -147,6 +151,10 @@ console.log(newPost);
           </div>
         )}
         <input ref={imageRef} type="file" onChange={onUploadFile} hidden />
+
+        {imageError && (
+          <div className="createPost__requiredErr">{ imageError }</div>
+        )}
 
         <TextArea
           placeholder="Post title..."

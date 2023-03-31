@@ -40,6 +40,8 @@ export const Comments: FC<ICommentsProps> = () => {
   const [fullCommentImage, setFullCommentImage] = useState('');
   const [isCommCreating, setCommCreating] = useState(false);
 
+  const [serverError, setServerError] = useState('')
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sidebarCommentsRef = useRef<HTMLDivElement>(null);
   const commentFileRef = useRef<HTMLInputElement>(null);
@@ -85,19 +87,28 @@ export const Comments: FC<ICommentsProps> = () => {
   };
 
   const onUploadCommentImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    setCommCreating(true)
-    const file = e.target.files?.[0];
-
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      await dispatch(uploadFile(formData))
-        .unwrap()
-        .then(({ url }) => {
-          setCommentImage(url);
-          setCommCreating(false)
-        });
+    try {
+      setCommCreating(true)
+      const file = e.target.files?.[0];
+  
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+  
+        await dispatch(uploadFile(formData))
+          .unwrap()
+          .then((data) => {
+            if(data) {
+              setCommentImage(data.url);
+              // setCommCreating(false)
+              setServerError('')
+            }
+          });
+      }
+    } catch (error: any) {
+      setServerError(error.message);
+    } finally {
+      setCommCreating(false)
     }
   };
 
@@ -170,6 +181,10 @@ export const Comments: FC<ICommentsProps> = () => {
                   </div>
                 )}
               </div>
+
+              {serverError && (
+                  <div className="input input_error">{serverError}</div>
+                )}
 
               <div className={s.comments__create__buttons}>
                 {isCommCreating && (

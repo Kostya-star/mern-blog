@@ -1,17 +1,17 @@
-import { ErrorMessage, Form, Formik } from 'formik';
-import { useState, useRef, ChangeEvent } from 'react';
-import { useAppSelector } from 'redux/hooks';
-import { updateUser } from 'redux/slices/auth';
-import * as Yup from 'yup';
-import { useAppDispatch } from './../redux/hooks';
-import { ReactComponent as AvatarDefaultSVG } from 'assets/avatar.svg';
 import { ReactComponent as ArrowLeftSVG } from 'assets/arrow-left.svg';
+import { Avatar } from 'components/Avatar/Avatar';
 import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { InputPassword } from 'components/UI/InputPassword/InputPassword';
+import { Loader } from 'components/UI/Loader/Loader';
+import { ErrorMessage, Form, Formik } from 'formik';
+import { ChangeEvent, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from 'redux/hooks';
+import { updateUser } from 'redux/slices/auth';
 import { uploadFile } from 'redux/slices/files';
-import { Avatar } from 'components/Avatar/Avatar';
+import * as Yup from 'yup';
+import { useAppDispatch } from './../redux/hooks';
 
 interface IUserUpdatedValues {
   fullName: string;
@@ -48,7 +48,14 @@ const validationSchema = Yup.object().shape({
 export const ProfileEdit = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUser = useAppSelector(({ auth }) => auth.data);
+
+  const { currentUser, imageUploadStatus, authStatus } = useAppSelector(
+    ({ auth, files }) => ({
+      currentUser: auth.data,
+      imageUploadStatus: files.status,
+      authStatus: auth.status,
+    }),
+  );
 
   const initialValues = {
     fullName: currentUser?.fullName,
@@ -61,28 +68,21 @@ export const ProfileEdit = () => {
 
   const inputFileRef = useRef<HTMLInputElement>(null);
 
-  // const [image, setImage] = useState(currentUser?.avatarUrl);
-
-  const [serverError, setServerError] = useState('');
+  const [serverError, setServerError] = useState({
+    formError: '',
+    imageError: '',
+  });
 
   const onUpdateUserProfile = async (values: IUserUpdatedValues) => {
     try {
-      // const { fullName, email, password, avatarUrl } = values;
-
-      // const formData = new FormData();
-      // formData.append('fullName', fullName);
-      // formData.append('email', email);
-      // formData.append('password', password);
-      // formData.append('image', image || '');
-
       const resp = await dispatch(updateUser(values)).unwrap();
 
       if (resp) {
-        setServerError('');
+        setServerError({ formError: '', imageError: '' });
         alert('Profile is successfully updated!');
       }
     } catch (error: any) {
-      setServerError(error.message);
+      setServerError({ ...serverError, formError: error.message });
     }
   };
 
@@ -92,15 +92,21 @@ export const ProfileEdit = () => {
   ) => {
     event.preventDefault();
 
-    const file = event.target?.files?.[0];
+    try {
+      const file = event.target?.files?.[0];
 
-    if(file) {
-      const formData = new FormData()
-      formData.append('file', file)
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      await dispatch(uploadFile(formData)).unwrap().then(({ url }) => {
-        setFieldValue('avatarUrl', url);
-      })
+        const data = await dispatch(uploadFile(formData)).unwrap();
+        if (data) {
+          setFieldValue('avatarUrl', data.url);
+          setServerError({ ...serverError, imageError: '' });
+        }
+      }
+    } catch (error: any) {
+      setServerError({ ...serverError, imageError: error.message });
     }
   };
 
@@ -110,6 +116,7 @@ export const ProfileEdit = () => {
   ) => {
     e.preventDefault();
     setFieldValue('avatarUrl', '');
+    setServerError({ ...serverError, imageError: '' });
   };
 
   return (
@@ -143,12 +150,22 @@ export const ProfileEdit = () => {
             setFieldValue,
             isSubmitting,
           }) => {
-            console.log(values);
+            // console.log(values);
             return (
               <Form onSubmit={handleSubmit}>
                 <div className="profileEdit__form">
                   <div className="profileEdit__form__image">
-                    <Avatar avatar={values.avatarUrl}/>
+                    {imageUploadStatus === 'loading' ? (
+                      <Loader className="loader_big" />
+                    ) : (
+                      <Avatar avatar={values.avatarUrl} />
+                    )}
+                    {serverError.imageError && (
+                      <div className="input_error">
+                        {serverError.imageError}
+                      </div>
+                    )}
+
                     <Button
                       text="Change photo"
                       className="button button_transparent"
@@ -263,19 +280,27 @@ export const ProfileEdit = () => {
                       />
                     </label>
 
-                    {serverError && (
-                      <div className="input input_error">{serverError}</div>
+                    {serverError.formError && (
+                      <div className="input input_error">
+                        {serverError.formError}
+                      </div>
                     )}
 
-                    <Button
-                      type="submit"
-                      text="Save changes"
-                      className={`button ${
-                        isValid && dirty ? 'button_colored' : 'button_disabled'
-                      }`}
-                      disabled={!(isValid && dirty)}
-                      // disabled={!isValid || !dirty}
-                    />
+                    {authStatus === 'loading' ? (
+                      <Loader className="loader_mini" />
+                    ) : (
+                      <Button
+                        type="submit"
+                        text="Save changes"
+                        className={`button ${
+                          isValid && dirty
+                            ? 'button_colored'
+                            : 'button_disabled'
+                        }`}
+                        disabled={!(isValid && dirty)}
+                        // disabled={!isValid || !dirty}
+                      />
+                    )}
                   </div>
                 </div>
               </Form>

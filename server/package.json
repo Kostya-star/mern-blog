@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "concurrently \"nodemon app.js\" \"nodemon socket.js\""
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",

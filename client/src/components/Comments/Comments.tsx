@@ -7,20 +7,31 @@ import { Button } from 'components/UI/Button/Button';
 import { Loader } from 'components/UI/Loader/Loader';
 import { Modal } from 'components/UI/Modal/Modal';
 import { TextArea } from 'components/UI/TextArea/TextArea';
-import { ChangeEvent, FC, useRef, useState } from 'react';
+import { ChangeEvent, FC, useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import {
+  addComment,
   clearCommentsSlice,
   createComment,
+  deleteComment,
+  likeComment,
+  removeComment,
+  updateComm,
   updateComment,
+  updateCommentLike,
 } from 'redux/slices/comments';
 import { uploadFile } from 'redux/slices/files';
 import { createTimeSince } from 'utils/createTimeSince';
 import { MemoizedCommentItem } from './CommentItem/CommentItem';
 import s from './Comments.module.scss';
+import io from 'socket.io-client'
+import { baseUrl } from 'API/baseUrl';
+import { IComment } from 'types/IComment';
 
 interface ICommentsProps {}
+
+const socket = io(baseUrl)
 
 export const Comments: FC<ICommentsProps> = () => {
   const isAuth = useAppSelector(isAuthSelector);
@@ -39,6 +50,7 @@ export const Comments: FC<ICommentsProps> = () => {
   const [commentImage, setCommentImage] = useState<string>('');
   const [fullCommentImage, setFullCommentImage] = useState('');
   const [isCommCreating, setCommCreating] = useState(false);
+  const [isCommDeleting, setCommDeleting] = useState(false);
 
   const [serverError, setServerError] = useState('')
 
@@ -46,35 +58,95 @@ export const Comments: FC<ICommentsProps> = () => {
   const sidebarCommentsRef = useRef<HTMLDivElement>(null);
   const commentFileRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    socket.on('newComment', async (newComm: IComment) => {
+      if(newComm.post === postId) {
+        const resp = await dispatch(addComment(newComm))
+        if(resp) {
+          const parentNode = sidebarCommentsRef.current?.parentNode as HTMLElement;
+          if (parentNode) {
+            parentNode.scrollTop = parentNode.scrollHeight;
+          }
+        }
+      } 
+    })
+
+    socket.on('updateComment', updatedComment => {
+      dispatch(updateComm(updatedComment))
+    })
+
+    socket.on('likeComment', resp => {
+      dispatch(updateCommentLike(resp))
+    })
+
+    socket.on('deleteComment', commId => {
+      dispatch(removeComment({ id: commId }))
+    })
+
+    return () => {
+      socket.off('newComment')
+      socket.off('updateComment')
+      socket.off('likeComment')
+      socket.off('deleteComment')
+    }
+  }, [socket])
+
   const onSubmitComment = async () => {
-    setCommCreating(true);
-
-    const comment = {
-      text: commentText.text.trim() || '',
-      postId,
-      imageUrl: commentImage,
-    };
-
-    if (commentText.id) {
-      dispatch(updateComment({ comment, commId: commentText.id })).then(() =>
-      setCommCreating(false),
-      );
+    try {
+      setCommCreating(true);
+  
+      const comment = {
+        text: commentText.text.trim() || '',
+        postId,
+        imageUrl: commentImage,
+      };
+      
+      // UPDATING COMMENT
+      if (commentText.id) {
+        const updatedComm = await dispatch(updateComment({ comment, commId: commentText.id })).unwrap()
+        if(updatedComm) {
+          socket.emit('updateComment', updatedComm)
+        }
+        
+        return;
+      }
+      
+      // CREATING COMMENT
+      const newComm = await dispatch(createComment(comment)).unwrap()
+      if(newComm) {
+        socket.emit('newComment', newComm)
+      }
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+      
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCommCreating(false);
       setCommentText({ id: '', text: '' });
       setCommentImage('');
-      return;
     }
+  };
+  
+  const onLikeComment = async (commId: string) => {
+    const resp = await dispatch(likeComment(commId)).unwrap();
+    if(resp) {
+      socket.emit('likeComment', resp)
+    }
+  };
 
-    dispatch(createComment(comment)).then(() => {
-      const parentNode = sidebarCommentsRef.current?.parentNode as HTMLElement;
-      if (parentNode) {
-        parentNode.scrollTop = parentNode.scrollHeight;
+  const onDeleteComment = async (commId: string) => {
+    try {
+      setCommDeleting(true);
+      const resp = await dispatch(deleteComment(commId)).unwrap()
+      if(resp) {
+        socket.emit('deleteComment', resp.id)
       }
-      setCommCreating(false);
-    });
-    setCommentText({ id: '', text: '' });
-    setCommentImage('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCommDeleting(false);
     }
   };
 
@@ -138,9 +210,12 @@ export const Comments: FC<ICommentsProps> = () => {
                   comment={comment}
                   commRef={sidebarCommentsRef}
                   creationTime={creationTime}
+                  isCommDeleting={isCommDeleting}
                   setCommentText={setCommentText}
                   setCommentImage={setCommentImage}
                   onShowFullImage={setFullCommentImage}
+                  onDeleteComment={onDeleteComment}
+                  onLikeComment={onLikeComment}
                 />
               );
             })

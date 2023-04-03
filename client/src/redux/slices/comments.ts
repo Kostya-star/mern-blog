@@ -76,7 +76,7 @@ export const likeComment = createAsyncThunk(
     const { data } = await instance.post<ILikeCommResp>(`/comments/like`, {
       commId,
     });
-    thunkApi.dispatch(updateCommentLike(data));
+    return data
   },
 );
 
@@ -119,6 +119,26 @@ export const commentsSlice = createSlice({
         );
       }
     },
+    addComment: (state, action: PayloadAction<IComment>) => {
+      state.comments = [...state.comments, action.payload];
+    },
+    updateComm: (state, action: PayloadAction<IComment>) => {
+      const updatedComm = action.payload;
+          
+      state.comments = state.comments.map((comment) => {
+        if (comment._id === updatedComm._id) {
+          return updatedComm;
+        }
+
+        return comment;
+      });
+    },
+    removeComment: (state, action: PayloadAction<{id: string}>) => {
+      const deletedCommId = action.payload.id
+      state.comments = state.comments.filter(
+        (comment) => comment._id !== deletedCommId,
+      );
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -149,7 +169,7 @@ export const commentsSlice = createSlice({
         createComment.fulfilled,
         (state, action: PayloadAction<IComment>) => {
           state.status = 'success';
-          state.comments = [...state.comments, action.payload];
+          // state.comments = [...state.comments, action.payload];
         },
       )
       .addCase(createComment.rejected, (state) => {
@@ -162,16 +182,6 @@ export const commentsSlice = createSlice({
         updateComment.fulfilled,
         (state, action: PayloadAction<IComment>) => {
           state.status = 'success';
-
-          const updatedComm = action.payload;
-
-          state.comments = state.comments.map((comment) => {
-            if (comment._id === updatedComm._id) {
-              return updatedComm;
-            }
-
-            return comment;
-          });
         },
       )
       .addCase(updateComment.rejected, (state) => {
@@ -183,14 +193,14 @@ export const commentsSlice = createSlice({
         deleteComment.fulfilled,
         (state, action: PayloadAction<{ id: string }>) => {
           state.status = 'success';
-          state.comments = state.comments.filter(
-            (comment) => comment._id !== action.payload.id,
-          );
+          // state.comments = state.comments.filter(
+          //   (comment) => comment._id !== action.payload.id,
+          // );
         },
       );
   },
 });
 
-export const { clearCommentsSlice, updateCommentLike } = commentsSlice.actions;
+export const { clearCommentsSlice, updateCommentLike, addComment, updateComm, removeComment } = commentsSlice.actions;
 
 export default commentsSlice.reducer;

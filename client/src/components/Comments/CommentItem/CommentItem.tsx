@@ -15,23 +15,27 @@ interface ICommentItemProps {
   comment: IComment;
   commRef: LegacyRef<HTMLDivElement>;
   creationTime: string;
+  isCommDeleting: boolean
   setCommentText: ({ id, text }: { id: string; text: string }) => void;
   setCommentImage: (imgUrl: string) => void;
-  onShowFullImage: (imgBase64: string) => void;
+  onShowFullImage: (imgUrl: string) => void;
+  onDeleteComment: (commId: string) => void
+  onLikeComment: (commId: string) => void
 }
 
 export const CommentItem: FC<ICommentItemProps> = ({
   comment,
   commRef,
   creationTime,
+  isCommDeleting,
   setCommentText,
   setCommentImage,
   onShowFullImage,
+  onDeleteComment,
+  onLikeComment
 }) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [isCommDeleting, setCommDeleting] = useState(false);
 
   const { isLiked, likeCount, isShowEditDelete } = useAppSelector(
     ({ auth }) => ({
@@ -41,21 +45,11 @@ export const CommentItem: FC<ICommentItemProps> = ({
     }),
   );
 
-  const onLikeComment = (commId: string) => {
-    dispatch(likeComment(commId));
-  };
-
-  const onDeleteComment = (commId: string) => {
-    setCommDeleting(true);
-    dispatch(deleteComment(commId)).then(() => {
-      setCommDeleting(false);
-    });
-  };
-
   const onEditComment = () => {
     setCommentText({ id: comment._id, text: comment.text });
     setCommentImage(comment.imageUrl);
   };
+
 
   const onRedirectAboutProfile = () => {
     navigate(`/profile/about/${comment.user._id}`);

@@ -9,6 +9,7 @@ import commentsRouters from './routes/comments-routes.js'
 import profileRouters from './routes/profile-routes.js'
 import multer from 'multer'
 import imageRoutes from './routes/image-routes.js'
+import chatsRouters from './routes/chats-routes.js'
 import cors from 'cors';
 import http from 'http'
 import { Server } from 'socket.io'
@@ -33,6 +34,7 @@ app.use('/auth', authRouters)
 app.use('/posts', postsRouters)
 app.use('/comments', commentsRouters)
 app.use('/profile', profileRouters)
+app.use('/chats', chatsRouters)
 app.use('/tags', tagsRouters)
 app.use('/upload', multerMid.single('file'), imageRoutes)
 

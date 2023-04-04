@@ -1,7 +1,6 @@
 .messanger {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  border-radius: 50px;
   // justify-content: space-between;
   
   // ALL CHATS + SEARCH INPUT
@@ -13,6 +12,7 @@
       padding: 20px;
       input {
         padding: 5px;
+        color: black;
         background-color: rgb(211, 211, 211);
       }
     }

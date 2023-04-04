@@ -1,6 +1,7 @@
 import { CreatePost } from 'pages/CreatePost';
 import { Home } from 'pages/Home';
 import { Login } from 'pages/Login';
+import { Messanger } from 'pages/Messanger';
 import { ProfileAbout } from 'pages/ProfileAbout';
 import { ProfileEdit } from 'pages/ProfileEdit';
 import { Register } from 'pages/Register';
@@ -34,6 +35,7 @@ export const AppRouter = () => {
               <Route path="/posts/:id/edit" element={<CreatePost />} />
               <Route path="/profile/about" element={<ProfileAbout />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
+              <Route path="/messanger" element={<Messanger />} />
             </>
           )}
 

@@ -1,0 +1,28 @@
+.chatItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid black;
+  &__img {
+    // margin-right: 15px;
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+  }
+
+  &__body {
+    margin-right: 30px;
+    // last message
+    p {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  }
+
+  &__timestamp {
+    display: flex;
+    flex-direction: column;
+  }
+}

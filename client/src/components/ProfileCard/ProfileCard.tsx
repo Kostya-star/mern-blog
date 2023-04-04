@@ -53,9 +53,15 @@ export const ProfileCard: FC<IProfileCardProps> = ({
                   }`}
                   onClick={() => onFollowUser({ userId: profileUser._id })}
                 />
-                {/* <Button text="Message" className="button button_follow" /> */}
               </>
             ))}
+            {
+              profileUser._id !== currentUserId && (
+                <Link to='/messanger'>
+                  <Button text="Message" className="button button_follow" />
+                </Link>
+              )
+            }
             {
               profileUser._id === currentUserId && (
                 <Link to='/profile/edit'>

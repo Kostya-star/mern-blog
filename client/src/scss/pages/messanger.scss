@@ -1,0 +1,52 @@
+.messanger {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  border-radius: 50px;
+  // justify-content: space-between;
+  
+  // ALL CHATS + SEARCH INPUT
+  .chats {
+    color: white;
+    background-color: rgb(78, 78, 200);
+
+    &__search {
+      padding: 20px;
+      input {
+        padding: 5px;
+        background-color: rgb(211, 211, 211);
+      }
+    }
+
+    &__list {
+      // display: flex;
+      // flex-direction: column;
+      // gap: 20px;
+    }
+  }
+
+  // CURRENT CHAT
+  .currentChat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    // width: 100%;
+    &__heading {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      background-color: rgb(213, 212, 212);
+    }
+
+    &__body {
+      height: 100%;
+      background-color: white;
+    }
+    
+    &__footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      background-color: rgb(213, 212, 212);
+    }
+  }
+}

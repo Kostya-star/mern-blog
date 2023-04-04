@@ -3,6 +3,10 @@
   justify-content: space-between;
   padding: 15px;
   border-bottom: 1px solid black;
+
+  &__group {
+    display: flex;
+  }
   &__img {
     // margin-right: 15px;
     img {
@@ -14,6 +18,10 @@
 
   &__body {
     margin-right: 30px;
+    span {
+      font-size: 12px;
+      font-weight: 400;
+    }
     // last message
     p {
       margin-top: 10px;
@@ -24,5 +32,8 @@
   &__timestamp {
     display: flex;
     flex-direction: column;
+    span {
+      font-size: 11px;
+    }
   }
 }

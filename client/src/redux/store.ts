@@ -5,6 +5,7 @@ import authReducer from './slices/auth';
 import commentsReducer from './slices/comments';
 import profileReducer from './slices/userProfile'
 import filesReducer from './slices/files'
+import messangerReducer from './slices/messanger'
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
     comments: commentsReducer,
     auth: authReducer,
     profile: profileReducer,
-    files: filesReducer
+    files: filesReducer,
+    messanger: messangerReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

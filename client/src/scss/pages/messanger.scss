@@ -2,11 +2,13 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   // justify-content: space-between;
+  min-height: 50vh;
   
   // ALL CHATS + SEARCH INPUT
   .chats {
     color: white;
-    background-color: rgb(78, 78, 200);
+    // background-color: rgb(78, 78, 200);
+    background-color: rgb(95, 92, 92);
 
     &__search {
       padding: 20px;

@@ -35,7 +35,7 @@ export const AppRouter = () => {
               <Route path="/posts/:id/edit" element={<CreatePost />} />
               <Route path="/profile/about" element={<ProfileAbout />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/messanger" element={<Messanger />} />
+              <Route path="/messanger/:id" element={<Messanger />} />
             </>
           )}
 

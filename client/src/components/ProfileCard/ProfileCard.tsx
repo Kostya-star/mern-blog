@@ -57,7 +57,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
             ))}
             {
               profileUser._id !== currentUserId && (
-                <Link to='/messanger'>
+                <Link to={`/messanger/${profileUser._id}`}>
                   <Button text="Message" className="button button_follow" />
                 </Link>
               )

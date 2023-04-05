@@ -28,6 +28,7 @@ import s from './Comments.module.scss';
 import io from 'socket.io-client'
 import { baseUrl } from 'API/baseUrl';
 import { IComment } from 'types/IComment';
+import { scrollToBottom } from 'utils/scrollToBottom';
 
 interface ICommentsProps {}
 
@@ -59,16 +60,17 @@ export const Comments: FC<ICommentsProps> = () => {
   const commentFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    scrollToBottom(sidebarCommentsRef)
+  }, [])
+
+  useEffect(() => {
     socket.on('newComment', async (newComm: IComment) => {
       if(newComm.post === postId) {
         const resp = await dispatch(addComment(newComm))
         if(resp) {
-          const parentNode = sidebarCommentsRef.current?.parentNode as HTMLElement;
-          if (parentNode) {
-            parentNode.scrollTop = parentNode.scrollHeight;
-          }
+          scrollToBottom(sidebarCommentsRef)
         }
-      } 
+      }
     })
 
     socket.on('updateComment', updatedComment => {
@@ -94,23 +96,23 @@ export const Comments: FC<ICommentsProps> = () => {
   const onSubmitComment = async () => {
     try {
       setCommCreating(true);
-  
+
       const comment = {
         text: commentText.text.trim() || '',
         postId,
         imageUrl: commentImage,
       };
-      
+
       // UPDATING COMMENT
       if (commentText.id) {
         const updatedComm = await dispatch(updateComment({ comment, commId: commentText.id })).unwrap()
         if(updatedComm) {
           socket.emit('updateComment', updatedComm)
         }
-        
+
         return;
       }
-      
+
       // CREATING COMMENT
       const newComm = await dispatch(createComment(comment)).unwrap()
       if(newComm) {
@@ -119,7 +121,7 @@ export const Comments: FC<ICommentsProps> = () => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-      
+
     } catch (error) {
       console.log(error);
     } finally {
@@ -128,7 +130,7 @@ export const Comments: FC<ICommentsProps> = () => {
       setCommentImage('');
     }
   };
-  
+
   const onLikeComment = async (commId: string) => {
     const resp = await dispatch(likeComment(commId)).unwrap();
     if(resp) {
@@ -162,11 +164,11 @@ export const Comments: FC<ICommentsProps> = () => {
     try {
       setCommCreating(true)
       const file = e.target.files?.[0];
-  
+
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-  
+
         await dispatch(uploadFile(formData))
           .unwrap()
           .then((data) => {

@@ -66,13 +66,24 @@ const getChatMessages = async (req, res) => {
   try {
     const { chatId } = req.params
 
-    if(!chatId) {
+    if (!chatId) {
       return res.status(400).json({
         message: 'No chat id'
       })
     }
 
-    const messages = await MessageModel.find({ chat: chatId }).populate('sender', '-hashedPassword')
+    const messages = await MessageModel.find({ chat: chatId })
+      .populate({
+        path: 'chat',
+        populate: {
+          path: 'latestMessage',
+          populate: {
+            path: 'sender',
+            select: '-hashedPassword'
+          }
+        }
+      })
+      .populate('sender', '-hashedPassword');
 
     res.json(messages)
   } catch (error) {

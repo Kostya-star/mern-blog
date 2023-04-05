@@ -3,15 +3,17 @@ import { ChatItem } from 'components/ChatItem/ChatItem';
 import { ChatMessage } from 'components/ChatMessage/ChatMessage';
 import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
   accessChat,
+  addMessage,
   getAllChats,
   getChatMessages,
   sendMessage,
 } from 'redux/slices/messanger';
+import { scrollToBottom } from 'utils/scrollToBottom';
 
 export const Messanger = () => {
   // const [searchChatsVal, setSearchChatsVal] = useState('');
@@ -58,6 +60,8 @@ export const Messanger = () => {
 
   const [newMessage, setNewMessage] = useState('');
 
+  const lastChatMessageRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (id) {
       (async () => {
@@ -68,18 +72,26 @@ export const Messanger = () => {
   }, []);
 
   useEffect(() => {
-    if (currentChat) {
-      dispatch(getChatMessages(currentChat._id));
-    }
-  }, [currentChat]);
+    (async () => {
+      if (currentChat) {
+        await dispatch(getChatMessages(currentChat._id));
 
-  const onSendMessage = () => {
+        scrollToBottom(lastChatMessageRef)
+      }
+    })()
+  }, [currentChat?._id]);
+  
+  const onSendMessage = async () => {
     const message = {
       chat: currentChat?._id as string,
       text: newMessage,
       imageUrl: '',
     };
-    dispatch(sendMessage(message));
+    setNewMessage('')
+    const createdMessage = await dispatch(sendMessage(message)).unwrap();
+    await dispatch(addMessage(createdMessage))
+    
+    scrollToBottom(lastChatMessageRef)
   };
 
   return (
@@ -148,27 +160,21 @@ export const Messanger = () => {
             (chatMessages?.length ? (
               chatMessages.map((message, ind) => {
                 const isMyMessage = message.sender._id === currentUserId
-                // const isFirstUserMessage = message.sender._id !== chatMessages[ind - 1]?.sender._id
-                // const isSameUserMessage = message.sender._id === chatMessages[ind - 1]?.sender._id
 
-                const isSameSender = ind < chatMessages.length - 1 &&
-                (chatMessages[ind + 1].sender._id !== message.sender._id ||
-                  chatMessages[ind + 1].sender._id === undefined) &&
-                  chatMessages[ind].sender._id !== currentUserId
+                  const isLastUserMessage = chatMessages[ind + 1]?.sender._id !== message.sender._id ||
+                  chatMessages[ind + 1].sender._id === undefined
 
-                  const isLastMessage = ind === chatMessages.length - 1 &&
-                  chatMessages[chatMessages.length - 1].sender._id !== currentUserId &&
-                  Boolean(chatMessages[chatMessages.length - 1].sender._id)
+                  const isSameUserMessage = ind < chatMessages.length - 1 && 
+                  chatMessages[ind + 1].sender._id === message.sender._id
 
                 return (
                   <ChatMessage
                     key={message._id}
                     message={message}
                     isMyMessage={isMyMessage}
-                    // isFirstUserMessage={isFirstUserMessage}
-                    // isSameUserMessage={isSameUserMessage}
-                    isSameSender={isSameSender}
-                    isLastMessage={isLastMessage}
+                    isSameUserMessage={isSameUserMessage}
+                    isLastUserMessage={isLastUserMessage}
+                    messageRef={lastChatMessageRef}
                   />
                 );
               })

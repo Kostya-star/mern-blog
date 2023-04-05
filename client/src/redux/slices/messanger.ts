@@ -59,17 +59,40 @@ const initialState: MessangerState = {
 export const messangerSlice = createSlice({
   name: 'messanger',
   initialState,
-  reducers: {},
+  reducers: {
+    addMessage: (state, action: PayloadAction<IMessage>) => {
+      const newMessage = action.payload;
+
+      state.messages = [...state.messages, newMessage];
+
+      state.chats = state.chats.map((chat) => {
+        if (chat._id === newMessage.chat._id) {
+          return {
+            ...chat,
+            latestMessage: {
+              ...chat.latestMessage,
+              text: newMessage.text,
+              // createdAt: newMessage.createdAt,
+            },
+          };
+        }
+        return chat;
+      });
+    },
+  },
   extraReducers: (builder) => {
     builder
       // getAllChats
       .addCase(getAllChats.pending, (state) => {
         state.chatStatus = 'loading';
       })
-      .addCase(getAllChats.fulfilled, (state, action: PayloadAction<IChat[]>) => {
-        state.chats = action.payload
-        state.chatStatus = 'success';
-      })
+      .addCase(
+        getAllChats.fulfilled,
+        (state, action: PayloadAction<IChat[]>) => {
+          state.chats = action.payload;
+          state.chatStatus = 'success';
+        },
+      )
       .addCase(getAllChats.rejected, (state) => {
         state.chatStatus = 'error';
       })
@@ -78,16 +101,19 @@ export const messangerSlice = createSlice({
       .addCase(getChatMessages.pending, (state) => {
         state.messagesStatus = 'loading';
       })
-      .addCase(getChatMessages.fulfilled, (state, action: PayloadAction<IMessage[]>) => {
-        state.messages = action.payload
-        state.messagesStatus = 'success';
-      })
+      .addCase(
+        getChatMessages.fulfilled,
+        (state, action: PayloadAction<IMessage[]>) => {
+          state.messages = action.payload;
+          state.messagesStatus = 'success';
+        },
+      )
       .addCase(getChatMessages.rejected, (state) => {
         state.messagesStatus = 'error';
       });
   },
 });
 
-export const {} = messangerSlice.actions;
+export const { addMessage } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

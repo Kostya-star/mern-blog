@@ -1,4 +1,5 @@
 import ChatModel from "../models/chat-model.js";
+import MessageModel from "../models/message-model.js";
 import UserModel from "../models/user-model.js";
 
 const accessChat = async (req, res) => {
@@ -61,8 +62,82 @@ const getAllChats = async (req, res) => {
   }
 }
 
+const getChatMessages = async (req, res) => {
+  try {
+    const { chatId } = req.params
+
+    if(!chatId) {
+      return res.status(400).json({
+        message: 'No chat id'
+      })
+    }
+
+    const messages = await MessageModel.find({ chat: chatId }).populate('sender', '-hashedPassword')
+
+    res.json(messages)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when fetching the messages'
+    })
+  }
+} 
+
+const sendMessage = async (req, res) => {
+  try {
+    const { chat, text, imageUrl, userId } = req.body
+
+    if(!text && !imageUrl) {
+      return res.status(400).json({
+        message: 'Message text or image is required'
+      })
+    }
+
+    let message = new MessageModel({
+      chat,
+      sender: userId,
+      text,
+      imageUrl
+    })
+
+    await message.save()
+
+    message = await MessageModel.findById(message._id)
+      .populate([
+        {
+          path: 'sender',
+          select: '-hashedPassword'
+        },
+        {
+          path: 'chat',
+          populate: {
+            path: 'latestMessage',
+            populate: {
+              path: 'sender',
+              select: '-hashedPassword'
+            }
+          }
+        }
+      ]);
+
+    await ChatModel.findByIdAndUpdate(chat, {
+      latestMessage: message._id,
+    })
+
+    res.json(message)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when sending the message'
+    })
+  }
+}
+
+
 
 export default {
   accessChat,
-  getAllChats
+  getAllChats,
+  sendMessage,
+  getChatMessages
 }

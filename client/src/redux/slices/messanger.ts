@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IChat } from 'types/IChat';
+import { IMessage } from 'types/IMessage';
+import { INewMessageReq } from 'types/INewMessageReq';
 
 export const accessChat = createAsyncThunk(
   'messanger/getChat',
@@ -20,16 +22,38 @@ export const getAllChats = createAsyncThunk(
   },
 );
 
+export const getChatMessages = createAsyncThunk(
+  'messanger/getChatMessages',
+  async (chatId: string) => {
+    const resp = await instance.get<IMessage[]>(`/chats/${chatId}/messages`);
+
+    return resp.data;
+  },
+);
+
+export const sendMessage = createAsyncThunk(
+  'messanger/sendMessage',
+  async (message: INewMessageReq) => {
+    const resp = await instance.post<IMessage>(`/chats/message`, message);
+
+    return resp.data;
+  },
+);
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
-  chats: IChat[] | null;
-  status: Status;
+  chats: IChat[];
+  messages: IMessage[];
+  chatStatus: Status;
+  messagesStatus: Status;
 }
 
 const initialState: MessangerState = {
-  status: '',
   chats: [],
+  messages: [],
+  chatStatus: 'loading',
+  messagesStatus: 'loading'
 };
 
 export const messangerSlice = createSlice({
@@ -38,16 +62,28 @@ export const messangerSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // accessChat (either create a chat if there is no one, or get the existed chat)
+      // getAllChats
       .addCase(getAllChats.pending, (state) => {
-        state.status = 'loading';
+        state.chatStatus = 'loading';
       })
       .addCase(getAllChats.fulfilled, (state, action: PayloadAction<IChat[]>) => {
         state.chats = action.payload
-        state.status = 'success';
+        state.chatStatus = 'success';
       })
       .addCase(getAllChats.rejected, (state) => {
-        state.status = 'error';
+        state.chatStatus = 'error';
+      })
+
+      // GET CHAT MESSAGES
+      .addCase(getChatMessages.pending, (state) => {
+        state.messagesStatus = 'loading';
+      })
+      .addCase(getChatMessages.fulfilled, (state, action: PayloadAction<IMessage[]>) => {
+        state.messages = action.payload
+        state.messagesStatus = 'success';
+      })
+      .addCase(getChatMessages.rejected, (state) => {
+        state.messagesStatus = 'error';
       });
   },
 });

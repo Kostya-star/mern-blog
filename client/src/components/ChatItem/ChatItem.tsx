@@ -7,16 +7,17 @@ import { createTimeSince } from 'utils/createTimeSince';
 interface IChatItemProps {
   chat: IChat;
   currentUserId: string;
+  isActiveChat: boolean
 }
 
-export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId }) => {
+export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat }) => {
   const interlocutorUser = chat.participants.find(
     (user) => user._id !== currentUserId,
   );
   const creationTime = createTimeSince(new Date(chat.createdAt));
 
   return (
-    <div className={s.chatItem}>
+  <div className={`${s.chatItem} ${isActiveChat && s.chatItem_active}`} >
       <div className={s.chatItem__group}>
         <div className={s.chatItem__img}>
           <Avatar avatar={interlocutorUser?.avatarUrl as string} />

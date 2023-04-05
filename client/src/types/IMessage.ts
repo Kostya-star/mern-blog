@@ -1,8 +1,9 @@
+import { IChat } from "./IChat"
 import { IUser } from "./IUser"
 
 export interface IMessage {
   _id: string
-  chat: string
+  chat: IChat
   sender: IUser
   text?: string
   imageUrl?: string

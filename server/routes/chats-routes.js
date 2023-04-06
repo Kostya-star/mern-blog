@@ -9,6 +9,7 @@ router.get('', checkAuth, chatsController.getAllChats)
 
 router.get('/:chatId/messages', checkAuth, chatsController.getChatMessages)
 router.post('/message', checkAuth, chatsController.sendMessage)
+router.delete('/empty', checkAuth, chatsController.deleteEmptyChats)
 // router.delete('/chatId', checkAuth, chatsController.deleteUnusedChats)
 // router.post('', checkAuth, postsController.createPost)
 // router.patch('/:postId', checkAuth, postsController.updatePost)

@@ -40,6 +40,13 @@ export const sendMessage = createAsyncThunk(
   },
 );
 
+export const deleteEmptyChats = createAsyncThunk(
+  'messanger/deleteEmptyChats',
+  () => {
+    instance.delete(`/chats/empty`);
+  },
+);
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
@@ -53,7 +60,7 @@ const initialState: MessangerState = {
   chats: [],
   messages: [],
   chatStatus: 'loading',
-  messagesStatus: 'loading'
+  messagesStatus: 'loading',
 };
 
 export const messangerSlice = createSlice({
@@ -73,7 +80,7 @@ export const messangerSlice = createSlice({
               ...chat.latestMessage,
               text: newMessage.text,
               // createdAt: newMessage.createdAt,
-            },
+            } as IMessage,
           };
         }
         return chat;

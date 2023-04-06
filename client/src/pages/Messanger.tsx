@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
   accessChat,
   addMessage,
+  deleteEmptyChats,
   getAllChats,
   getChatMessages,
   sendMessage,
@@ -68,6 +69,10 @@ export const Messanger = () => {
         await dispatch(accessChat(id));
         await dispatch(getAllChats());
       })();
+    }
+
+    return () => {
+      dispatch(deleteEmptyChats())
     }
   }, []);
 

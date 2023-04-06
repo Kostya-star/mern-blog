@@ -52,7 +52,7 @@ const getAllChats = async (req, res) => {
     chats = await UserModel.populate(chats, {
       path: 'latestMessage.sender'
     })
-    
+
     res.json(chats)
   } catch (error) {
     console.log(error)
@@ -92,13 +92,13 @@ const getChatMessages = async (req, res) => {
       message: 'Error when fetching the messages'
     })
   }
-} 
+}
 
 const sendMessage = async (req, res) => {
   try {
     const { chat, text, imageUrl, userId } = req.body
 
-    if(!text && !imageUrl) {
+    if (!text && !imageUrl) {
       return res.status(400).json({
         message: 'Message text or image is required'
       })
@@ -144,11 +144,48 @@ const sendMessage = async (req, res) => {
   }
 }
 
+const deleteEmptyChats = async (req, res) => {
+  try {
+    const { userId } = req.body
+
+    const emptyChats = await ChatModel.aggregate([
+      {
+        $lookup: {
+          from: 'messages',
+          localField: '_id',
+          foreignField: 'chat',
+          as: 'messages',
+        },
+      },
+      {
+        $match: {
+          // 'participants': { $all: [userId] },
+          'messages': { $size: 0 },
+        },
+      },
+    ]);
+
+    const chatIds = emptyChats.map((chat) => chat._id);
+
+    await ChatModel.deleteMany({ 
+      participants: userId,
+      _id: { $in: chatIds } 
+    });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when deleting empty chats'
+    })
+  }
+}
+
 
 
 export default {
   accessChat,
   getAllChats,
   sendMessage,
-  getChatMessages
+  getChatMessages,
+  deleteEmptyChats
 }

@@ -34,6 +34,8 @@ import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 interface ICommentsProps {}
 
 const socket = io(baseUrl)
+// console.log(socket);
+
 
 export const Comments: FC<ICommentsProps> = () => {
   const isAuth = useAppSelector(isAuthSelector);

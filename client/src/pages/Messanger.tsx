@@ -1,3 +1,4 @@
+import { baseUrl } from 'API/baseUrl';
 import { ReactComponent as SendMessageSVG } from 'assets/send-message.svg';
 import { ChatItem } from 'components/ChatItem/ChatItem';
 import { ChatMessage } from 'components/ChatMessage/ChatMessage';
@@ -17,8 +18,14 @@ import {
   getChatMessages,
   sendMessage,
 } from 'redux/slices/messanger';
+import io from 'socket.io-client';
+import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 import { scrollToBottom } from 'utils/scrollToBottom';
+
+const socket = io(baseUrl)
+// console.log(socket);
+
 
 export const Messanger = () => {
   // const [searchChatsVal, setSearchChatsVal] = useState('');
@@ -68,6 +75,34 @@ export const Messanger = () => {
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
+  // useEffect(() => {
+  //   console.log('socket front');
+    
+  //   socket.on('receive message', async (newMessage: IMessage) => {
+  //     await dispatch(addMessage(newMessage));
+  //     scrollToBottom(lastChatMessageRef);
+  //   })
+
+  //   return () => {
+  //     socket.off('receive message')
+  //   }
+  // }, [socket])
+
+  useEffect(() => {
+    socket.emit('setup', currentUserId)
+    socket.on('connected', () => console.log('the current user is connected to socket io'))
+  }, [])
+
+  useEffect(() => {
+    socket.on('receive message', (newMessage) => {
+      dispatch(addMessage(newMessage));
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [socket])
+
   useEffect(() => {
     (async () => {
       if (id) {
@@ -86,11 +121,13 @@ export const Messanger = () => {
     (async () => {
       if (currentChat) {
         await dispatch(getChatMessages(currentChat._id));
+        socket.emit('join chat', currentChat._id)
 
         scrollToBottom(lastChatMessageRef);
       }
     })();
   }, [currentChat?._id]);
+
 
   const onSendMessage = async () => {
     const message = {
@@ -100,9 +137,8 @@ export const Messanger = () => {
     };
     setNewMessage('');
     const createdMessage = await dispatch(sendMessage(message)).unwrap();
-    await dispatch(addMessage(createdMessage));
+    socket.emit('send message', createdMessage)
 
-    scrollToBottom(lastChatMessageRef);
     messageInputRef.current?.focus();
 
     if (messageInputRef.current) {

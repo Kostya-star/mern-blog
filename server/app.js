@@ -14,7 +14,6 @@ import cors from 'cors';
 import http from 'http'
 import { Server } from 'socket.io'
 
-
 const app = express();
 app.use(cors())
 const server = http.createServer(app)
@@ -74,6 +73,37 @@ io.on('connection', (socket) => {
 
   socket.on('deleteComment', (commId) => {
     io.emit('deleteComment', commId)
+  })
+
+  // socket.on('send message', (newMessage) => {
+  //   newMessage.chat.participants.forEach(userId => {
+  //     socket.to(userId).emit('receive message', newMessage)
+  //   })
+  // })
+
+  socket.on('setup', (currentUserId) => {
+    socket.join(currentUserId)
+    socket.emit('connected')
+  })
+
+  // the room for the two users in one-on-one chat
+  socket.on('join chat', (roomId) => {
+    socket.join(roomId)
+    console.log('User joined room' + ' ' + roomId);
+  })
+
+  socket.on('send message', (newMessage) => {
+    const chat = newMessage.chat
+
+    if(!chat.participants.length) {
+      return console.log('chat.participants not defined');
+    } 
+
+    chat.participants.forEach(userId => {
+      if(userId === newMessage.sender._id) return
+
+      io.to(userId).emit('receive message', newMessage)
+    })
   })
 
   socket.on('disconnect', () => {

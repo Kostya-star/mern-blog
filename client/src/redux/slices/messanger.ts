@@ -86,6 +86,13 @@ export const messangerSlice = createSlice({
         return chat;
       });
     },
+
+    clearMessangerState: (state) => {
+      state.chats = []
+      state.messages = []
+      state.chatStatus = 'loading'
+      state.messagesStatus = 'loading'
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -121,6 +128,6 @@ export const messangerSlice = createSlice({
   },
 });
 
-export const { addMessage } = messangerSlice.actions;
+export const { addMessage, clearMessangerState } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

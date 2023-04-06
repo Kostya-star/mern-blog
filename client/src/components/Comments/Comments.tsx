@@ -29,6 +29,7 @@ import io from 'socket.io-client'
 import { baseUrl } from 'API/baseUrl';
 import { IComment } from 'types/IComment';
 import { scrollToBottom } from 'utils/scrollToBottom';
+import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 
 interface ICommentsProps {}
 
@@ -131,6 +132,11 @@ export const Comments: FC<ICommentsProps> = () => {
     }
   };
 
+  const onTypingCommentHandle = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setCommentText({ ...commentText, text: e.target.value });
+    extendTextAreaWhenTyping(e)
+  }
+
   const onLikeComment = async (commId: string) => {
     const resp = await dispatch(likeComment(commId)).unwrap();
     if(resp) {
@@ -232,11 +238,7 @@ export const Comments: FC<ICommentsProps> = () => {
                   placeholder="Write comment..."
                   value={commentText.text}
                   ref={textareaRef}
-                  onChange={(e) => {
-                    setCommentText({ ...commentText, text: e.target.value });
-                    e.target.style.height = 'auto';
-                    e.target.style.height = `${e.target.scrollHeight}px`;
-                  }}
+                  onChange={onTypingCommentHandle}
                 />
                 {commentText.text && !isAuth && (
                   <div className="input_error"> you are not authenticated!</div>

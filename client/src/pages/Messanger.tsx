@@ -3,17 +3,20 @@ import { ChatItem } from 'components/ChatItem/ChatItem';
 import { ChatMessage } from 'components/ChatMessage/ChatMessage';
 import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
-import { useEffect, useState, useRef } from 'react';
+import { TextArea } from 'components/UI/TextArea/TextArea';
+import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
   accessChat,
   addMessage,
+  clearMessangerState,
   deleteEmptyChats,
   getAllChats,
   getChatMessages,
   sendMessage,
 } from 'redux/slices/messanger';
+import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 import { scrollToBottom } from 'utils/scrollToBottom';
 
 export const Messanger = () => {
@@ -62,18 +65,20 @@ export const Messanger = () => {
   const [newMessage, setNewMessage] = useState('');
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (id) {
-      (async () => {
+    (async () => {
+      if (id) {
         await dispatch(accessChat(id));
-        await dispatch(getAllChats());
-      })();
-    }
+      }
+      await dispatch(getAllChats());
+    })();
 
     return () => {
-      dispatch(deleteEmptyChats())
-    }
+      dispatch(deleteEmptyChats());
+      dispatch(clearMessangerState());
+    };
   }, []);
 
   useEffect(() => {
@@ -81,22 +86,34 @@ export const Messanger = () => {
       if (currentChat) {
         await dispatch(getChatMessages(currentChat._id));
 
-        scrollToBottom(lastChatMessageRef)
+        scrollToBottom(lastChatMessageRef);
       }
-    })()
+    })();
   }, [currentChat?._id]);
-  
+
   const onSendMessage = async () => {
     const message = {
       chat: currentChat?._id as string,
       text: newMessage,
       imageUrl: '',
     };
-    setNewMessage('')
+    setNewMessage('');
     const createdMessage = await dispatch(sendMessage(message)).unwrap();
-    await dispatch(addMessage(createdMessage))
-    
-    scrollToBottom(lastChatMessageRef)
+    await dispatch(addMessage(createdMessage));
+
+    scrollToBottom(lastChatMessageRef);
+    messageInputRef.current?.focus();
+
+    if (messageInputRef.current) {
+      messageInputRef.current.style.height = 'auto';
+    }
+  };
+
+  const onTypingMessageHandle = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMessage(e.target.value);
+    extendTextAreaWhenTyping(e);
+
+    // user is typing message real time indicator
   };
 
   return (
@@ -148,57 +165,65 @@ export const Messanger = () => {
         </div>
       </div>
 
-      <div className="currentChat">
-        <div className="currentChat__heading">
-          <span>{currentChatInterlocutor?.fullName}</span>
-          <span>Delete svg</span>
+      {id ? (
+        <div className="currentChat">
+          <div className="currentChat__heading">
+            <span>{currentChatInterlocutor?.fullName}</span>
+            <span>Delete svg</span>
+          </div>
+
+          {/* CHAT MESSAGES */}
+          <div className="currentChat__messages">
+            {getMessagesStatus === 'loading' && (
+              <div className="loader_center">
+                <Loader className="loader_big" />
+              </div>
+            )}
+            {getMessagesStatus === 'success' &&
+              (chatMessages?.length ? (
+                chatMessages.map((message, ind) => {
+                  const isMyMessage = message.sender._id === currentUserId;
+
+                  const isLastUserMessage =
+                    chatMessages[ind + 1]?.sender._id !== message.sender._id ||
+                    chatMessages[ind + 1].sender._id === undefined;
+
+                  const isSameUserMessage =
+                    ind < chatMessages.length - 1 &&
+                    chatMessages[ind + 1].sender._id === message.sender._id;
+
+                  return (
+                    <ChatMessage
+                      key={message._id}
+                      message={message}
+                      isMyMessage={isMyMessage}
+                      isSameUserMessage={isSameUserMessage}
+                      isLastUserMessage={isLastUserMessage}
+                      messageRef={lastChatMessageRef}
+                    />
+                  );
+                })
+              ) : (
+                <div>NO MESSAGES</div>
+              ))}
+          </div>
+
+          <div className="currentChat__footer">
+            <TextArea
+              placeholder="type a message"
+              value={newMessage}
+              onChange={onTypingMessageHandle}
+              ref={messageInputRef}
+            />
+            <SendMessageSVG onClick={onSendMessage} />
+            <span>Attach svg</span>
+          </div>
         </div>
-
-{/* CHAT MESSAGES */}
-        <div className="currentChat__messages">
-          {getMessagesStatus === 'loading' && (
-            <div className="loader_center">
-              <Loader className="loader_big" />
-            </div>
-          )}
-          {getMessagesStatus === 'success' &&
-            (chatMessages?.length ? (
-              chatMessages.map((message, ind) => {
-                const isMyMessage = message.sender._id === currentUserId
-
-                  const isLastUserMessage = chatMessages[ind + 1]?.sender._id !== message.sender._id ||
-                  chatMessages[ind + 1].sender._id === undefined
-
-                  const isSameUserMessage = ind < chatMessages.length - 1 && 
-                  chatMessages[ind + 1].sender._id === message.sender._id
-
-                return (
-                  <ChatMessage
-                    key={message._id}
-                    message={message}
-                    isMyMessage={isMyMessage}
-                    isSameUserMessage={isSameUserMessage}
-                    isLastUserMessage={isLastUserMessage}
-                    messageRef={lastChatMessageRef}
-                  />
-                );
-              })
-            ) : (
-              <div>NO MESSAGES</div>
-            ))}
+      ) : (
+        <div className="chats__emptyBlock">
+          <h1>SELECT A CHAT FROM THE EXISTED OR CREATE A NEW CHAT(button for creating a new chat)</h1>
         </div>
-
-        <div className="currentChat__footer">
-          <Input
-            type="text"
-            placeholder="type a message"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-          />
-          <SendMessageSVG onClick={onSendMessage} />
-          <span>Attach svg</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

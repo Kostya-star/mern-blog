@@ -159,7 +159,6 @@ const deleteEmptyChats = async (req, res) => {
       },
       {
         $match: {
-          // 'participants': { $all: [userId] },
           'messages': { $size: 0 },
         },
       },
@@ -171,6 +170,10 @@ const deleteEmptyChats = async (req, res) => {
       participants: userId,
       _id: { $in: chatIds } 
     });
+
+    res.json({
+      success: 'All of the unused empty chats of the current user have been successfully deleted'
+    })
 
   } catch (error) {
     console.log(error)

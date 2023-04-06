@@ -24,6 +24,14 @@
       // flex-direction: column;
       // gap: 20px;
     }
+
+    &__emptyBlock {
+      height: 100%;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   // CURRENT CHAT

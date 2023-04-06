@@ -9,6 +9,7 @@ import s from './Navigation.module.scss';
 import { ReactComponent as ArrowDownSVG } from 'assets/arrow-down.svg';
 import { ReactComponent as UserAboutSVG } from 'assets/about-profile.svg';
 import { ReactComponent as SignOutSVG } from 'assets/sign-out.svg';
+import { ReactComponent as ChatSVG } from 'assets/message.svg';
 import { useRef, useState, useEffect } from 'react';
 
 export const Navigation = () => {
@@ -72,6 +73,9 @@ export const Navigation = () => {
               </>
             ) : (
               <>
+              <Link to={`/messanger`} className={s.chat}>
+                <ChatSVG/>
+              </Link>
                 <div
                   className={s.navigation__profile}
                   onClick={() => setShowDropdown(!isShowDropdown)}

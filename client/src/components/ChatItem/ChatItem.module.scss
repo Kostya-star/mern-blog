@@ -20,7 +20,7 @@
   }
 
   &__body {
-    margin-right: 30px;
+    // margin-right: 30px;
     span {
       font-size: 12px;
       font-weight: 400;
@@ -29,6 +29,10 @@
     p {
       margin-top: 10px;
       font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
     }
   }
 

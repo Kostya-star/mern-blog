@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, FocusEvent } from 'react';
 import s from './Input.module.scss'
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, ReactNode, LegacyRef } from 'react';
 
 interface InputProps {
   placeholder?: string
@@ -21,7 +21,7 @@ interface InputProps {
 export const Input:FC<InputProps> = ({ ...props }) => {
   return (
     <>
-      <input {...props} className={s.input}/>
+      <input {...props} className={s.input} />
     </>
   );
 };

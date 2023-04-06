@@ -1,6 +1,7 @@
 import { ReactComponent as SendMessageSVG } from 'assets/send-message.svg';
 import { ChatItem } from 'components/ChatItem/ChatItem';
 import { ChatMessage } from 'components/ChatMessage/ChatMessage';
+import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
 import { TextArea } from 'components/UI/TextArea/TextArea';
@@ -210,18 +211,30 @@ export const Messanger = () => {
 
           <div className="currentChat__footer">
             <TextArea
-              placeholder="type a message"
+              placeholder="Type your message here"
               value={newMessage}
               onChange={onTypingMessageHandle}
               ref={messageInputRef}
             />
-            <SendMessageSVG onClick={onSendMessage} />
-            <span>Attach svg</span>
+            <Button
+              onClick={onSendMessage}
+              className={`button ${
+                newMessage ? 'button_colored' : 'button_disabled'
+              }`}
+              text=""
+              disabled={!newMessage}
+            >
+              <SendMessageSVG />
+            </Button>
+            {/* <span>Attach svg</span> */}
           </div>
         </div>
       ) : (
         <div className="chats__emptyBlock">
-          <h1>SELECT A CHAT FROM THE EXISTED OR CREATE A NEW CHAT(button for creating a new chat)</h1>
+          <h1>
+            SELECT A CHAT FROM THE EXISTED OR CREATE A NEW CHAT(button for
+            creating a new chat)
+          </h1>
         </div>
       )}
     </div>

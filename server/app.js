@@ -19,6 +19,7 @@ const app = express();
 app.use(cors())
 const server = http.createServer(app)
 const io = new Server(server, {
+  pingTimeout: 60000,
   cors: {
     origin: '*'
   }
@@ -78,4 +79,5 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected', socket.id);
   })
+
 })

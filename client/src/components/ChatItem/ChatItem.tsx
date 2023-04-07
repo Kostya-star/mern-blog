@@ -3,14 +3,17 @@ import s from './ChatItem.module.scss';
 import { IChat } from 'types/IChat';
 import { Avatar } from 'components/Avatar/Avatar';
 import { createTimeSince } from 'utils/createTimeSince';
+import { OnlineOfflineCircle } from 'components/OnlineOfflineCircle/OnlineOfflineCircle';
 
 interface IChatItemProps {
   chat: IChat;
   currentUserId: string;
   isActiveChat: boolean
+  isUserOnline: boolean
+  chatUnreadMessagesCount?: number
 }
 
-export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat }) => {
+export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat, isUserOnline, chatUnreadMessagesCount }) => {
   const interlocutorUser = chat.participants.find(
     (user) => user._id !== currentUserId,
   );
@@ -26,6 +29,7 @@ export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat
         <div className={s.chatItem__body}>
           <span>
             {interlocutorUser?.fullName}
+            <OnlineOfflineCircle isOnline={isUserOnline}/>
           </span>
           <p>{chat.latestMessage?.text}</p>
         </div>
@@ -33,7 +37,13 @@ export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat
 
       <div className={s.chatItem__timestamp}>
         <span>{creationTime}</span>
-        {/* <span>@</span> */}
+        {
+          chatUnreadMessagesCount 
+          ? (
+            <span className={s.unreadMessages}>{chatUnreadMessagesCount}</span>
+          )
+          : null
+        }
       </div>
     </div>
   );

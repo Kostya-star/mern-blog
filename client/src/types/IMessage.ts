@@ -5,6 +5,7 @@ export interface IMessage {
   _id: string
   chat: IChat
   sender: IUser
+  isRead: boolean
   text?: string
   imageUrl?: string
   createdAt: string

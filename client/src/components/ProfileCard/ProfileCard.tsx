@@ -1,4 +1,5 @@
 import { Avatar } from 'components/Avatar/Avatar';
+import { OnlineOfflineCircle } from 'components/OnlineOfflineCircle/OnlineOfflineCircle';
 import { Button } from 'components/UI/Button/Button';
 import { Loader } from 'components/UI/Loader/Loader';
 import { FC } from 'react';
@@ -6,14 +7,13 @@ import { Link } from 'react-router-dom';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IUser } from 'types/IUser';
 import s from './ProfileCard.module.scss';
-import { ReactComponent as UserEditSVG } from 'assets/user-edit.svg';
-
 
 interface IProfileCardProps {
   profileUser: IUser;
   isFollowed: boolean;
   followStatus: string;
-  currentUserId: string
+  currentUserId: string;
+  isUserOnline: boolean
   onFollowUser: (val: IFollowUnfollowPayload) => void;
   onShowFollowers: (userId: string) => void;
   onShowFollowing: (userId: string) => void;
@@ -24,6 +24,7 @@ export const ProfileCard: FC<IProfileCardProps> = ({
   isFollowed,
   followStatus,
   currentUserId,
+  isUserOnline,
   onFollowUser,
   onShowFollowers,
   onShowFollowing,
@@ -36,7 +37,8 @@ export const ProfileCard: FC<IProfileCardProps> = ({
       <div className={s.profileCard__data}>
         <div className={s.profileCard__data__top}>
           <h4>
-            {profileUser?.fullName}{' '}
+            {profileUser?.fullName}
+            <OnlineOfflineCircle isOnline={isUserOnline} />
             {profileUser._id === '64010100736d71817f3d671f' && (
               <strong>ADMIN</strong>
             )}
@@ -55,21 +57,16 @@ export const ProfileCard: FC<IProfileCardProps> = ({
                 />
               </>
             ))}
-            {
-              profileUser._id !== currentUserId && (
-                <Link to={`/messanger/${profileUser._id}`}>
-                  <Button text="Message" className="button button_follow" />
-                </Link>
-              )
-            }
-            {
-              profileUser._id === currentUserId && (
-                <Link to='/profile/edit'>
-                <Button text='Edit profile' className='button button_cancel' />
-              </Link>
-
-              )
-            }
+          {profileUser._id !== currentUserId && (
+            <Link to={`/messanger/${profileUser._id}`}>
+              <Button text="Message" className="button button_follow" />
+            </Link>
+          )}
+          {profileUser._id === currentUserId && (
+            <Link to="/profile/edit">
+              <Button text="Edit profile" className="button button_cancel" />
+            </Link>
+          )}
         </div>
         <div className={s.profileCard__data__statistics}>
           <div>

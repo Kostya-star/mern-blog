@@ -22,14 +22,23 @@ export const getAllChats = createAsyncThunk(
   },
 );
 
-export const getChatMessages = createAsyncThunk(
-  'messanger/getChatMessages',
-  async (chatId: string) => {
-    const resp = await instance.get<IMessage[]>(`/chats/${chatId}/messages`);
+export const getAllMessages = createAsyncThunk(
+  'messanger/getAllMessages',
+  async () => {
+    const resp = await instance.get<IMessage[]>('/chats/allMessages');
 
     return resp.data;
   },
 );
+
+// export const getChatMessages = createAsyncThunk(
+//   'messanger/getChatMessages',
+//   async (chatId: string) => {
+//     const resp = await instance.get<IMessage[]>(`/chats/${chatId}/messages`);
+
+//     return resp.data;
+//   },
+// );
 
 export const sendMessage = createAsyncThunk(
   'messanger/sendMessage',
@@ -44,6 +53,13 @@ export const deleteEmptyChats = createAsyncThunk(
   'messanger/deleteEmptyChats',
   () => {
     instance.delete(`/chats/empty`);
+  },
+);
+
+export const updateMessageToRead = createAsyncThunk(
+  'messanger/updateMessageToRead',
+  (messageId: string) => {
+    instance.patch(`/chats/message/${messageId}/read`);
   },
 );
 
@@ -71,6 +87,10 @@ export const messangerSlice = createSlice({
       const newMessage = action.payload;
 
       state.messages = [...state.messages, newMessage];
+    },
+
+    updateLatestMessage: (state, action: PayloadAction<IMessage>) => {
+      const newMessage = action.payload;
 
       state.chats = state.chats.map((chat) => {
         if (chat._id === newMessage.chat._id) {
@@ -112,22 +132,22 @@ export const messangerSlice = createSlice({
       })
 
       // GET CHAT MESSAGES
-      .addCase(getChatMessages.pending, (state) => {
-        state.messagesStatus = 'loading';
-      })
-      .addCase(
-        getChatMessages.fulfilled,
-        (state, action: PayloadAction<IMessage[]>) => {
-          state.messages = action.payload;
-          state.messagesStatus = 'success';
-        },
-      )
-      .addCase(getChatMessages.rejected, (state) => {
-        state.messagesStatus = 'error';
-      });
+      // .addCase(getChatMessages.pending, (state) => {
+      //   state.messagesStatus = 'loading';
+      // })
+      // .addCase(
+      //   getChatMessages.fulfilled,
+      //   (state, action: PayloadAction<IMessage[]>) => {
+      //     state.messages = action.payload;
+      //     state.messagesStatus = 'success';
+      //   },
+      // )
+      // .addCase(getChatMessages.rejected, (state) => {
+      //   state.messagesStatus = 'error';
+      // });
   },
 });
 
-export const { addMessage, clearMessangerState } = messangerSlice.actions;
+export const { addMessage, clearMessangerState, updateLatestMessage } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

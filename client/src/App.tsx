@@ -1,32 +1,62 @@
 import { AppRouter } from 'components/AppRouter';
-import { useEffect, useState } from 'react';
-import { onAuthMeThunk } from 'redux/slices/auth';
+import { useEffect, useRef, useState } from 'react';
+import {
+  isAuthSelector,
+  onAuthMeThunk,
+  setOnlineUsers,
+} from 'redux/slices/auth';
 import { Navigation } from './components/UI/Navigation/Navigation';
-import { useAppDispatch } from './redux/hooks';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
 import './scss/all.scss';
+import io, { Socket } from 'socket.io-client';
+import { baseUrl } from 'API/baseUrl';
+
+export const socket = io(baseUrl);
 
 const App = () => {
   const dispatch = useAppDispatch();
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const { currentUser } = useAppSelector(({ auth }) => ({
+    currentUser: auth.data,
+  }));
+
+  const isAuth = useAppSelector(isAuthSelector);
 
   useEffect(() => {
-    // setLoading(true)
-    // if (window.localStorage.getItem('token')) {
-      (async () => {
-        try {
-          await dispatch(onAuthMeThunk())
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false)
-        }
-      })()
-    // }
+    (async () => {
+      try {
+        await dispatch(onAuthMeThunk());
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  if(loading) {
-    return <div>Loading...</div>
+  useEffect(() => {
+    if (isAuth && currentUser && !loading) {
+      socket.connect();
+
+      socket.emit('add new user', currentUser._id);
+      socket.on('getOnlineUsers', (users) => {
+        dispatch(setOnlineUsers(users));
+      });
+    } else if (!isAuth && !loading) {
+      socket.disconnect();
+      socket.on('getOnlineUsers', (users) => {
+        dispatch(setOnlineUsers(users));
+      });
+    }
+
+    return () => {
+      socket.off('getOnlineUsers');
+    };
+  }, [currentUser, isAuth, loading]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -35,6 +65,6 @@ const App = () => {
       <AppRouter />
     </div>
   );
-}
+};
 
 export default App;

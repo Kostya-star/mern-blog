@@ -1,4 +1,4 @@
-import dotenv from'dotenv'
+import dotenv from 'dotenv'
 dotenv.config();
 import express from 'express'
 import mongoose from 'mongoose'
@@ -18,7 +18,7 @@ const app = express();
 app.use(cors())
 const server = http.createServer(app)
 const io = new Server(server, {
-  pingTimeout: 60000,
+  // pingTimeout: 60000,
   cors: {
     origin: '*'
   }
@@ -55,25 +55,61 @@ start()
 
 // SOCKETS
 
+const onlineUsers = []
+console.log(onlineUsers);
+
 io.on('connection', (socket) => {
-  console.log('a user is connected', socket.id)
+  console.log('user is connected', socket.id)
 
-  socket.on('newComment', (comment) => {
-    io.emit('newComment', comment)
-    // socket.broadcast.emit('newComment', comment);
+  // online users & private messages logic
+  socket.on('add new user', (userId) => { // add new online user if they just signed in
+    !onlineUsers.some(user => user?.userId === userId) &&
+      onlineUsers.push({
+        userId,
+        socketId: socket.id
+      })
+      io.emit('getOnlineUsers', onlineUsers)
+    })
+    
+    socket.on('send message', ({createdMessage, recipientId}) => {
+      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      
+      if(recipient) {
+        // console.log('recipient.socketId', recipient.socketId);
+        // console.log(onlineUsers);
+        // io.to(recipient.socketId).emit('receive message', createdMessage)
+        io.to(recipient.socketId).emit('receive message', createdMessage)
+      }
+    })
+    
+    
+    
+    socket.on('newComment', (comment) => {
+      io.emit('newComment', comment)
+    })
+    
+    socket.on('updateComment', (comment) => {
+      io.emit('updateComment', comment)
+    })
+    
+    socket.on('likeComment', (resp) => {
+      io.emit('likeComment', resp)
+    })
+    
+    socket.on('deleteComment', (commId) => {
+      io.emit('deleteComment', commId)
+    })
+    
+    socket.on('disconnect', () => {
+      console.log('user disconnected', socket.id);
+      const disconnectedUserInd = onlineUsers.findIndex(user => user?.socketId === socket.id);
+      if (disconnectedUserInd !== -1) {
+        onlineUsers.splice(disconnectedUserInd, 1)
+      }
+      io.emit('getOnlineUsers', onlineUsers)
   })
+})
 
-  socket.on('updateComment', (comment) => {
-    io.emit('updateComment', comment)
-  })
-
-  socket.on('likeComment', (resp) => {
-    io.emit('likeComment', resp)
-  })
-
-  socket.on('deleteComment', (commId) => {
-    io.emit('deleteComment', commId)
-  })
 
   // socket.on('send message', (newMessage) => {
   //   newMessage.chat.participants.forEach(userId => {
@@ -81,33 +117,27 @@ io.on('connection', (socket) => {
   //   })
   // })
 
-  socket.on('setup', (currentUserId) => {
-    socket.join(currentUserId)
-    socket.emit('connected')
-  })
+  // socket.on('setup', (currentUserId) => {
+  //   socket.join(currentUserId)
+  //   socket.emit('connected')
+  // })
 
-  // the room for the two users in one-on-one chat
-  socket.on('join chat', (roomId) => {
-    socket.join(roomId)
-    console.log('User joined room' + ' ' + roomId);
-  })
+  // // the room for the two users in one-on-one chat
+  // socket.on('join chat', (roomId) => {
+  //   socket.join(roomId)
+  //   console.log('User joined room' + ' ' + roomId);
+  // })
 
-  socket.on('send message', (newMessage) => {
-    const chat = newMessage.chat
+  // socket.on('send message', (newMessage) => {
+  //   const chat = newMessage.chat
 
-    if(!chat.participants.length) {
-      return console.log('chat.participants not defined');
-    } 
+  //   if(!chat.participants.length) {
+  //     return console.log('chat.participants not defined');
+  //   } 
 
-    chat.participants.forEach(userId => {
-      if(userId === newMessage.sender._id) return
+  //   chat.participants.forEach(userId => {
+  //     if(userId === newMessage.sender._id) return
 
-      io.to(userId).emit('receive message', newMessage)
-    })
-  })
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id);
-  })
-
-})
+  //     io.to(userId).emit('receive message', newMessage)
+  //   })
+  // })

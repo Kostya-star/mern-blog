@@ -19,6 +19,8 @@ import s from './PostItem.module.scss';
 import { Loader } from 'components/UI/Loader/Loader';
 import { Button } from 'components/UI/Button/Button';
 import { follow_unfollow } from 'redux/slices/userProfile';
+import { OnlineOfflineCircle } from 'components/OnlineOfflineCircle/OnlineOfflineCircle';
+import { getUserOnlineStatus } from 'utils/getUserOnlineStatus';
 
 interface IPostItemProps {
   post: IPost;
@@ -29,9 +31,10 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { currentUserId, followStatus } = useAppSelector(({ auth, profile }) => ({
+  const { currentUserId, followStatus, onlineUsers } = useAppSelector(({ auth, profile }) => ({
     currentUserId: auth.data?._id,
-    followStatus: profile.followers.status
+    followStatus: profile.followers.status,
+    onlineUsers: auth.onlineUsers
   }));
 
   const [isShowText, setShowText] = useState(false);
@@ -62,6 +65,9 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
   const isUserFollowed = post.user.usersFollowed.includes(
     currentUserId as string,
   );
+  const isUserOnline = getUserOnlineStatus(onlineUsers, post.user._id)
+  // console.log(onlineUsers);
+  
 
   return (
     // POST IMAGE POP UP BUTTONS
@@ -98,6 +104,7 @@ export const PostItem: FC<IPostItemProps> = ({ post }) => {
             <div className={s.group}>
               <span className={s.fullName} onClick={onRedirectAboutProfile}>
                 {post.user?.fullName}
+                <OnlineOfflineCircle isOnline={isUserOnline}/>
               </span>
               {!isUserFollowed &&
                 currentUserId !== post.user._id &&

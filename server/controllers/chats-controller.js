@@ -62,17 +62,41 @@ const getAllChats = async (req, res) => {
   }
 }
 
-const getChatMessages = async (req, res) => {
+// const getChatMessages = async (req, res) => {
+//   try {
+//     const { chatId } = req.params
+
+//     if (!chatId) {
+//       return res.status(400).json({
+//         message: 'No chat id'
+//       })
+//     }
+
+//     const messages = await MessageModel.find({ chat: chatId })
+//       .populate({
+//         path: 'chat',
+//         populate: {
+//           path: 'latestMessage',
+//           populate: {
+//             path: 'sender',
+//             select: '-hashedPassword'
+//           }
+//         }
+//       })
+//       .populate('sender', '-hashedPassword');
+
+//     res.json(messages)
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({
+//       message: 'Error when fetching the messages'
+//     })
+//   }
+// }
+
+const getAllMessages = async (req, res) => {
   try {
-    const { chatId } = req.params
-
-    if (!chatId) {
-      return res.status(400).json({
-        message: 'No chat id'
-      })
-    }
-
-    const messages = await MessageModel.find({ chat: chatId })
+    const allMessages = await MessageModel.find()
       .populate({
         path: 'chat',
         populate: {
@@ -85,7 +109,7 @@ const getChatMessages = async (req, res) => {
       })
       .populate('sender', '-hashedPassword');
 
-    res.json(messages)
+    res.json(allMessages)
   } catch (error) {
     console.log(error)
     res.status(500).json({
@@ -107,6 +131,7 @@ const sendMessage = async (req, res) => {
     let message = new MessageModel({
       chat,
       sender: userId,
+      isRead: false,
       text,
       imageUrl
     })
@@ -166,9 +191,9 @@ const deleteEmptyChats = async (req, res) => {
 
     const chatIds = emptyChats.map((chat) => chat._id);
 
-    await ChatModel.deleteMany({ 
+    await ChatModel.deleteMany({
       participants: userId,
-      _id: { $in: chatIds } 
+      _id: { $in: chatIds }
     });
 
     res.json({
@@ -183,12 +208,41 @@ const deleteEmptyChats = async (req, res) => {
   }
 }
 
+const updateMessageToRead = async (req, res) => {
+  try {
+    const { messageId } = req.params
+    console.log(messageId);
+
+    if (!messageId) {
+      return res.status(404).json({
+        message: 'The message to update to read is not found'
+      })
+    }
+
+    await MessageModel.findByIdAndUpdate(messageId, {
+      isRead: true
+    })
+
+    res.json({
+      success: 'The message has been successfully updated to read'
+    })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when updating the message to read'
+    })
+  }
+}
+
 
 
 export default {
   accessChat,
   getAllChats,
   sendMessage,
-  getChatMessages,
-  deleteEmptyChats
+  // getChatMessages,
+  deleteEmptyChats,
+  updateMessageToRead,
+  getAllMessages
 }

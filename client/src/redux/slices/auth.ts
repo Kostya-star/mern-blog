@@ -1,5 +1,4 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { RootState } from 'redux/store';
 import { IFollowUnfollowResp } from 'types/IFollowUnfollowResp';
@@ -8,6 +7,7 @@ import { IRegisterRequest } from 'types/IRegisterRequest';
 import { IUpdateUserReq } from 'types/IUpdateUserReq';
 import { clearCommentsSlice } from './comments';
 import { IUser } from './../../types/IUser';
+import { IOnlineUser } from 'types/IOnlineUser';
 
 export const onLogin = createAsyncThunk(
   'auth/onLogin',
@@ -82,13 +82,16 @@ export const deleteUser = createAsyncThunk('auth/deleteUser', async (_, thunkApi
 })
 
 
+
 export interface authState {
   data: null | IUser;
+  onlineUsers: IOnlineUser[]
   status: string;
 }
 
 const initialState: authState = {
   data: null,
+  onlineUsers: [],
   status: '',
 };
 
@@ -100,6 +103,9 @@ export const authSlice = createSlice({
       state.status = '';
       state.data = null;
     },
+    setOnlineUsers: (state, action: PayloadAction<IOnlineUser[]>) => {
+      state.onlineUsers = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -184,6 +190,6 @@ export const authSlice = createSlice({
 
 export const isAuthSelector = ({ auth }: RootState) => Boolean(auth.data);
 
-export const { logout } = authSlice.actions;
+export const { logout, setOnlineUsers } = authSlice.actions;
 
 export default authSlice.reducer;

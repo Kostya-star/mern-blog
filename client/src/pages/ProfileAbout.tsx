@@ -23,6 +23,7 @@ import { IFollowersModal } from 'types/IFollowersModal';
 import { IFollowUnfollowPayload } from 'types/IFollowUnfollowPayload';
 import { IPost } from 'types/IPost';
 import { IUser } from 'types/IUser';
+import { getUserOnlineStatus } from 'utils/getUserOnlineStatus';
 
 export const ProfileAbout = () => {
   const dispatch = useAppDispatch();
@@ -41,7 +42,7 @@ export const ProfileAbout = () => {
     profileStatus,
     followers,
     followStatus,
-    // followings
+    onlineUsers
   } = useAppSelector(({ auth, posts, comments, profile }) => ({
     currentUser: auth.data,
     posts: posts.posts,
@@ -52,7 +53,7 @@ export const ProfileAbout = () => {
     profileStatus: profile.profile.status,
     followers: profile.followers.users,
     followStatus: profile.followers.status,
-    // followings: profile.following.users
+    onlineUsers: auth.onlineUsers
   }));
 
   // MODAL FOR POSTS AND COMMENTS
@@ -147,6 +148,8 @@ export const ProfileAbout = () => {
     currentUser?._id as string,
   );
 
+  const isUserOnline = getUserOnlineStatus(onlineUsers, profileUser?._id as string)
+
   return (
     <div className="profileAbout">
       <div className="profileAbout__userData">
@@ -157,6 +160,7 @@ export const ProfileAbout = () => {
             isFollowed={isBrowsedUserFollowed as boolean}
             currentUserId={currentUser?._id as string}
             followStatus={followStatus}
+            isUserOnline={isUserOnline}
             onFollowUser={onFollowUser}
             onShowFollowers={onShowFollowers}
             onShowFollowing={onShowFollowing}

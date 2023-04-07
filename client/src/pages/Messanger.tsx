@@ -1,4 +1,5 @@
 import { baseUrl } from 'API/baseUrl';
+import { socket } from 'App';
 import { ReactComponent as SendMessageSVG } from 'assets/send-message.svg';
 import { ChatItem } from 'components/ChatItem/ChatItem';
 import { ChatMessage } from 'components/ChatMessage/ChatMessage';
@@ -9,23 +10,22 @@ import { TextArea } from 'components/UI/TextArea/TextArea';
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { isAuthSelector } from 'redux/slices/auth';
 import {
   accessChat,
   addMessage,
   clearMessangerState,
   deleteEmptyChats,
   getAllChats,
-  getChatMessages,
+  getAllMessages,
   sendMessage,
+  updateLatestMessage,
+  updateMessageToRead,
 } from 'redux/slices/messanger';
-import io from 'socket.io-client';
 import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
+import { getUserOnlineStatus } from 'utils/getUserOnlineStatus';
 import { scrollToBottom } from 'utils/scrollToBottom';
-
-const socket = io(baseUrl)
-// console.log(socket);
-
 
 export const Messanger = () => {
   // const [searchChatsVal, setSearchChatsVal] = useState('');
@@ -55,13 +55,17 @@ export const Messanger = () => {
     currentUserId,
     getAllChatsStatus,
     getMessagesStatus,
+    usersOnline,
   } = useAppSelector(({ messanger, auth }) => ({
     chats: messanger.chats,
     chatMessages: messanger.messages,
     currentUserId: auth.data?._id,
     getAllChatsStatus: messanger.chatStatus,
     getMessagesStatus: messanger.messagesStatus,
+    usersOnline: auth.onlineUsers,
   }));
+
+  const isAuth = useAppSelector(isAuthSelector)
 
   const currentChat = chats?.find((chat) =>
     chat.participants.some((user) => user._id === id),
@@ -75,33 +79,22 @@ export const Messanger = () => {
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
-  // useEffect(() => {
-  //   console.log('socket front');
-    
-  //   socket.on('receive message', async (newMessage: IMessage) => {
-  //     await dispatch(addMessage(newMessage));
-  //     scrollToBottom(lastChatMessageRef);
-  //   })
-
-  //   return () => {
-  //     socket.off('receive message')
-  //   }
-  // }, [socket])
 
   useEffect(() => {
-    socket.emit('setup', currentUserId)
-    socket.on('connected', () => console.log('the current user is connected to socket io'))
-  }, [])
-
-  useEffect(() => {
-    socket.on('receive message', (newMessage) => {
-      dispatch(addMessage(newMessage));
-    })
+    socket.on('receive message', async (newMessage: IMessage) => {
+      dispatch(updateLatestMessage(newMessage));
+      const isCurrentChat = currentChat?._id === newMessage.chat._id;
+      if (isCurrentChat) {
+        await dispatch(updateMessageToRead(newMessage._id))
+        await dispatch(addMessage(newMessage));
+        scrollToBottom(lastChatMessageRef);
+      }
+    });
 
     return () => {
-      socket.disconnect()
-    }
-  }, [socket])
+      socket.off('receive message');
+    };
+  }, [socket, currentChat]);
 
   useEffect(() => {
     (async () => {
@@ -109,6 +102,7 @@ export const Messanger = () => {
         await dispatch(accessChat(id));
       }
       await dispatch(getAllChats());
+      await dispatch(getAllMessages());
     })();
 
     return () => {
@@ -117,17 +111,14 @@ export const Messanger = () => {
     };
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      if (currentChat) {
-        await dispatch(getChatMessages(currentChat._id));
-        socket.emit('join chat', currentChat._id)
-
-        scrollToBottom(lastChatMessageRef);
-      }
-    })();
-  }, [currentChat?._id]);
-
+  // useEffect(() => {
+  //   (async () => {
+  //     if (currentChat) {
+  //       // await dispatch(getChatMessages(currentChat._id));
+  //       scrollToBottom(lastChatMessageRef);
+  //     }
+  //   })();
+  // }, [currentChat?._id]);
 
   const onSendMessage = async () => {
     const message = {
@@ -137,7 +128,17 @@ export const Messanger = () => {
     };
     setNewMessage('');
     const createdMessage = await dispatch(sendMessage(message)).unwrap();
-    socket.emit('send message', createdMessage)
+    socket.emit('send message', { createdMessage, recipientId: id});
+    await dispatch(addMessage(createdMessage));
+    scrollToBottom(lastChatMessageRef);
+    dispatch(updateLatestMessage(createdMessage));
+    // const isRecipientOnline = usersOnline.some(user => user?.userId === id)
+    // const isCurrentChat = createdMessage.chat._id === currentChat?._id
+    // console.log(isCurrentChat);
+    
+    // if(!isRecipientOnline) {
+    //   await dispatch(updateMessageToUnread(newMessage._id))
+    // }
 
     messageInputRef.current?.focus();
 
@@ -152,6 +153,7 @@ export const Messanger = () => {
 
     // user is typing message real time indicator
   };
+
 
   return (
     <div className="messanger">
@@ -183,6 +185,18 @@ export const Messanger = () => {
                   (p) => p._id !== currentUserId,
                 )?._id;
 
+                const isUserOnline = getUserOnlineStatus(
+                  usersOnline,
+                  selectedInterlocutorId,
+                );
+
+                const unreadChatMessagesCount = chatMessages?.filter(
+                  (mess) =>
+                    !mess?.isRead &&
+                    mess.chat._id === chat._id &&
+                    mess.sender._id !== currentUserId,
+                )?.length;
+
                 return (
                   <Link
                     to={`/messanger/${selectedInterlocutorId}`}
@@ -192,6 +206,8 @@ export const Messanger = () => {
                       chat={chat}
                       isActiveChat={isActiveChat}
                       currentUserId={currentUserId as string}
+                      isUserOnline={isUserOnline}
+                      chatUnreadMessagesCount={unreadChatMessagesCount}
                     />
                   </Link>
                 );
@@ -252,16 +268,16 @@ export const Messanger = () => {
               onChange={onTypingMessageHandle}
               ref={messageInputRef}
             />
-            <Button
-              onClick={onSendMessage}
-              className={`button ${
-                newMessage ? 'button_colored' : 'button_disabled'
-              }`}
-              text=""
-              disabled={!newMessage}
-            >
-              <SendMessageSVG />
-            </Button>
+            {newMessage && (
+              <Button
+                onClick={onSendMessage}
+                className="button button_colored"
+                text=""
+                disabled={!newMessage.trim()}
+              >
+                <SendMessageSVG />
+              </Button>
+            )}
             {/* <span>Attach svg</span> */}
           </div>
         </div>

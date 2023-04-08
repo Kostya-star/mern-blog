@@ -18,6 +18,7 @@ import {
   deleteEmptyChats,
   getAllChats,
   getAllMessages,
+  readMessage,
   sendMessage,
   updateLatestMessage,
   updateMessageToRead,
@@ -51,14 +52,14 @@ export const Messanger = () => {
 
   const {
     chats,
-    chatMessages,
+    messages,
     currentUserId,
     getAllChatsStatus,
     getMessagesStatus,
     usersOnline,
   } = useAppSelector(({ messanger, auth }) => ({
     chats: messanger.chats,
-    chatMessages: messanger.messages,
+    messages: messanger.messages,
     currentUserId: auth.data?._id,
     getAllChatsStatus: messanger.chatStatus,
     getMessagesStatus: messanger.messagesStatus,
@@ -79,23 +80,6 @@ export const Messanger = () => {
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
-
-  useEffect(() => {
-    socket.on('receive message', async (newMessage: IMessage) => {
-      dispatch(updateLatestMessage(newMessage));
-      const isCurrentChat = currentChat?._id === newMessage.chat._id;
-      if (isCurrentChat) {
-        await dispatch(updateMessageToRead(newMessage._id))
-        await dispatch(addMessage(newMessage));
-        scrollToBottom(lastChatMessageRef);
-      }
-    });
-
-    return () => {
-      socket.off('receive message');
-    };
-  }, [socket, currentChat]);
-
   useEffect(() => {
     (async () => {
       if (id) {
@@ -111,14 +95,32 @@ export const Messanger = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     if (currentChat) {
-  //       // await dispatch(getChatMessages(currentChat._id));
-  //       scrollToBottom(lastChatMessageRef);
-  //     }
-  //   })();
-  // }, [currentChat?._id]);
+  useEffect(() => {
+    
+    socket.on('receive message', async (newMessage: IMessage) => {
+      await dispatch(addMessage(newMessage));
+      dispatch(updateLatestMessage(newMessage));
+      
+      const isCurrentChat = currentChat?._id === newMessage.chat._id;
+      if (isCurrentChat) {
+        const messId = await dispatch(updateMessageToRead(newMessage._id)).unwrap()
+        await dispatch(readMessage(messId))
+        scrollToBottom(lastChatMessageRef);
+      }
+    });
+
+    return () => {
+      socket.off('receive message');
+    };
+  }, [socket, currentChat]);
+
+  // Always scroll to the bottom whenever the page refreshes or the chat is switched
+  useEffect(() => {
+    if(getMessagesStatus === 'success') {
+      scrollToBottom(lastChatMessageRef);
+    }
+  }, [getMessagesStatus, currentChat?._id])
+
 
   const onSendMessage = async () => {
     const message = {
@@ -190,7 +192,7 @@ export const Messanger = () => {
                   selectedInterlocutorId,
                 );
 
-                const unreadChatMessagesCount = chatMessages?.filter(
+                const unreadChatMessagesCount = messages?.filter(
                   (mess) =>
                     !mess?.isRead &&
                     mess.chat._id === chat._id &&
@@ -233,27 +235,29 @@ export const Messanger = () => {
               </div>
             )}
             {getMessagesStatus === 'success' &&
-              (chatMessages?.length ? (
-                chatMessages.map((message, ind) => {
+              (messages?.length ? (
+                messages.map((message, ind) => {
                   const isMyMessage = message.sender._id === currentUserId;
 
                   const isLastUserMessage =
-                    chatMessages[ind + 1]?.sender._id !== message.sender._id ||
-                    chatMessages[ind + 1].sender._id === undefined;
+                  messages[ind + 1]?.sender._id !== message.sender._id ||
+                  messages[ind + 1].sender._id === undefined;
 
                   const isSameUserMessage =
-                    ind < chatMessages.length - 1 &&
-                    chatMessages[ind + 1].sender._id === message.sender._id;
+                    ind < messages.length - 1 &&
+                    messages[ind + 1].sender._id === message.sender._id;
 
                   return (
-                    <ChatMessage
-                      key={message._id}
-                      message={message}
-                      isMyMessage={isMyMessage}
-                      isSameUserMessage={isSameUserMessage}
-                      isLastUserMessage={isLastUserMessage}
-                      messageRef={lastChatMessageRef}
-                    />
+                    message.chat._id === currentChat?._id && (
+                      <ChatMessage
+                        key={message._id}
+                        message={message}
+                        isMyMessage={isMyMessage}
+                        isSameUserMessage={isSameUserMessage}
+                        isLastUserMessage={isLastUserMessage}
+                        messageRef={lastChatMessageRef}
+                      />
+                    )
                   );
                 })
               ) : (

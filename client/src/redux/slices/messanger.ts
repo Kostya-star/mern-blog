@@ -7,6 +7,7 @@ import { INewMessageReq } from 'types/INewMessageReq';
 export const accessChat = createAsyncThunk(
   'messanger/getChat',
   async (userId: string) => {
+
     const resp = await instance.get<IChat>(`/chats/${userId}`);
 
     return resp.data;
@@ -25,7 +26,7 @@ export const getAllChats = createAsyncThunk(
 export const getAllMessages = createAsyncThunk(
   'messanger/getAllMessages',
   async () => {
-    const resp = await instance.get<IMessage[]>('/chats/allMessages');
+    const resp = await instance.get<IMessage[]>('/chats/messages');
 
     return resp.data;
   },
@@ -60,6 +61,8 @@ export const updateMessageToRead = createAsyncThunk(
   'messanger/updateMessageToRead',
   (messageId: string) => {
     instance.patch(`/chats/message/${messageId}/read`);
+
+    return messageId
   },
 );
 
@@ -107,12 +110,20 @@ export const messangerSlice = createSlice({
       });
     },
 
+    readMessage: (state, action: PayloadAction<string>) => {
+      console.log(action.payload);
+      
+      state.messages = state.messages.map((mess) =>
+        mess._id === action.payload ? { ...mess, isRead: true } : mess,
+      );
+    },
+
     clearMessangerState: (state) => {
-      state.chats = []
-      state.messages = []
-      state.chatStatus = 'loading'
-      state.messagesStatus = 'loading'
-    }
+      state.chats = [];
+      state.messages = [];
+      state.chatStatus = 'loading';
+      state.messagesStatus = 'loading';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -131,23 +142,46 @@ export const messangerSlice = createSlice({
         state.chatStatus = 'error';
       })
 
-      // GET CHAT MESSAGES
-      // .addCase(getChatMessages.pending, (state) => {
-      //   state.messagesStatus = 'loading';
-      // })
-      // .addCase(
-      //   getChatMessages.fulfilled,
-      //   (state, action: PayloadAction<IMessage[]>) => {
-      //     state.messages = action.payload;
-      //     state.messagesStatus = 'success';
-      //   },
-      // )
-      // .addCase(getChatMessages.rejected, (state) => {
-      //   state.messagesStatus = 'error';
-      // });
+      // GET ALL MESSAGES
+      .addCase(getAllMessages.pending, (state) => {
+        state.messagesStatus = 'loading';
+      })
+      .addCase(
+        getAllMessages.fulfilled,
+        (state, action: PayloadAction<IMessage[]>) => {
+          state.messages = action.payload;
+          state.messagesStatus = 'success';
+        },
+      )
+      .addCase(getAllMessages.rejected, (state) => {
+        state.messagesStatus = 'error';
+      });
+
+    // .addCase(
+    //   updateMessageToRead.fulfilled,
+    //   (state, action: PayloadAction<string>) => {
+    //     state.messages = state.messages.map((mess) =>
+    //       mess._id === action.payload ? { ...mess, isRead: true } : mess,
+    //     );
+    //   },
+    // )
+    // GET CHAT MESSAGES
+    // .addCase(getChatMessages.pending, (state) => {
+    //   state.messagesStatus = 'loading';
+    // })
+    // .addCase(
+    //   getChatMessages.fulfilled,
+    //   (state, action: PayloadAction<IMessage[]>) => {
+    //     state.messages = action.payload;
+    //     state.messagesStatus = 'success';
+    //   },
+    // )
+    // .addCase(getChatMessages.rejected, (state) => {
+    //   state.messagesStatus = 'error';
+    // });
   },
 });
 
-export const { addMessage, clearMessangerState, updateLatestMessage } = messangerSlice.actions;
+export const { addMessage, clearMessangerState, updateLatestMessage, readMessage } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

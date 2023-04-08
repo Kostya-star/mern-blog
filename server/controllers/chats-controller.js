@@ -4,6 +4,7 @@ import UserModel from "../models/user-model.js";
 
 const accessChat = async (req, res) => {
   try {
+    console.log('accessChat');
     const authorizedUserId = req.body.userId
     const { interlocutorId } = req.params
 
@@ -96,6 +97,7 @@ const getAllChats = async (req, res) => {
 
 const getAllMessages = async (req, res) => {
   try {
+    console.log('getAllMessages');
     const allMessages = await MessageModel.find()
       .populate({
         path: 'chat',
@@ -240,9 +242,9 @@ const updateMessageToRead = async (req, res) => {
 export default {
   accessChat,
   getAllChats,
+  getAllMessages,
   sendMessage,
   // getChatMessages,
   deleteEmptyChats,
   updateMessageToRead,
-  getAllMessages
 }

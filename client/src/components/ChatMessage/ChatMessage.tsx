@@ -20,6 +20,7 @@ export const ChatMessage: FC<IChatMessageProps> = ({
   messageRef
 }) => {
   const creationTime = createTimeSince(new Date(message.createdAt));
+  
 
   return (
     <div className={`${s.message} ${isMyMessage && s.message_myMessage}`} ref={messageRef}>

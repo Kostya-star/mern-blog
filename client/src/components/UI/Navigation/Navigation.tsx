@@ -22,10 +22,12 @@ export const Navigation = () => {
 
   const dropDownRef = useRef<HTMLDivElement>(null);
 
-  const { userPhoto, userName, userId } = useAppSelector(({ auth }) => ({
+  const { userPhoto, userName, currentUserId, messages, chats } = useAppSelector(({ auth, messanger }) => ({
     userPhoto: auth.data?.avatarUrl,
     userName: auth.data?.fullName,
-    userId: auth.data?._id
+    currentUserId: auth.data?._id,
+    messages: messanger.messages,
+    chats: messanger.chats
   }));
 
   useEffect(() => {
@@ -51,6 +53,22 @@ export const Navigation = () => {
     dispatch(logout());
   };
 
+  // const unreadCurrentUsersMessagesCount = messages.filter((message) =>
+  //   message.chat.participants.some((user) => user._id === currentUserId),
+  // ).filter(mess => !mess.isRead).length;
+  const chatIdsOfCurrentUser = chats
+    .filter((chat) =>
+      chat.participants.some((user) => user._id === currentUserId),
+    )
+    .map((chat) => chat._id);
+    
+    const unreadMessagesOfCurrentUserCount = messages.filter(
+      (mess) =>
+        !mess.isRead &&
+        chatIdsOfCurrentUser.includes(mess.chat._id) &&
+        mess.sender._id !== currentUserId,
+    ).length;
+
   return (
     <>
       <div className={s.navigation}>
@@ -75,6 +93,7 @@ export const Navigation = () => {
               <>
               <Link to={`/messanger`} className={s.chat}>
                 <ChatSVG/>
+                {unreadMessagesOfCurrentUserCount ? unreadMessagesOfCurrentUserCount : null}
               </Link>
                 <div
                   className={s.navigation__profile}
@@ -91,7 +110,7 @@ export const Navigation = () => {
                     ref={dropDownRef}
                   >
                     <ul>
-                      <Link to={`/profile/about/${userId}`}>
+                      <Link to={`/profile/about/${currentUserId}`}>
                         <li>
                           About me <UserAboutSVG />
                         </li>

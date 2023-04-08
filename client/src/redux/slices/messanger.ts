@@ -66,6 +66,15 @@ export const updateMessageToRead = createAsyncThunk(
   },
 );
 
+export const readAllChatsMessages = createAsyncThunk(
+  'messanger/readAllChatsMessages',
+  async (chatId: string) => {
+    await instance.patch(`/chats/${chatId}/messages/readAll`);
+
+    return chatId
+  },
+);
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
@@ -155,7 +164,22 @@ export const messangerSlice = createSlice({
       )
       .addCase(getAllMessages.rejected, (state) => {
         state.messagesStatus = 'error';
-      });
+      })
+
+      // READ ALL CHAT'S MESSAGES
+      .addCase(readAllChatsMessages.pending, (state) => {
+        // state.messagesStatus = 'loading';
+      })
+      .addCase(
+        readAllChatsMessages.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          const chatId = action.payload;
+          state.messages = state.messages.map(mess => mess.chat._id === chatId ? { ...mess, isRead: true } : mess)
+        },
+      )
+      .addCase(readAllChatsMessages.rejected, (state) => {
+        state.messagesStatus = 'error';
+      })
 
     // .addCase(
     //   updateMessageToRead.fulfilled,

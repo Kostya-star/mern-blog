@@ -18,6 +18,7 @@ import {
   deleteEmptyChats,
   getAllChats,
   getAllMessages,
+  readAllChatsMessages,
   readMessage,
   sendMessage,
   updateLatestMessage,
@@ -116,8 +117,11 @@ export const Messanger = () => {
 
   // Always scroll to the bottom whenever the page refreshes or the chat is switched
   useEffect(() => {
-    if(getMessagesStatus === 'success') {
+    if(getMessagesStatus === 'success' && currentChat) {
       scrollToBottom(lastChatMessageRef);
+      if(currentChat.latestMessage?.sender._id !== currentUserId) {
+        dispatch(readAllChatsMessages(currentChat?._id))
+      }
     }
   }, [getMessagesStatus, currentChat?._id])
 

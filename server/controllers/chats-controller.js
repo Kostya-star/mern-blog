@@ -97,17 +97,35 @@ const getAllChats = async (req, res) => {
 
 const getAllMessages = async (req, res) => {
   try {
-    console.log('getAllMessages');
+    // const allMessages = await MessageModel.find()
+    //   .populate({
+    //     path: 'chat',
+    //     populate: {
+    //       path: 'participants',
+    //     },
+    //     populate: {
+    //       path: 'latestMessage',
+    //       populate: {
+    //         path: 'sender',
+    //         select: '-hashedPassword'
+    //       }
+    //     }
+    //   })
+    //   .populate('sender', '-hashedPassword');
+
     const allMessages = await MessageModel.find()
       .populate({
         path: 'chat',
-        populate: {
-          path: 'latestMessage',
-          populate: {
-            path: 'sender',
-            select: '-hashedPassword'
+        populate: [
+          { path: 'participants' },
+          {
+            path: 'latestMessage',
+            populate: {
+              path: 'sender',
+              select: '-hashedPassword'
+            }
           }
-        }
+        ]
       })
       .populate('sender', '-hashedPassword');
 
@@ -213,7 +231,6 @@ const deleteEmptyChats = async (req, res) => {
 const updateMessageToRead = async (req, res) => {
   try {
     const { messageId } = req.params
-    console.log(messageId);
 
     if (!messageId) {
       return res.status(404).json({
@@ -237,6 +254,29 @@ const updateMessageToRead = async (req, res) => {
   }
 }
 
+const readAllChatMessages = async (req, res) => {
+  try {
+    const { chatId } = req.params
+
+    if(!chatId) {
+      return res.json({
+        message: 'No chat was found'
+      })
+    }
+
+    await MessageModel.find({ chat: chatId }).updateMany({ isRead: true })
+
+    res.json({
+      success: "All chat's messages were read"
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when reading all chat messages'
+    })
+  }
+}
+
 
 
 export default {
@@ -247,4 +287,5 @@ export default {
   // getChatMessages,
   deleteEmptyChats,
   updateMessageToRead,
+  readAllChatMessages
 }

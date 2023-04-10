@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 import './scss/all.scss';
 import io, { Socket } from 'socket.io-client';
 import { baseUrl } from 'API/baseUrl';
+import { addMessage, getAllChats, getAllMessages, updateLatestMessage } from 'redux/slices/messanger';
+import { IMessage } from 'types/IMessage';
 
 export const socket = io(baseUrl);
 
@@ -22,11 +24,13 @@ const App = () => {
   }));
 
   const isAuth = useAppSelector(isAuthSelector);
+  const token = localStorage.getItem('token')
+  
 
   useEffect(() => {
     (async () => {
       try {
-        await dispatch(onAuthMeThunk());
+        await dispatch(onAuthMeThunk())
       } catch (error) {
         console.log(error);
       } finally {
@@ -54,6 +58,26 @@ const App = () => {
       socket.off('getOnlineUsers');
     };
   }, [currentUser, isAuth, loading]);
+
+  useEffect(() => {
+    if(loading || !isAuth || !token) return
+      (async () => {
+        await dispatch(getAllMessages());
+        await dispatch(getAllChats());
+      })()
+  }, [loading, isAuth, token])
+
+  useEffect(() => {
+    socket.on('receive message', async (newMessage: IMessage) => {
+      await dispatch(addMessage(newMessage));
+      dispatch(updateLatestMessage(newMessage));
+    });
+    
+    return () => {
+      socket.off('receive message');
+    };
+  }, [socket]);
+
 
   if (loading) {
     return <div>Loading...</div>;

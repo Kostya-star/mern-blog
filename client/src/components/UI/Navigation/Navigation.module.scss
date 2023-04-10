@@ -38,8 +38,18 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    .chat {
+    .chatSvg {
       cursor: pointer;
+      position: relative;
+      span {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        background-color: rgb(163, 46, 236);
+        color: white;
+        padding: 0px 5px;
+        border-radius: 50%;
+      }
     }
   }
 

@@ -47,27 +47,26 @@ export const Navigation = () => {
     };
   }, [dropDownRef]);
 
+
   const onLogoutHandle = () => {
     setShowDropdown(false);
     window.localStorage.removeItem('token');
     dispatch(logout());
   };
 
-  // const unreadCurrentUsersMessagesCount = messages.filter((message) =>
-  //   message.chat.participants.some((user) => user._id === currentUserId),
-  // ).filter(mess => !mess.isRead).length;
   const chatIdsOfCurrentUser = chats
-    .filter((chat) =>
-      chat.participants.some((user) => user._id === currentUserId),
-    )
-    .map((chat) => chat._id);
-    
-    const unreadMessagesOfCurrentUserCount = messages.filter(
-      (mess) =>
-        !mess.isRead &&
-        chatIdsOfCurrentUser.includes(mess.chat._id) &&
-        mess.sender._id !== currentUserId,
-    ).length;
+  .filter((chat) =>
+    chat?.participants.some((user) => user._id === currentUserId),
+  )
+  .map((chat) => chat?._id);
+  
+  const unreadMessagesOfCurrentUserCount = messages.filter(
+    (mess) =>
+      !mess?.isRead &&
+      chatIdsOfCurrentUser.includes(mess?.chat?._id) &&
+      mess?.sender?._id !== currentUserId,
+      ).length;
+
 
   return (
     <>
@@ -91,9 +90,11 @@ export const Navigation = () => {
               </>
             ) : (
               <>
-              <Link to={`/messanger`} className={s.chat}>
+              <Link to={`/messanger`} className={s.chatSvg}>
                 <ChatSVG/>
-                {unreadMessagesOfCurrentUserCount ? unreadMessagesOfCurrentUserCount : null}
+                <span>
+                  {unreadMessagesOfCurrentUserCount ? unreadMessagesOfCurrentUserCount : null}
+                </span>
               </Link>
                 <div
                   className={s.navigation__profile}

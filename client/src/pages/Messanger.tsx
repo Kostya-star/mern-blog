@@ -92,34 +92,41 @@ export const Messanger = () => {
 
     return () => {
       dispatch(deleteEmptyChats());
-      dispatch(clearMessangerState());
+      // dispatch(clearMessangerState());
     };
   }, []);
 
+  
   useEffect(() => {
-    
-    socket.on('receive message', async (newMessage: IMessage) => {
-      await dispatch(addMessage(newMessage));
-      dispatch(updateLatestMessage(newMessage));
+
+    const sendSms = async (newMessage: IMessage) => {
       
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
+
+      console.log('currentChat?._id', currentChat?._id);
+      console.log('newMessage.chat._id', newMessage.chat._id);
       if (isCurrentChat) {
+        
+        
         const messId = await dispatch(updateMessageToRead(newMessage._id)).unwrap()
         await dispatch(readMessage(messId))
         scrollToBottom(lastChatMessageRef);
       }
-    });
+    }
 
+    socket.on('receive message', sendSms);
+    
     return () => {
-      socket.off('receive message');
-    };
-  }, [socket, currentChat]);
+      socket.off('receive message', sendSms)
+    }
+  });
+  
 
   // Always scroll to the bottom whenever the page refreshes or the chat is switched
   useEffect(() => {
     if(getMessagesStatus === 'success' && currentChat) {
       scrollToBottom(lastChatMessageRef);
-      if(currentChat.latestMessage?.sender._id !== currentUserId) {
+      if(currentChat.latestMessage?.sender?._id !== currentUserId) {
         dispatch(readAllChatsMessages(currentChat?._id))
       }
     }
@@ -138,13 +145,6 @@ export const Messanger = () => {
     await dispatch(addMessage(createdMessage));
     scrollToBottom(lastChatMessageRef);
     dispatch(updateLatestMessage(createdMessage));
-    // const isRecipientOnline = usersOnline.some(user => user?.userId === id)
-    // const isCurrentChat = createdMessage.chat._id === currentChat?._id
-    // console.log(isCurrentChat);
-    
-    // if(!isRecipientOnline) {
-    //   await dispatch(updateMessageToUnread(newMessage._id))
-    // }
 
     messageInputRef.current?.focus();
 
@@ -199,8 +199,8 @@ export const Messanger = () => {
                 const unreadChatMessagesCount = messages?.filter(
                   (mess) =>
                     !mess?.isRead &&
-                    mess.chat._id === chat._id &&
-                    mess.sender._id !== currentUserId,
+                    mess.chat?._id === chat?._id &&
+                    mess.sender?._id !== currentUserId,
                 )?.length;
 
                 return (
@@ -252,7 +252,7 @@ export const Messanger = () => {
                     messages[ind + 1].sender._id === message.sender._id;
 
                   return (
-                    message.chat._id === currentChat?._id && (
+                    message.chat?._id === currentChat?._id && (
                       <ChatMessage
                         key={message._id}
                         message={message}

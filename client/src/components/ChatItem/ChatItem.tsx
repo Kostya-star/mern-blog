@@ -18,6 +18,7 @@ export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat
     (user) => user._id !== currentUserId,
   );
   const creationTime = createTimeSince(new Date(chat.createdAt));
+  
 
   return (
   <div className={`${s.chatItem} ${isActiveChat && s.chatItem_active}`} >

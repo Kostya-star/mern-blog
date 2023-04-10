@@ -69,6 +69,7 @@ export const updateMessageToRead = createAsyncThunk(
 export const readAllChatsMessages = createAsyncThunk(
   'messanger/readAllChatsMessages',
   async (chatId: string) => {
+    
     await instance.patch(`/chats/${chatId}/messages/readAll`);
 
     return chatId
@@ -120,7 +121,7 @@ export const messangerSlice = createSlice({
     },
 
     readMessage: (state, action: PayloadAction<string>) => {
-      console.log(action.payload);
+      // console.log(action.payload);
       
       state.messages = state.messages.map((mess) =>
         mess._id === action.payload ? { ...mess, isRead: true } : mess,
@@ -174,7 +175,10 @@ export const messangerSlice = createSlice({
         readAllChatsMessages.fulfilled,
         (state, action: PayloadAction<string>) => {
           const chatId = action.payload;
-          state.messages = state.messages.map(mess => mess.chat._id === chatId ? { ...mess, isRead: true } : mess)
+          
+          state.messages = state.messages.map((mess) =>
+            mess.chat?._id === chatId ? { ...mess, isRead: true } : mess,
+          );
         },
       )
       .addCase(readAllChatsMessages.rejected, (state) => {

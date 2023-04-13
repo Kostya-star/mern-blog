@@ -46,6 +46,11 @@
       justify-content: space-between;
       padding: 20px;
       background-color: rgb(213, 212, 212);
+      &__typing {
+        font-size: 14px;
+        color: $blue_dark;
+        margin-left: 5px;
+      }
     }
 
     &__messages {
@@ -59,6 +64,7 @@
     &__footer {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 20px;
       padding: 10px;
       background-color: rgb(213, 212, 212);
@@ -72,8 +78,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        // background-color: white;
         border-radius: 50%;
+        padding: 10px;
         &:hover {
           background-color: #0095F6;
           svg {
@@ -83,6 +89,7 @@
           }
         }
         svg {
+          width: 15px;
           path {
             fill: white
           }

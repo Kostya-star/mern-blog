@@ -11,17 +11,24 @@ interface IChatItemProps {
   isActiveChat: boolean
   isUserOnline: boolean
   chatUnreadMessagesCount?: number
+  typing: { isTyping: boolean, chatId: string }
 }
 
-export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat, isUserOnline, chatUnreadMessagesCount }) => {
+export const ChatItem: FC<IChatItemProps> = ({
+  chat,
+  currentUserId,
+  isActiveChat,
+  isUserOnline,
+  chatUnreadMessagesCount,
+  typing
+}) => {
   const interlocutorUser = chat.participants.find(
     (user) => user._id !== currentUserId,
   );
   const creationTime = createTimeSince(new Date(chat.createdAt));
-  
 
   return (
-  <div className={`${s.chatItem} ${isActiveChat && s.chatItem_active}`} >
+    <div className={`${s.chatItem} ${isActiveChat && s.chatItem_active}`}>
       <div className={s.chatItem__group}>
         <div className={s.chatItem__img}>
           <Avatar avatar={interlocutorUser?.avatarUrl as string} />
@@ -30,21 +37,23 @@ export const ChatItem: FC<IChatItemProps> = ({ chat, currentUserId, isActiveChat
         <div className={s.chatItem__body}>
           <span>
             {interlocutorUser?.fullName}
-            <OnlineOfflineCircle isOnline={isUserOnline}/>
+            <OnlineOfflineCircle isOnline={isUserOnline} />
           </span>
-          <p>{chat.latestMessage?.text}</p>
+          <p>
+            {typing.chatId && typing.chatId === chat._id ? (
+              <span className={s.chatItem__body__typing}>typing...</span>
+            ) : (
+              chat.latestMessage?.text
+            )}
+          </p>
         </div>
       </div>
 
       <div className={s.chatItem__timestamp}>
         <span>{creationTime}</span>
-        {
-          chatUnreadMessagesCount 
-          ? (
-            <span className={s.unreadMessages}>{chatUnreadMessagesCount}</span>
-          )
-          : null
-        }
+        {chatUnreadMessagesCount ? (
+          <span className={s.unreadMessages}>{chatUnreadMessagesCount}</span>
+        ) : null}
       </div>
     </div>
   );

@@ -56,7 +56,6 @@ start()
 // SOCKETS
 
 const onlineUsers = []
-console.log(onlineUsers);
 
 io.on('connection', (socket) => {
   console.log('user is connected', socket.id)
@@ -75,10 +74,21 @@ io.on('connection', (socket) => {
       const recipient = onlineUsers.find(user => user?.userId === recipientId)
       
       if(recipient) {
-        // console.log('recipient.socketId', recipient.socketId);
-        // console.log(onlineUsers);
-        // io.to(recipient.socketId).emit('receive message', createdMessage)
         io.to(recipient.socketId).emit('receive message', createdMessage)
+      }
+    })
+    
+    socket.on('typing', ({ currentChatId, recipientId }) => {
+      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('typing', currentChatId)
+      }
+    })
+
+    socket.on('stop typing', ({ recipientId }) => {
+      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('stop typing', recipientId)
       }
     })
     
@@ -109,35 +119,3 @@ io.on('connection', (socket) => {
       io.emit('getOnlineUsers', onlineUsers)
   })
 })
-
-
-  // socket.on('send message', (newMessage) => {
-  //   newMessage.chat.participants.forEach(userId => {
-  //     socket.to(userId).emit('receive message', newMessage)
-  //   })
-  // })
-
-  // socket.on('setup', (currentUserId) => {
-  //   socket.join(currentUserId)
-  //   socket.emit('connected')
-  // })
-
-  // // the room for the two users in one-on-one chat
-  // socket.on('join chat', (roomId) => {
-  //   socket.join(roomId)
-  //   console.log('User joined room' + ' ' + roomId);
-  // })
-
-  // socket.on('send message', (newMessage) => {
-  //   const chat = newMessage.chat
-
-  //   if(!chat.participants.length) {
-  //     return console.log('chat.participants not defined');
-  //   } 
-
-  //   chat.participants.forEach(userId => {
-  //     if(userId === newMessage.sender._id) return
-
-  //     io.to(userId).emit('receive message', newMessage)
-  //   })
-  // })

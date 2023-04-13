@@ -77,6 +77,8 @@ export const Messanger = () => {
   );
 
   const [newMessage, setNewMessage] = useState('');
+  const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
+  const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
@@ -96,36 +98,49 @@ export const Messanger = () => {
     };
   }, []);
 
-  
+
   useEffect(() => {
 
     const sendSms = async (newMessage: IMessage) => {
-      
+
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
 
-      console.log('currentChat?._id', currentChat?._id);
-      console.log('newMessage.chat._id', newMessage.chat._id);
       if (isCurrentChat) {
-        
-        
         const messId = await dispatch(updateMessageToRead(newMessage._id)).unwrap()
         await dispatch(readMessage(messId))
         scrollToBottom(lastChatMessageRef);
       }
     }
 
+    const onStartTyping = (currentChatId: string) => {
+      setTyping({ ...typing, chatId: currentChatId });
+      if(currentChatId === currentChat?._id) {
+        setTyping({ chatId: currentChatId, isTyping: true });
+      }
+    };
+
+    const onStopTyping = () => {
+      setTyping({ chatId: '', isTyping: false })
+    }
+
     socket.on('receive message', sendSms);
-    
+
+    socket.on('typing', onStartTyping)
+    socket.on('stop typing', onStopTyping)
+
     return () => {
       socket.off('receive message', sendSms)
+      socket.off('typing', onStartTyping)
+      socket.off('stop typing', onStopTyping)
     }
   });
-  
+
 
   // Always scroll to the bottom whenever the page refreshes or the chat is switched
   useEffect(() => {
     if(getMessagesStatus === 'success' && currentChat) {
       scrollToBottom(lastChatMessageRef);
+      setTyping({ ...typing, isTyping: false })
       if(currentChat.latestMessage?.sender?._id !== currentUserId) {
         dispatch(readAllChatsMessages(currentChat?._id))
       }
@@ -134,6 +149,7 @@ export const Messanger = () => {
 
 
   const onSendMessage = async () => {
+    socket.emit('stop typing', { recipientId: id })
     const message = {
       chat: currentChat?._id as string,
       text: newMessage,
@@ -157,7 +173,26 @@ export const Messanger = () => {
     setNewMessage(e.target.value);
     extendTextAreaWhenTyping(e);
 
-    // user is typing message real time indicator
+    if(!typing.isTyping) {
+      socket.emit('typing', { currentChatId: currentChat?._id , recipientId: id })
+    }
+
+    if (typingTimeoutId !== null) {
+      clearTimeout(typingTimeoutId);
+    }
+
+    const lastTypingTime = new Date().getTime()
+    const timerLength = 1500
+
+    const onTypingHandle = setTimeout(() => {
+        const timeNow = new Date().getTime()
+        const timeDiff = timeNow - lastTypingTime
+        if(timeDiff >= timerLength) {
+          socket.emit('stop typing', { recipientId: id })
+        }
+      }, timerLength)
+
+    setTypingTimeoutId(onTypingHandle)
   };
 
 
@@ -214,6 +249,7 @@ export const Messanger = () => {
                       currentUserId={currentUserId as string}
                       isUserOnline={isUserOnline}
                       chatUnreadMessagesCount={unreadChatMessagesCount}
+                      typing={typing}
                     />
                   </Link>
                 );
@@ -227,7 +263,12 @@ export const Messanger = () => {
       {id ? (
         <div className="currentChat">
           <div className="currentChat__heading">
-            <span>{currentChatInterlocutor?.fullName}</span>
+            <div>
+              <span>{currentChatInterlocutor?.fullName}</span>
+              {
+                typing.isTyping && <span className="currentChat__heading__typing">is typing...</span>
+              }
+            </div>
             <span>Delete svg</span>
           </div>
 
@@ -277,14 +318,16 @@ export const Messanger = () => {
               ref={messageInputRef}
             />
             {newMessage && (
-              <Button
-                onClick={onSendMessage}
-                className="button button_colored"
-                text=""
-                disabled={!newMessage.trim()}
-              >
-                <SendMessageSVG />
-              </Button>
+              <div>
+                <Button
+                  onClick={onSendMessage}
+                  className="button button_colored"
+                  text=""
+                  disabled={!newMessage.trim()}
+                >
+                  <SendMessageSVG />
+                </Button>
+              </div>
             )}
             {/* <span>Attach svg</span> */}
           </div>

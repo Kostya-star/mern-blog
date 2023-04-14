@@ -348,7 +348,7 @@ export const Messanger = () => {
               </div>
             )}
             <span className="attachSvg" onClick={() => inputFile.current?.click()}><AttachSVG/></span>
-            <input type="file" ref={inputFile} onChange={onImageUpload} hidden/>
+            <input key={imageUrl} type="file" ref={inputFile} onChange={onImageUpload} hidden/>
           </div>
             {
               imageUrl && (

@@ -39,7 +39,14 @@ export const ChatMessage: FC<IChatMessageProps> = ({
 
       <div className={s.message__body}>
         <p className={`${!isMyMessage ? s.bubble_left : s.bubble_right}`}>
-          {message.text}
+          <span>
+            {message.text}
+          </span>
+          {
+            message.imageUrl && (
+              <img src={message.imageUrl} alt="message img" />
+            )
+          }
         </p>
         <span>{creationTime}</span>
       </div>

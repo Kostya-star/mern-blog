@@ -28,6 +28,9 @@ import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 import { getUserOnlineStatus } from 'utils/getUserOnlineStatus';
 import { scrollToBottom } from 'utils/scrollToBottom';
+import { ReactComponent as AttachSVG } from 'assets/attach.svg'
+import { ReactComponent as CloseSVG } from 'assets/close.svg'
+import { uploadFile } from 'redux/slices/files';
 
 export const Messanger = () => {
   // const [searchChatsVal, setSearchChatsVal] = useState('');
@@ -79,9 +82,11 @@ export const Messanger = () => {
   const [newMessage, setNewMessage] = useState('');
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
   const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [imageUrl, setImageUrl] = useState('')
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const inputFile = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -153,9 +158,10 @@ export const Messanger = () => {
     const message = {
       chat: currentChat?._id as string,
       text: newMessage,
-      imageUrl: '',
+      imageUrl,
     };
     setNewMessage('');
+    setImageUrl('')
     const createdMessage = await dispatch(sendMessage(message)).unwrap();
     socket.emit('send message', { createdMessage, recipientId: id});
     await dispatch(addMessage(createdMessage));
@@ -195,6 +201,17 @@ export const Messanger = () => {
     setTypingTimeoutId(onTypingHandle)
   };
 
+  const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if(file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      const resp = await dispatch(uploadFile(formData)).unwrap()
+      if(resp) {
+        setImageUrl(resp?.url as string)
+      }
+    }
+  }
 
   return (
     <div className="messanger">
@@ -311,25 +328,36 @@ export const Messanger = () => {
           </div>
 
           <div className="currentChat__footer">
+          <div className="currentChat__footer__textarea">
             <TextArea
               placeholder="Type your message here"
               value={newMessage}
               onChange={onTypingMessageHandle}
               ref={messageInputRef}
             />
-            {newMessage && (
+            {(newMessage || imageUrl) && (
               <div>
                 <Button
                   onClick={onSendMessage}
                   className="button button_colored"
                   text=""
-                  disabled={!newMessage.trim()}
+                  disabled={!newMessage.trim() && !imageUrl}
                 >
                   <SendMessageSVG />
                 </Button>
               </div>
             )}
-            {/* <span>Attach svg</span> */}
+            <span className="attachSvg" onClick={() => inputFile.current?.click()}><AttachSVG/></span>
+            <input type="file" ref={inputFile} onChange={onImageUpload} hidden/>
+          </div>
+            {
+              imageUrl && (
+                <div className="currentChat__footer__image">
+                  <img src={imageUrl} alt="" />
+                  <CloseSVG onClick={() => setImageUrl('')}/>
+                </div>
+              )
+            }
           </div>
         </div>
       ) : (

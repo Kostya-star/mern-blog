@@ -112,6 +112,7 @@ export const messangerSlice = createSlice({
             latestMessage: {
               ...chat.latestMessage,
               text: newMessage.text,
+              imageUrl: newMessage.imageUrl
               // createdAt: newMessage.createdAt,
             } as IMessage,
           };

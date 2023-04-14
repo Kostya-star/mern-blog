@@ -8,10 +8,10 @@ import { OnlineOfflineCircle } from 'components/OnlineOfflineCircle/OnlineOfflin
 interface IChatItemProps {
   chat: IChat;
   currentUserId: string;
-  isActiveChat: boolean
-  isUserOnline: boolean
-  chatUnreadMessagesCount?: number
-  typing: { isTyping: boolean, chatId: string }
+  isActiveChat: boolean;
+  isUserOnline: boolean;
+  chatUnreadMessagesCount?: number;
+  typing: { isTyping: boolean; chatId: string };
 }
 
 export const ChatItem: FC<IChatItemProps> = ({
@@ -20,7 +20,7 @@ export const ChatItem: FC<IChatItemProps> = ({
   isActiveChat,
   isUserOnline,
   chatUnreadMessagesCount,
-  typing
+  typing,
 }) => {
   const interlocutorUser = chat.participants.find(
     (user) => user._id !== currentUserId,
@@ -43,7 +43,14 @@ export const ChatItem: FC<IChatItemProps> = ({
             {typing.chatId && typing.chatId === chat._id ? (
               <span className={s.chatItem__body__typing}>typing...</span>
             ) : (
-              chat.latestMessage?.text
+              <span className={s.chatItem__body__lastMessage}>
+                {
+                  chat.latestMessage?.imageUrl && <img src={chat.latestMessage.imageUrl}/>
+                }
+                {
+                  chat.latestMessage?.text
+                }
+              </span>
             )}
           </p>
         </div>

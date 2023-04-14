@@ -29,7 +29,7 @@
     }
     // last message
     p {
-      margin-top: 10px;
+      margin-top: 5px;
       font-size: 13px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -40,6 +40,13 @@
     &__typing {
       color: rgb(192, 212, 12);
       font-weight: 900!important;
+    }
+    &__lastMessage {
+      img {
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+      }
     }
   }
 

@@ -21,6 +21,7 @@ import {
   editMessage,
   getAllChats,
   getAllMessages,
+  likeMessage,
   readAllChatsMessages,
   readMessage,
   removeChat,
@@ -29,6 +30,7 @@ import {
   updateLatestMessage,
   updateMessage,
   updateMessageToRead,
+  likeSms
 } from 'redux/slices/messanger';
 import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
@@ -160,13 +162,18 @@ export const Messanger = () => {
       }
     };
 
+    const onLikeMessage = (messId: string) => {
+      dispatch(likeSms(messId))
+    }
+
     socket.on('receive message', sendSms);
     socket.on('typing', onStartTyping);
     socket.on('stop typing', onStopTyping);
     socket.on('delete message', onDeleteMessage);
     socket.on('edit message', onEditMessage);
     socket.on('delete chat', onDeleteChat);
-
+    socket.on('like message', onLikeMessage);
+    
     return () => {
       socket.off('receive message', sendSms);
       socket.off('typing', onStartTyping);
@@ -174,6 +181,7 @@ export const Messanger = () => {
       socket.off('delete message', onDeleteMessage);
       socket.off('edit message', onEditMessage);
       socket.off('delete chat', onDeleteChat);
+      socket.off('like message', onLikeMessage);
     };
   });
 
@@ -287,6 +295,12 @@ export const Messanger = () => {
     }
   };
 
+  const onLikeMessage = (messId: string) => {
+    dispatch(likeMessage(messId))
+    dispatch(likeSms(messId))
+    socket.emit('like message', { messId, recipientId: id })
+  }
+
   return (
     <div className="messanger">
       {/* CHATS */}
@@ -398,6 +412,7 @@ export const Messanger = () => {
                         messageRef={lastChatMessageRef}
                         deleteMessage={onDeleteMessage}
                         onEditMessage={onEditMessage}
+                        onLikeMessage={onLikeMessage}
                       />
                     )
                   );

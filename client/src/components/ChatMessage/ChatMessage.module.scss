@@ -98,4 +98,23 @@
     }
   }
 
+  &__like {
+    position: absolute;
+    right: -17px;
+    bottom: 10px;
+    cursor: pointer;
+    svg {
+      width: 14px;
+    }
+  }
+  
+  &__liked {
+    position: absolute;
+    top: -5px;
+    right: -2px;
+  }
+  svg {
+    width: 14px;
+  }
+
 }

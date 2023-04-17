@@ -96,6 +96,13 @@ export const deleteChat = createAsyncThunk(
   },
 );
 
+export const likeMessage = createAsyncThunk(
+  'messanger/likeMessage',
+  async (messId: string) => {
+    await instance.get(`chats/message/like/${messId}`);
+  },
+);
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
@@ -174,6 +181,14 @@ export const messangerSlice = createSlice({
 
     removeChat: (state, action: PayloadAction<string>) => {
       state.chats = state.chats.filter(chat => chat._id !== action.payload)
+    },
+
+    likeSms: (state, action: PayloadAction<string>) => {
+      state.messages = state.messages.map((mess) =>
+        mess._id === action.payload
+          ? { ...mess, isLiked: !mess.isLiked }
+          : mess,
+      );
     },
 
     clearMessangerState: (state) => {
@@ -265,7 +280,8 @@ export const {
   readMessage,
   removeMessage,
   updateMessage,
-  removeChat
+  removeChat,
+  likeSms
 } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

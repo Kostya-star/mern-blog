@@ -28,6 +28,10 @@ const MessageSchema = new mongoose.Schema({
       !this.text
     },
   },
+  isLiked: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true
 })

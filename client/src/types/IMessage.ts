@@ -10,4 +10,5 @@ export interface IMessage {
   imageUrl?: string
   createdAt: string
   updatedAt: string
+  isLiked: boolean
 }

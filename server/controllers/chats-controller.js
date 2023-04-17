@@ -349,6 +349,34 @@ const deleteChat = async (req, res) => {
   }
 }
 
+const likeMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params
+    
+    if(!messageId) {
+      return res.status(404).json({
+        message: 'The message was not found'
+      })
+    }
+
+    const message = await MessageModel.findById(messageId)
+
+    await MessageModel.findByIdAndUpdate(message._id, {
+      isLiked: message.isLiked ? false : true
+    })
+
+    res.json({
+      success: true
+    })
+    
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when liking the message'
+    })
+  }
+}
+
 
 
 export default {
@@ -362,5 +390,6 @@ export default {
   readAllChatMessages,
   deleteMessage,
   editMessage,
-  deleteChat
+  deleteChat,
+  likeMessage
 }

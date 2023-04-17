@@ -6,6 +6,8 @@ import s from './ChatMessage.module.scss';
 // import { ReactComponent as MessageDetailsSVG } from 'assets/three_dots.svg'
 import { ReactComponent as EditMessageSVG } from 'assets/edit.svg'
 import { ReactComponent as DeleteMessageSVG } from 'assets/close.svg'
+import { ReactComponent as HeartUncoloredSVG } from 'assets/heart-uncolored.svg'
+import { ReactComponent as HeartColoredSVG } from 'assets/heart-colored.svg'
 
 interface IChatMessageProps {
   message: IMessage;
@@ -15,6 +17,7 @@ interface IChatMessageProps {
   messageRef: LegacyRef<HTMLDivElement>
   deleteMessage: (messId: string) => void
   onEditMessage: (mess: IMessage) => void
+  onLikeMessage: (messId: string) => void
 }
 
 export const ChatMessage: FC<IChatMessageProps> = ({
@@ -24,7 +27,8 @@ export const ChatMessage: FC<IChatMessageProps> = ({
   isLastUserMessage,
   messageRef,
   deleteMessage,
-  onEditMessage
+  onEditMessage,
+  onLikeMessage
 }) => {
   const creationTime = createTimeSince(new Date(message.createdAt));
   
@@ -53,9 +57,6 @@ export const ChatMessage: FC<IChatMessageProps> = ({
           {message.imageUrl && <img src={message.imageUrl} alt="message img" />}
         </p>
         <span>{creationTime}</span>
-        {/* <div className={`${s.message__details} ${isMyMessage ? s.message__details__mySms : s.message__details__notMySms}`}>
-          <MessageDetailsSVG />
-        </div> */}
 
         {
           isMyMessage && (
@@ -63,6 +64,27 @@ export const ChatMessage: FC<IChatMessageProps> = ({
               <EditMessageSVG onClick={() => onEditMessage(message)} />
               <DeleteMessageSVG onClick={() => deleteMessage(message._id)} />
             </div>
+          )
+        }
+
+        {
+          !isMyMessage && (
+            <span className={s.message__like} onClick={() => onLikeMessage(message._id)}>
+              {
+                message.isLiked
+                ? <HeartColoredSVG/>
+                :
+                <HeartUncoloredSVG/>
+              }
+            </span>
+          )
+        }
+
+        {
+          isMyMessage && message.isLiked && (
+            <span className={s.message__liked}>
+              <HeartColoredSVG/>
+            </span>
           )
         }
       </div>

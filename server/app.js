@@ -116,6 +116,13 @@ io.on('connection', (socket) => {
       }
     })
     
+    socket.on('like message', ({ messId, recipientId }) => {
+      const recipient = getOnlineUser(onlineUsers, recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('like message', messId)
+      }
+    })
+    
     
     
     socket.on('newComment', (comment) => {

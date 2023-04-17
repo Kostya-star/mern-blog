@@ -298,6 +298,32 @@ const deleteMessage = async (req, res) => {
   }
 }
 
+const editMessage = async (req, res) => {
+  try {
+    const { text, imageUrl, id } = req.body
+
+    if(!text && !imageUrl) {
+      return res.status(400).json({
+        message: 'Message text or image is required'
+      })
+    }
+
+    await MessageModel.findByIdAndUpdate(id, {
+      text, 
+      imageUrl
+    })
+
+    res.json({
+      success: true
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when updating the message'
+    })
+  }
+}
+
 
 
 export default {
@@ -309,5 +335,6 @@ export default {
   deleteEmptyChats,
   updateMessageToRead,
   readAllChatMessages,
-  deleteMessage
+  deleteMessage,
+  editMessage
 }

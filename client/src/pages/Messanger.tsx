@@ -17,6 +17,7 @@ import {
   clearMessangerState,
   deleteEmptyChats,
   deleteMessage,
+  editMessage,
   getAllChats,
   getAllMessages,
   readAllChatsMessages,
@@ -24,6 +25,7 @@ import {
   removeMessage,
   sendMessage,
   updateLatestMessage,
+  updateMessage,
   updateMessageToRead,
 } from 'redux/slices/messanger';
 import { IMessage } from 'types/IMessage';
@@ -81,7 +83,7 @@ export const Messanger = () => {
     (user) => user._id === id,
   );
 
-  const [message, setMessage] = useState({ text: '', imageUrl: '' });
+  const [message, setMessage] = useState({ text: '', imageUrl: '', isEditing: false, id: '' });
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
   const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
   // const [imageUrl, setImageUrl] = useState('')
@@ -109,7 +111,6 @@ export const Messanger = () => {
   useEffect(() => {
 
     const sendSms = async (newMessage: IMessage) => {
-
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
 
       if (isCurrentChat) {
@@ -134,11 +135,16 @@ export const Messanger = () => {
       dispatch(removeMessage(messId))
     }
 
+    const onEditMessage = ({ text, imageUrl, id }) => {
+      dispatch(updateMessage({ text, imageUrl, id }))
+    }
+
     socket.on('receive message', sendSms);
 
     socket.on('typing', onStartTyping)
     socket.on('stop typing', onStopTyping)
     socket.on('delete message', onDeleteMessage)
+    socket.on('edit message', onEditMessage)
 
     return () => {
       socket.off('receive message', sendSms)
@@ -168,13 +174,23 @@ export const Messanger = () => {
       text: message.text,
       imageUrl: message.imageUrl,
     };
-    setMessage({ text: '', imageUrl: '' });
-    const createdMessage = await dispatch(sendMessage(mess)).unwrap();
-    socket.emit('send message', { createdMessage, recipientId: id});
-    await dispatch(addMessage(createdMessage));
-    scrollToBottom(lastChatMessageRef);
-    dispatch(updateLatestMessage(createdMessage));
 
+    if(!message.isEditing) {
+      const sms = await dispatch(sendMessage(mess)).unwrap();
+
+      socket.emit('send message', { sms, recipientId: id});
+      await dispatch(addMessage(sms));
+      scrollToBottom(lastChatMessageRef);
+      dispatch(updateLatestMessage(sms));
+
+    } else if (message.isEditing && message.id) {
+      await dispatch(editMessage(message)).unwrap();
+
+      dispatch(updateMessage(message))
+      socket.emit('edit message', { ...message, recipientId: id })
+    }
+    
+    setMessage({ id: '', isEditing: false, text: '', imageUrl: '' });
     messageInputRef.current?.focus();
 
     if (messageInputRef.current) {
@@ -226,10 +242,12 @@ export const Messanger = () => {
     dispatch(removeMessage(messId))
   }
 
-  const onEditMessage = (message: IMessage) => {
+  const onEditMessage = (mess: IMessage) => {
     setMessage({
-      text: message.text as string,
-      imageUrl: message.imageUrl as string,
+      isEditing: true,
+      id: mess._id,
+      text: mess.text as string,
+      imageUrl: mess.imageUrl as string,
     });
   }
 

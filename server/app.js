@@ -70,11 +70,11 @@ io.on('connection', (socket) => {
       io.emit('getOnlineUsers', onlineUsers)
     })
     
-    socket.on('send message', ({createdMessage, recipientId}) => {
+    socket.on('send message', ({sms, recipientId}) => {
+
       const recipient = onlineUsers.find(user => user?.userId === recipientId)
-      
       if(recipient) {
-        io.to(recipient.socketId).emit('receive message', createdMessage)
+        io.to(recipient.socketId).emit('receive message', sms)
       }
     })
     
@@ -96,6 +96,15 @@ io.on('connection', (socket) => {
       const recipient = onlineUsers.find(user => user?.userId === recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('delete message', messId)
+      }
+    })
+    
+    socket.on('edit message', (updatedMess) => {
+      const { text, imageUrl, id, recipientId } = updatedMess
+
+      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('edit message', { text, imageUrl, id })
       }
     })
     

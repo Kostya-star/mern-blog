@@ -84,7 +84,7 @@ export const Messanger = () => {
     (user) => user._id === id,
   );
 
-  const [message, setMessage] = useState({ text: '', imageUrl: '', isEditing: false, id: '' });
+  const [message, setMessage] = useState({ text: '', imageUrl: '', isEditing: false, id: '' })
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
   const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
   // const [imageUrl, setImageUrl] = useState('')

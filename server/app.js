@@ -109,6 +109,13 @@ io.on('connection', (socket) => {
       }
     })
     
+    socket.on('delete chat', ({ chatId, recipientId }) => {
+      const recipient = getOnlineUser(onlineUsers, recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('delete chat', chatId)
+      }
+    })
+    
     
     
     socket.on('newComment', (comment) => {

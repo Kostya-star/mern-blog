@@ -8,13 +8,14 @@ import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
 import { TextArea } from 'components/UI/TextArea/TextArea';
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import {
   accessChat,
   addMessage,
   clearMessangerState,
+  deleteChat,
   deleteEmptyChats,
   deleteMessage,
   editMessage,
@@ -22,6 +23,7 @@ import {
   getAllMessages,
   readAllChatsMessages,
   readMessage,
+  removeChat,
   removeMessage,
   sendMessage,
   updateLatestMessage,
@@ -32,8 +34,9 @@ import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
 import { getUserOnlineStatus } from 'utils/getUserOnlineStatus';
 import { scrollToBottom } from 'utils/scrollToBottom';
-import { ReactComponent as AttachSVG } from 'assets/attach.svg'
-import { ReactComponent as CloseSVG } from 'assets/close.svg'
+import { ReactComponent as AttachSVG } from 'assets/attach.svg';
+import { ReactComponent as CloseSVG } from 'assets/close.svg';
+import { ReactComponent as DeleteSVG } from 'assets/trash_bin.svg';
 import { uploadFile } from 'redux/slices/files';
 import { IEditMessageReq } from 'types/IEditMessageReq';
 
@@ -58,6 +61,7 @@ export const Messanger = () => {
 
   const dispatch = useAppDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const {
     chats,
@@ -75,7 +79,7 @@ export const Messanger = () => {
     usersOnline: auth.onlineUsers,
   }));
 
-  const isAuth = useAppSelector(isAuthSelector)
+  const isAuth = useAppSelector(isAuthSelector);
 
   const currentChat = chats?.find((chat) =>
     chat.participants.some((user) => user._id === id),
@@ -84,9 +88,16 @@ export const Messanger = () => {
     (user) => user._id === id,
   );
 
-  const [message, setMessage] = useState({ text: '', imageUrl: '', isEditing: false, id: '' })
+  const [message, setMessage] = useState({
+    text: '',
+    imageUrl: '',
+    isEditing: false,
+    id: '',
+  });
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
-  const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(
+    null,
+  );
   // const [imageUrl, setImageUrl] = useState('')
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
@@ -108,89 +119,97 @@ export const Messanger = () => {
     };
   }, []);
 
-
   useEffect(() => {
-
     const sendSms = async (newMessage: IMessage) => {
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
 
       if (isCurrentChat) {
-        const messId = await dispatch(updateMessageToRead(newMessage._id)).unwrap()
-        await dispatch(readMessage(messId))
+        const messId = await dispatch(
+          updateMessageToRead(newMessage._id),
+        ).unwrap();
+        await dispatch(readMessage(messId));
         scrollToBottom(lastChatMessageRef);
       }
-    }
+    };
 
     const onStartTyping = (currentChatId: string) => {
       setTyping({ ...typing, chatId: currentChatId });
-      if(currentChatId === currentChat?._id) {
+      if (currentChatId === currentChat?._id) {
         setTyping({ chatId: currentChatId, isTyping: true });
       }
     };
 
     const onStopTyping = () => {
-      setTyping({ chatId: '', isTyping: false })
-    }
+      setTyping({ chatId: '', isTyping: false });
+    };
 
     const onDeleteMessage = (messId: string) => {
-      dispatch(removeMessage(messId))
-    }
+      dispatch(removeMessage(messId));
+    };
 
     const onEditMessage = (editedMess: IEditMessageReq) => {
-      dispatch(updateMessage(editedMess))
-    }
+      dispatch(updateMessage(editedMess));
+    };
+
+    const onDeleteChat = (chatId: string) => {
+      dispatch(removeChat(chatId));
+
+      const isCurrentChat = currentChat?._id === chatId;
+      if (isCurrentChat) {
+        navigate('/messanger');
+      }
+    };
 
     socket.on('receive message', sendSms);
-
-    socket.on('typing', onStartTyping)
-    socket.on('stop typing', onStopTyping)
-    socket.on('delete message', onDeleteMessage)
-    socket.on('edit message', onEditMessage)
+    socket.on('typing', onStartTyping);
+    socket.on('stop typing', onStopTyping);
+    socket.on('delete message', onDeleteMessage);
+    socket.on('edit message', onEditMessage);
+    socket.on('delete chat', onDeleteChat);
 
     return () => {
-      socket.off('receive message', sendSms)
-      socket.off('typing', onStartTyping)
-      socket.off('stop typing', onStopTyping)
-      socket.off('delete message', onDeleteMessage)
-    }
+      socket.off('receive message', sendSms);
+      socket.off('typing', onStartTyping);
+      socket.off('stop typing', onStopTyping);
+      socket.off('delete message', onDeleteMessage);
+      socket.off('edit message', onEditMessage);
+      socket.off('delete chat', onDeleteChat);
+    };
   });
-
 
   // Always scroll to the bottom whenever the page refreshes or the chat is switched
   useEffect(() => {
-    if(getMessagesStatus === 'success' && currentChat) {
+    if (getMessagesStatus === 'success' && currentChat) {
       scrollToBottom(lastChatMessageRef);
-      setTyping({ ...typing, isTyping: false })
-      if(currentChat.latestMessage?.sender?._id !== currentUserId) {
-        dispatch(readAllChatsMessages(currentChat?._id))
+      setTyping({ ...typing, isTyping: false });
+      if (currentChat.latestMessage?.sender?._id !== currentUserId) {
+        dispatch(readAllChatsMessages(currentChat?._id));
       }
     }
-  }, [getMessagesStatus, currentChat?._id])
-
+  }, [getMessagesStatus, currentChat?._id]);
 
   const onSendMessage = async () => {
-    socket.emit('stop typing', { recipientId: id })
+    socket.emit('stop typing', { recipientId: id });
     const mess = {
       chat: currentChat?._id as string,
       text: message.text,
       imageUrl: message.imageUrl,
     };
 
-    if(!message.isEditing) {
+    if (!message.isEditing) {
       const sms = await dispatch(sendMessage(mess)).unwrap();
 
-      socket.emit('send message', { sms, recipientId: id});
+      socket.emit('send message', { sms, recipientId: id });
       await dispatch(addMessage(sms));
       scrollToBottom(lastChatMessageRef);
       dispatch(updateLatestMessage(sms));
-
     } else if (message.isEditing && message.id) {
       await dispatch(editMessage(message)).unwrap();
 
-      dispatch(updateMessage(message))
-      socket.emit('edit message', { ...message, recipientId: id })
+      dispatch(updateMessage(message));
+      socket.emit('edit message', { ...message, recipientId: id });
     }
-    
+
     setMessage({ id: '', isEditing: false, text: '', imageUrl: '' });
     messageInputRef.current?.focus();
 
@@ -203,45 +222,48 @@ export const Messanger = () => {
     setMessage({ ...message, text: e.target.value });
     extendTextAreaWhenTyping(e);
 
-    if(!typing.isTyping) {
-      socket.emit('typing', { currentChatId: currentChat?._id , recipientId: id })
+    if (!typing.isTyping) {
+      socket.emit('typing', {
+        currentChatId: currentChat?._id,
+        recipientId: id,
+      });
     }
 
     if (typingTimeoutId !== null) {
       clearTimeout(typingTimeoutId);
     }
 
-    const lastTypingTime = new Date().getTime()
-    const timerLength = 1500
+    const lastTypingTime = new Date().getTime();
+    const timerLength = 1500;
 
     const onTypingHandle = setTimeout(() => {
-        const timeNow = new Date().getTime()
-        const timeDiff = timeNow - lastTypingTime
-        if(timeDiff >= timerLength) {
-          socket.emit('stop typing', { recipientId: id })
-        }
-      }, timerLength)
+      const timeNow = new Date().getTime();
+      const timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength) {
+        socket.emit('stop typing', { recipientId: id });
+      }
+    }, timerLength);
 
-    setTypingTimeoutId(onTypingHandle)
+    setTypingTimeoutId(onTypingHandle);
   };
 
   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if(file) {
-      const formData = new FormData()
-      formData.append('file', file)
-      const resp = await dispatch(uploadFile(formData)).unwrap()
-      if(resp) {
-        setMessage({ ...message, imageUrl: resp.url })
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const resp = await dispatch(uploadFile(formData)).unwrap();
+      if (resp) {
+        setMessage({ ...message, imageUrl: resp.url });
       }
     }
-  }
+  };
 
   const onDeleteMessage = async (messId: string) => {
-    await dispatch(deleteMessage(messId))
-    socket.emit('delete message', { messId, recipientId: id })
-    dispatch(removeMessage(messId))
-  }
+    await dispatch(deleteMessage(messId));
+    socket.emit('delete message', { messId, recipientId: id });
+    dispatch(removeMessage(messId));
+  };
 
   const onEditMessage = (mess: IMessage) => {
     setMessage({
@@ -250,7 +272,20 @@ export const Messanger = () => {
       text: mess.text as string,
       imageUrl: mess.imageUrl as string,
     });
-  }
+  };
+
+  const onDeleteChat = async () => {
+    if (
+      window.confirm(
+        'Do you really want to delete this chat? Note: all of the chat messages will be permanently deleted!',
+      )
+    ) {
+      await dispatch(deleteChat(currentChat?._id as string));
+      dispatch(removeChat(currentChat?._id as string));
+      socket.emit('delete chat', { chatId: currentChat?._id, recipientId: id });
+      navigate('/messanger/');
+    }
+  };
 
   return (
     <div className="messanger">
@@ -321,11 +356,15 @@ export const Messanger = () => {
           <div className="currentChat__heading">
             <div>
               <span>{currentChatInterlocutor?.fullName}</span>
-              {
-                typing.isTyping && <span className="currentChat__heading__typing">is typing...</span>
-              }
+              {typing.isTyping && (
+                <span className="currentChat__heading__typing">
+                  is typing...
+                </span>
+              )}
             </div>
-            <span>Delete svg</span>
+            <span className="currentChat__heading__deleteSvg">
+              Delete chat <DeleteSVG onClick={onDeleteChat} />
+            </span>
           </div>
 
           {/* CHAT MESSAGES */}
@@ -341,8 +380,8 @@ export const Messanger = () => {
                   const isMyMessage = message.sender._id === currentUserId;
 
                   const isLastUserMessage =
-                  messages[ind + 1]?.sender._id !== message.sender._id ||
-                  messages[ind + 1].sender._id === undefined;
+                    messages[ind + 1]?.sender._id !== message.sender._id ||
+                    messages[ind + 1].sender._id === undefined;
 
                   const isSameUserMessage =
                     ind < messages.length - 1 &&
@@ -369,36 +408,47 @@ export const Messanger = () => {
           </div>
 
           <div className="currentChat__footer">
-          <div className="currentChat__footer__textarea">
-            <TextArea
-              placeholder="Type your message here"
-              value={message.text}
-              onChange={onTypingMessageHandle}
-              ref={messageInputRef}
-            />
-            {(message.text || message.imageUrl) && (
-              <div>
-                <Button
-                  onClick={onSendMessage}
-                  className="button button_colored"
-                  text=""
-                  disabled={!message.text.trim() && !message.imageUrl}
-                >
-                  <SendMessageSVG />
-                </Button>
+            <div className="currentChat__footer__textarea">
+              <TextArea
+                placeholder="Type your message here"
+                value={message.text}
+                onChange={onTypingMessageHandle}
+                ref={messageInputRef}
+              />
+              {(message.text || message.imageUrl) && (
+                <div>
+                  <Button
+                    onClick={onSendMessage}
+                    className="button button_colored"
+                    text=""
+                    disabled={!message.text.trim() && !message.imageUrl}
+                  >
+                    <SendMessageSVG />
+                  </Button>
+                </div>
+              )}
+              <span
+                className="attachSvg"
+                onClick={() => inputFile.current?.click()}
+              >
+                <AttachSVG />
+              </span>
+              <input
+                key={message.text}
+                type="file"
+                ref={inputFile}
+                onChange={onImageUpload}
+                hidden
+              />
+            </div>
+            {message.imageUrl && (
+              <div className="currentChat__footer__image">
+                <img src={message.imageUrl} alt="" />
+                <CloseSVG
+                  onClick={() => setMessage({ ...message, imageUrl: '' })}
+                />
               </div>
             )}
-            <span className="attachSvg" onClick={() => inputFile.current?.click()}><AttachSVG/></span>
-            <input key={message.text} type="file" ref={inputFile} onChange={onImageUpload} hidden/>
-          </div>
-            {
-              message.imageUrl && (
-                <div className="currentChat__footer__image">
-                  <img src={message.imageUrl} alt="" />
-                  <CloseSVG onClick={() => setMessage({ ...message, imageUrl: '' })}/>
-                </div>
-              )
-            }
           </div>
         </div>
       ) : (

@@ -51,6 +51,16 @@
         color: $blue_dark;
         margin-left: 5px;
       }
+
+      &__deleteSvg {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        svg {
+          cursor: pointer;
+        }
+      }
     }
 
     &__messages {

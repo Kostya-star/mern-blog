@@ -324,6 +324,31 @@ const editMessage = async (req, res) => {
   }
 }
 
+const deleteChat = async (req, res) => {
+  try {
+    const { chatId } = req.params
+
+    if(!chatId) {
+      return res.status(404).json({
+        message: 'Chat was not found'
+      })
+    }
+
+    await MessageModel.deleteMany({ chat: chatId })
+    await ChatModel.deleteOne({ _id: chatId })
+
+    res.json({
+      success: true
+    })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when deleting the chat'
+    })
+  }
+}
+
 
 
 export default {
@@ -336,5 +361,6 @@ export default {
   updateMessageToRead,
   readAllChatMessages,
   deleteMessage,
-  editMessage
+  editMessage,
+  deleteChat
 }

@@ -12,6 +12,7 @@ router.patch('/:chatId/messages/readAll', checkAuth, chatsController.readAllChat
 router.get('/:interlocutorId', checkAuth, chatsController.accessChat) // if there is the chat then it is returned, otherwise the chat is created and returned(but not saved in the DB)
 router.post('/message', checkAuth, chatsController.sendMessage)
 router.delete('/empty', checkAuth, chatsController.deleteEmptyChats)
+router.delete('/:chatId', checkAuth, chatsController.deleteChat)
 router.patch('/message/:messageId/read', chatsController.updateMessageToRead)
 router.delete('/message/:messageId', chatsController.deleteMessage)
 router.patch('/message', chatsController.editMessage)

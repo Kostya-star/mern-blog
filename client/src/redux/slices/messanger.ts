@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { instance } from 'API/instance';
 import { IChat } from 'types/IChat';
+import { IEditMessageReq } from 'types/IEditMessageReq';
 import { IMessage } from 'types/IMessage';
 import { INewMessageReq } from 'types/INewMessageReq';
 
 export const accessChat = createAsyncThunk(
   'messanger/getChat',
   async (userId: string) => {
-
     const resp = await instance.get<IChat>(`/chats/${userId}`);
 
     return resp.data;
@@ -62,31 +62,32 @@ export const updateMessageToRead = createAsyncThunk(
   (messageId: string) => {
     instance.patch(`/chats/message/${messageId}/read`);
 
-    return messageId
+    return messageId;
   },
 );
 
 export const readAllChatsMessages = createAsyncThunk(
   'messanger/readAllChatsMessages',
   async (chatId: string) => {
-    
     await instance.patch(`/chats/${chatId}/messages/readAll`);
 
-    return chatId
+    return chatId;
   },
 );
 
-export const deleteMessage = createAsyncThunk('messanger/deleteMessage', 
+export const deleteMessage = createAsyncThunk(
+  'messanger/deleteMessage',
   async (messId: string) => {
-    await instance.delete(`chats/message/${messId}`)
-  }
-)
+    await instance.delete(`chats/message/${messId}`);
+  },
+);
 
-export const editMessage = createAsyncThunk('messanger/editMessage', 
-  async (mess: { text: string, imageUrl: string, id: string }) => {
-    await instance.patch(`chats/message`, mess)
-  }
-)
+export const editMessage = createAsyncThunk(
+  'messanger/editMessage',
+  async (mess: IEditMessageReq) => {
+    await instance.patch(`chats/message`, mess);
+  },
+);
 
 type Status = 'loading' | 'success' | 'error' | '';
 
@@ -124,7 +125,7 @@ export const messangerSlice = createSlice({
             latestMessage: {
               ...chat.latestMessage,
               text: newMessage.text,
-              imageUrl: newMessage.imageUrl
+              imageUrl: newMessage.imageUrl,
               // createdAt: newMessage.createdAt,
             } as IMessage,
           };
@@ -135,31 +136,33 @@ export const messangerSlice = createSlice({
 
     readMessage: (state, action: PayloadAction<string>) => {
       // console.log(action.payload);
-      
+
       state.messages = state.messages.map((mess) =>
         mess._id === action.payload ? { ...mess, isRead: true } : mess,
       );
     },
 
     removeMessage: (state, action: PayloadAction<string>) => {
-      state.messages = state.messages.filter(mess => mess._id !== action.payload)
+      state.messages = state.messages.filter(
+        (mess) => mess._id !== action.payload,
+      );
     },
 
-    updateMessage: (state, action: PayloadAction<{
-      text: string;
-      imageUrl: string;
-      // isEditing: boolean;
-      id: string;
-  }>) => {
-    state.messages = state.messages.map((mess) =>
-      mess._id === action.payload.id
-        ? {
-            ...mess,
-            text: action.payload.text,
-            imageUrl: action.payload.imageUrl,
-          }
-        : mess,
-    );
+    updateMessage: (
+      state,
+      action: PayloadAction<IEditMessageReq>,
+    ) => {
+      const { text, imageUrl, id } = action.payload;
+
+      state.messages = state.messages.map((mess) =>
+        mess._id === id
+          ? {
+              ...mess,
+              text,
+              imageUrl,
+            }
+          : mess,
+      );
     },
 
     clearMessangerState: (state) => {
@@ -209,7 +212,7 @@ export const messangerSlice = createSlice({
         readAllChatsMessages.fulfilled,
         (state, action: PayloadAction<string>) => {
           const chatId = action.payload;
-          
+
           state.messages = state.messages.map((mess) =>
             mess.chat?._id === chatId ? { ...mess, isRead: true } : mess,
           );
@@ -217,7 +220,7 @@ export const messangerSlice = createSlice({
       )
       .addCase(readAllChatsMessages.rejected, (state) => {
         state.messagesStatus = 'error';
-      })
+      });
 
     // .addCase(
     //   updateMessageToRead.fulfilled,
@@ -250,7 +253,7 @@ export const {
   updateLatestMessage,
   readMessage,
   removeMessage,
-  updateMessage
+  updateMessage,
 } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

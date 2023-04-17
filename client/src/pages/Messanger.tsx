@@ -35,6 +35,7 @@ import { scrollToBottom } from 'utils/scrollToBottom';
 import { ReactComponent as AttachSVG } from 'assets/attach.svg'
 import { ReactComponent as CloseSVG } from 'assets/close.svg'
 import { uploadFile } from 'redux/slices/files';
+import { IEditMessageReq } from 'types/IEditMessageReq';
 
 export const Messanger = () => {
   // const [searchChatsVal, setSearchChatsVal] = useState('');
@@ -135,8 +136,8 @@ export const Messanger = () => {
       dispatch(removeMessage(messId))
     }
 
-    const onEditMessage = ({ text, imageUrl, id }) => {
-      dispatch(updateMessage({ text, imageUrl, id }))
+    const onEditMessage = (editedMess: IEditMessageReq) => {
+      dispatch(updateMessage(editedMess))
     }
 
     socket.on('receive message', sendSms);
@@ -394,7 +395,7 @@ export const Messanger = () => {
               message.imageUrl && (
                 <div className="currentChat__footer__image">
                   <img src={message.imageUrl} alt="" />
-                  <CloseSVG onClick={() => setMessage({ ...message, imageUrl: message.imageUrl })}/>
+                  <CloseSVG onClick={() => setMessage({ ...message, imageUrl: '' })}/>
                 </div>
               )
             }

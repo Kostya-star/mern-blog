@@ -13,6 +13,7 @@ import chatsRouters from './routes/chats-routes.js'
 import cors from 'cors';
 import http from 'http'
 import { Server } from 'socket.io'
+import { getOnlineUser } from './utils/getOnlineUser.js';
 
 const app = express();
 app.use(cors())
@@ -72,28 +73,28 @@ io.on('connection', (socket) => {
     
     socket.on('send message', ({sms, recipientId}) => {
 
-      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      const recipient = getOnlineUser(onlineUsers, recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('receive message', sms)
       }
     })
     
     socket.on('typing', ({ currentChatId, recipientId }) => {
-      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      const recipient = getOnlineUser(onlineUsers, recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('typing', currentChatId)
       }
     })
 
     socket.on('stop typing', ({ recipientId }) => {
-      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      const recipient = getOnlineUser(onlineUsers, recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('stop typing', recipientId)
       }
     })
     
     socket.on('delete message', ({ messId, recipientId}) => {
-      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      const recipient = getOnlineUser(onlineUsers, recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('delete message', messId)
       }
@@ -102,7 +103,7 @@ io.on('connection', (socket) => {
     socket.on('edit message', (updatedMess) => {
       const { text, imageUrl, id, recipientId } = updatedMess
 
-      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      const recipient = getOnlineUser(onlineUsers, recipientId)
       if(recipient) {
         io.to(recipient.socketId).emit('edit message', { text, imageUrl, id })
       }

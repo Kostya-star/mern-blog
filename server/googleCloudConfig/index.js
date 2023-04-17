@@ -65,6 +65,6 @@ async function cleanUpUnusedImages() {
 }
 
 // функция будет удалять неиспользуемые файлы каждый час 
-cron.schedule('0 * * * *', () => {
-  cleanUpUnusedImages()
-})
+// cron.schedule('0 * * * *', () => {
+//   cleanUpUnusedImages();
+// })

@@ -92,6 +92,13 @@ io.on('connection', (socket) => {
       }
     })
     
+    socket.on('delete message', ({ messId, recipientId}) => {
+      const recipient = onlineUsers.find(user => user?.userId === recipientId)
+      if(recipient) {
+        io.to(recipient.socketId).emit('delete message', messId)
+      }
+    })
+    
     
     
     socket.on('newComment', (comment) => {

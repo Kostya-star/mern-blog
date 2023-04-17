@@ -277,6 +277,27 @@ const readAllChatMessages = async (req, res) => {
   }
 }
 
+const deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params
+
+    if(!messageId) {
+      return res.json({
+        message: 'No message was found'
+      })
+    }
+
+    await MessageModel.deleteOne({ _id: messageId })
+
+    res.json(messageId)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when deleting the message'
+    })
+  }
+}
+
 
 
 export default {
@@ -287,5 +308,6 @@ export default {
   // getChatMessages,
   deleteEmptyChats,
   updateMessageToRead,
-  readAllChatMessages
+  readAllChatMessages,
+  deleteMessage
 }

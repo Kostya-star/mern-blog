@@ -16,10 +16,12 @@ import {
   addMessage,
   clearMessangerState,
   deleteEmptyChats,
+  deleteMessage,
   getAllChats,
   getAllMessages,
   readAllChatsMessages,
   readMessage,
+  removeMessage,
   sendMessage,
   updateLatestMessage,
   updateMessageToRead,
@@ -79,10 +81,10 @@ export const Messanger = () => {
     (user) => user._id === id,
   );
 
-  const [newMessage, setNewMessage] = useState('');
+  const [message, setMessage] = useState({ text: '', imageUrl: '' });
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
   const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const [imageUrl, setImageUrl] = useState('')
+  // const [imageUrl, setImageUrl] = useState('')
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
@@ -128,15 +130,21 @@ export const Messanger = () => {
       setTyping({ chatId: '', isTyping: false })
     }
 
+    const onDeleteMessage = (messId: string) => {
+      dispatch(removeMessage(messId))
+    }
+
     socket.on('receive message', sendSms);
 
     socket.on('typing', onStartTyping)
     socket.on('stop typing', onStopTyping)
+    socket.on('delete message', onDeleteMessage)
 
     return () => {
       socket.off('receive message', sendSms)
       socket.off('typing', onStartTyping)
       socket.off('stop typing', onStopTyping)
+      socket.off('delete message', onDeleteMessage)
     }
   });
 
@@ -155,14 +163,13 @@ export const Messanger = () => {
 
   const onSendMessage = async () => {
     socket.emit('stop typing', { recipientId: id })
-    const message = {
+    const mess = {
       chat: currentChat?._id as string,
-      text: newMessage,
-      imageUrl,
+      text: message.text,
+      imageUrl: message.imageUrl,
     };
-    setNewMessage('');
-    setImageUrl('')
-    const createdMessage = await dispatch(sendMessage(message)).unwrap();
+    setMessage({ text: '', imageUrl: '' });
+    const createdMessage = await dispatch(sendMessage(mess)).unwrap();
     socket.emit('send message', { createdMessage, recipientId: id});
     await dispatch(addMessage(createdMessage));
     scrollToBottom(lastChatMessageRef);
@@ -176,7 +183,7 @@ export const Messanger = () => {
   };
 
   const onTypingMessageHandle = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setNewMessage(e.target.value);
+    setMessage({ ...message, text: e.target.value });
     extendTextAreaWhenTyping(e);
 
     if(!typing.isTyping) {
@@ -208,9 +215,22 @@ export const Messanger = () => {
       formData.append('file', file)
       const resp = await dispatch(uploadFile(formData)).unwrap()
       if(resp) {
-        setImageUrl(resp?.url as string)
+        setMessage({ ...message, imageUrl: resp.url })
       }
     }
+  }
+
+  const onDeleteMessage = async (messId: string) => {
+    await dispatch(deleteMessage(messId))
+    socket.emit('delete message', { messId, recipientId: id })
+    dispatch(removeMessage(messId))
+  }
+
+  const onEditMessage = (message: IMessage) => {
+    setMessage({
+      text: message.text as string,
+      imageUrl: message.imageUrl as string,
+    });
   }
 
   return (
@@ -318,6 +338,8 @@ export const Messanger = () => {
                         isSameUserMessage={isSameUserMessage}
                         isLastUserMessage={isLastUserMessage}
                         messageRef={lastChatMessageRef}
+                        deleteMessage={onDeleteMessage}
+                        onEditMessage={onEditMessage}
                       />
                     )
                   );
@@ -331,30 +353,30 @@ export const Messanger = () => {
           <div className="currentChat__footer__textarea">
             <TextArea
               placeholder="Type your message here"
-              value={newMessage}
+              value={message.text}
               onChange={onTypingMessageHandle}
               ref={messageInputRef}
             />
-            {(newMessage || imageUrl) && (
+            {(message.text || message.imageUrl) && (
               <div>
                 <Button
                   onClick={onSendMessage}
                   className="button button_colored"
                   text=""
-                  disabled={!newMessage.trim() && !imageUrl}
+                  disabled={!message.text.trim() && !message.imageUrl}
                 >
                   <SendMessageSVG />
                 </Button>
               </div>
             )}
             <span className="attachSvg" onClick={() => inputFile.current?.click()}><AttachSVG/></span>
-            <input key={imageUrl} type="file" ref={inputFile} onChange={onImageUpload} hidden/>
+            <input key={message.text} type="file" ref={inputFile} onChange={onImageUpload} hidden/>
           </div>
             {
-              imageUrl && (
+              message.imageUrl && (
                 <div className="currentChat__footer__image">
-                  <img src={imageUrl} alt="" />
-                  <CloseSVG onClick={() => setImageUrl('')}/>
+                  <img src={message.imageUrl} alt="" />
+                  <CloseSVG onClick={() => setMessage({ ...message, imageUrl: message.imageUrl })}/>
                 </div>
               )
             }

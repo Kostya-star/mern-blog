@@ -26,27 +26,30 @@
 
   &__body {
     max-width: 50%;
+    position: relative;
 
-    
     p {
       background-color: rgb(235, 235, 235);
       padding: 10px;
       border-radius: 10px;
+
       span {
         word-break: break-word;
         font-size: 14px;
         margin-bottom: 5px;
       }
+
       img {
         max-width: 200px;
         max-height: 200px;
       }
     }
-    
+
     span {
       display: block;
       font-size: 11px;
     }
+
     .bubble_left {
       position: relative;
 
@@ -75,4 +78,24 @@
       }
     }
   }
+
+  .message__details {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    bottom: 10px;
+    left: -50px;
+    // background-color: rgb(221, 221, 221);
+    padding: 2px 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    
+    svg {
+      width: 15px;
+      &:hover {
+        background-color: rgb(221, 221, 221);
+      }
+    }
+  }
+
 }

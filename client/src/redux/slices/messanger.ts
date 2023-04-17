@@ -76,6 +76,12 @@ export const readAllChatsMessages = createAsyncThunk(
   },
 );
 
+export const deleteMessage = createAsyncThunk('messanger/deleteMessage', 
+  async (messId: string) => {
+    await instance.delete(`chats/message/${messId}`)
+  }
+)
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
@@ -127,6 +133,10 @@ export const messangerSlice = createSlice({
       state.messages = state.messages.map((mess) =>
         mess._id === action.payload ? { ...mess, isRead: true } : mess,
       );
+    },
+
+    removeMessage: (state, action: PayloadAction<string>) => {
+      state.messages = state.messages.filter(mess => mess._id !== action.payload)
     },
 
     clearMessangerState: (state) => {
@@ -211,6 +221,12 @@ export const messangerSlice = createSlice({
   },
 });
 
-export const { addMessage, clearMessangerState, updateLatestMessage, readMessage } = messangerSlice.actions;
+export const {
+  addMessage,
+  clearMessangerState,
+  updateLatestMessage,
+  readMessage,
+  removeMessage,
+} = messangerSlice.actions;
 
 export default messangerSlice.reducer;

@@ -13,6 +13,7 @@ router.get('/:interlocutorId', checkAuth, chatsController.accessChat) // if ther
 router.post('/message', checkAuth, chatsController.sendMessage)
 router.delete('/empty', checkAuth, chatsController.deleteEmptyChats)
 router.patch('/message/:messageId/read', chatsController.updateMessageToRead)
+router.delete('/message/:messageId', chatsController.deleteMessage)
 // router.delete('/chatId', checkAuth, chatsController.deleteUnusedChats)
 // router.post('', checkAuth, postsController.createPost)
 // router.patch('/:postId', checkAuth, postsController.updatePost)

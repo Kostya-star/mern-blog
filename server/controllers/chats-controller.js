@@ -97,21 +97,6 @@ const getAllChats = async (req, res) => {
 
 const getAllMessages = async (req, res) => {
   try {
-    // const allMessages = await MessageModel.find()
-    //   .populate({
-    //     path: 'chat',
-    //     populate: {
-    //       path: 'participants',
-    //     },
-    //     populate: {
-    //       path: 'latestMessage',
-    //       populate: {
-    //         path: 'sender',
-    //         select: '-hashedPassword'
-    //       }
-    //     }
-    //   })
-    //   .populate('sender', '-hashedPassword');
 
     const allMessages = await MessageModel.find()
       .populate({
@@ -377,6 +362,32 @@ const likeMessage = async (req, res) => {
   }
 }
 
+const getChatByUserName = async(req, res) => {
+  try {
+    const { userName } = req.params
+    const { userId } = req.body
+
+    if(!userName) {
+      return res.status(400).json({
+        message: "You must provide a user's name to search for chats"
+      })
+    }
+
+    const regex = new RegExp(userName, "i"); // i flag makes it case-insensitive
+    const users = await UserModel.find({ 
+      fullName: regex,
+      _id: { $ne: userId }
+    }).exec()
+
+    res.json(users)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      message: 'Error when finding the chat by the user name'
+    })
+  }
+}
+
 
 
 export default {
@@ -391,5 +402,6 @@ export default {
   deleteMessage,
   editMessage,
   deleteChat,
-  likeMessage
+  likeMessage,
+  getChatByUserName
 }

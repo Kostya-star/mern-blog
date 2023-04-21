@@ -4,52 +4,51 @@ import { IChat } from 'types/IChat';
 import { Avatar } from 'components/Avatar/Avatar';
 import { createTimeSince } from 'utils/createTimeSince';
 import { OnlineOfflineCircle } from 'components/OnlineOfflineCircle/OnlineOfflineCircle';
+import { IUser } from 'types/IUser';
 
 interface IChatItemProps {
-  chat: IChat;
-  currentUserId: string;
-  isActiveChat: boolean;
+  chat?: IChat;
+  user?: IUser;
+  isActiveChat?: boolean;
   isUserOnline: boolean;
+  selectedInterlocutor?: IUser;
   chatUnreadMessagesCount?: number;
-  typing: { isTyping: boolean; chatId: string };
+  creationTime?: string;
+  typing?: { isTyping: boolean; chatId: string };
 }
 
 export const ChatItem: FC<IChatItemProps> = ({
   chat,
-  currentUserId,
+  user,
   isActiveChat,
   isUserOnline,
   chatUnreadMessagesCount,
   typing,
+  creationTime,
+  selectedInterlocutor,
 }) => {
-  const interlocutorUser = chat.participants.find(
-    (user) => user._id !== currentUserId,
-  );
-  const creationTime = createTimeSince(new Date(chat.createdAt));
-
-  return (
+  // IF CHAT
+  return chat ? (
     <div className={`${s.chatItem} ${isActiveChat && s.chatItem_active}`}>
       <div className={s.chatItem__group}>
         <div className={s.chatItem__img}>
-          <Avatar avatar={interlocutorUser?.avatarUrl as string} />
+          <Avatar avatar={selectedInterlocutor?.avatarUrl as string} />
         </div>
 
         <div className={s.chatItem__body}>
           <span>
-            {interlocutorUser?.fullName}
+            {selectedInterlocutor?.fullName}
             <OnlineOfflineCircle isOnline={isUserOnline} />
           </span>
           <p>
-            {typing.chatId && typing.chatId === chat._id ? (
+            {typing?.chatId && typing.chatId === chat._id ? (
               <span className={s.chatItem__body__typing}>typing...</span>
             ) : (
               <span className={s.chatItem__body__lastMessage}>
-                {
-                  chat.latestMessage?.imageUrl && <img src={chat.latestMessage.imageUrl}/>
-                }
-                {
-                  chat.latestMessage?.text
-                }
+                {chat.latestMessage?.imageUrl && (
+                  <img src={chat.latestMessage.imageUrl} />
+                )}
+                {chat.latestMessage?.text}
               </span>
             )}
           </p>
@@ -61,6 +60,20 @@ export const ChatItem: FC<IChatItemProps> = ({
         {chatUnreadMessagesCount ? (
           <span className={s.unreadMessages}>{chatUnreadMessagesCount}</span>
         ) : null}
+      </div>
+    </div>
+  ) : (
+    // IF USER (WHEN SEARCHING FOR SUERS TO START A NEW CHAT)
+    <div className={s.chatItem}>
+      <div className={s.chatItem__group}>
+        <div className={s.chatItem__img}>
+          <Avatar avatar={user?.avatarUrl as string} />
+        </div>
+
+        <div className={s.chatItem__body}>
+          <span>{user?.fullName}</span>
+          {isUserOnline && <OnlineOfflineCircle isOnline={isUserOnline} />}
+        </div>
       </div>
     </div>
   );

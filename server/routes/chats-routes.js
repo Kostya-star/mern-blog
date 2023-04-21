@@ -13,17 +13,10 @@ router.get('/:interlocutorId', checkAuth, chatsController.accessChat) // if ther
 router.post('/message', checkAuth, chatsController.sendMessage)
 router.delete('/empty', checkAuth, chatsController.deleteEmptyChats)
 router.delete('/:chatId', checkAuth, chatsController.deleteChat)
-router.patch('/message/:messageId/read', chatsController.updateMessageToRead)
-router.delete('/message/:messageId', chatsController.deleteMessage)
-router.get('/message/like/:messageId', chatsController.likeMessage)
-router.patch('/message', chatsController.editMessage)
-// router.delete('/chatId', checkAuth, chatsController.deleteUnusedChats)
-// router.post('', checkAuth, postsController.createPost)
-// router.patch('/:postId', checkAuth, postsController.updatePost)
-// router.delete('/:id', checkAuth, postsController.deletePost)
-
-// router.post('/like', checkAuth, postsController.likePost)
-// router.get('/user/:id', postsController.getPostsByUserId)
-
+router.patch('/message/:messageId/read', checkAuth, chatsController.updateMessageToRead)
+router.delete('/message/:messageId', checkAuth, chatsController.deleteMessage)
+router.get('/message/like/:messageId', checkAuth, chatsController.likeMessage)
+router.patch('/message', checkAuth, chatsController.editMessage)
+router.get('/search/:userName', checkAuth, chatsController.getChatByUserName)
 
 export default router

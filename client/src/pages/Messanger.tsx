@@ -7,8 +7,8 @@ import { Button } from 'components/UI/Button/Button';
 import { Input } from 'components/UI/Input/Input';
 import { Loader } from 'components/UI/Loader/Loader';
 import { TextArea } from 'components/UI/TextArea/TextArea';
-import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef, ChangeEvent, useCallback } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { isAuthSelector } from 'redux/slices/auth';
 import {
@@ -30,7 +30,9 @@ import {
   updateLatestMessage,
   updateMessage,
   updateMessageToRead,
-  likeSms
+  likeSms,
+  getChatByUserName,
+  addChat,
 } from 'redux/slices/messanger';
 import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
@@ -41,29 +43,15 @@ import { ReactComponent as CloseSVG } from 'assets/close.svg';
 import { ReactComponent as DeleteSVG } from 'assets/trash_bin.svg';
 import { uploadFile } from 'redux/slices/files';
 import { IEditMessageReq } from 'types/IEditMessageReq';
+import _debounce from 'lodash.debounce';
+import { IUser } from 'types/IUser';
+import { createTimeSince } from 'utils/createTimeSince';
 
 export const Messanger = () => {
-  // const [searchChatsVal, setSearchChatsVal] = useState('');
-
-  // const debounceSearchChats = useCallback(
-  //   _debounce((userName) => getChatsByUserName(userName), 700),
-  //   [],
-  // );
-
-  // const getChatsByUserName = async (userName: string) => {
-  //   const resp = await instance.get(`chats/${userName}`)
-
-  //   console.log(resp);
-  // }
-
-  // const onSearchChatsHandle = (e: ChangeEvent<HTMLInputElement>) => {
-  //   setSearchChatsVal(e.target.value);
-  //   debounceSearchChats(e.target.value);
-  // };
-
   const dispatch = useAppDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation()
 
   const {
     chats,
@@ -81,13 +69,33 @@ export const Messanger = () => {
     usersOnline: auth.onlineUsers,
   }));
 
-  const isAuth = useAppSelector(isAuthSelector);
+  const [searchChatsVal, setSearchChatsVal] = useState('');
+  const [searchedUsers, setSearchedUsers] = useState<IUser[]>([]);
+  const [isSearchLoading, setSearchLoading] = useState(false);
+
+  const debounceSearchChats = useCallback(
+    _debounce(async (userName) => {
+      const users = await dispatch(getChatByUserName(userName)).unwrap();
+      setSearchedUsers(users);
+      setSearchLoading(false)
+    }, 700),
+    []
+    );
+    
+    const onSearchChatsHandle = (e: ChangeEvent<HTMLInputElement>) => {
+      const userName = e.target.value;
+      setSearchChatsVal(userName);
+      if (userName.trim()) {
+      setSearchLoading(true)
+      debounceSearchChats(userName.trim());
+    }
+  };
 
   const currentChat = chats?.find((chat) =>
-    chat.participants.some((user) => user._id === id),
+    chat.participants.some((user) => user._id === id)
   );
   const currentChatInterlocutor = currentChat?.participants.find(
-    (user) => user._id === id,
+    (user) => user._id === id
   );
 
   const [message, setMessage] = useState({
@@ -98,14 +106,14 @@ export const Messanger = () => {
   });
   const [typing, setTyping] = useState({ isTyping: false, chatId: '' });
   const [typingTimeoutId, setTypingTimeoutId] = useState<NodeJS.Timeout | null>(
-    null,
+    null
   );
-  // const [imageUrl, setImageUrl] = useState('')
 
   const lastChatMessageRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const inputFile = useRef<HTMLInputElement>(null);
 
+  // GET ALL CHATS AND MESSAGES
   useEffect(() => {
     (async () => {
       if (id) {
@@ -121,13 +129,30 @@ export const Messanger = () => {
     };
   }, []);
 
+  // LOGIC FOR CREATING A NEW CHAT WHEN USER IS SEARCHING FOR CHATS
+  useEffect(() => {
+    if (id && searchChatsVal) {
+      (async () => {
+        const chat = await dispatch(accessChat(id)).unwrap();
+
+        const isChatExists = chats.some(c => c._id === chat._id)
+        if (!isChatExists) {
+          await dispatch(addChat(chat))
+        }
+        setSearchChatsVal('')
+        setSearchedUsers([])
+      })();
+    }
+  }, [location]);
+
+  // REAL TIME COOPERATION
   useEffect(() => {
     const sendSms = async (newMessage: IMessage) => {
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
 
       if (isCurrentChat) {
         const messId = await dispatch(
-          updateMessageToRead(newMessage._id),
+          updateMessageToRead(newMessage._id)
         ).unwrap();
         await dispatch(readMessage(messId));
         scrollToBottom(lastChatMessageRef);
@@ -163,8 +188,8 @@ export const Messanger = () => {
     };
 
     const onLikeMessage = (messId: string) => {
-      dispatch(likeSms(messId))
-    }
+      dispatch(likeSms(messId));
+    };
 
     socket.on('receive message', sendSms);
     socket.on('typing', onStartTyping);
@@ -173,7 +198,7 @@ export const Messanger = () => {
     socket.on('edit message', onEditMessage);
     socket.on('delete chat', onDeleteChat);
     socket.on('like message', onLikeMessage);
-    
+
     return () => {
       socket.off('receive message', sendSms);
       socket.off('typing', onStartTyping);
@@ -285,7 +310,7 @@ export const Messanger = () => {
   const onDeleteChat = async () => {
     if (
       window.confirm(
-        'Do you really want to delete this chat? Note: all of the chat messages will be permanently deleted!',
+        'Do you really want to delete this chat? Note: all of the chat messages will be permanently deleted!'
       )
     ) {
       await dispatch(deleteChat(currentChat?._id as string));
@@ -296,10 +321,11 @@ export const Messanger = () => {
   };
 
   const onLikeMessage = (messId: string) => {
-    dispatch(likeMessage(messId))
-    dispatch(likeSms(messId))
-    socket.emit('like message', { messId, recipientId: id })
-  }
+    dispatch(likeMessage(messId));
+    dispatch(likeSms(messId));
+    socket.emit('like message', { messId, recipientId: id });
+  };
+console.log(isSearchLoading);
 
   return (
     <div className="messanger">
@@ -309,8 +335,8 @@ export const Messanger = () => {
           <Input
             type="text"
             placeholder="Search"
-            // value={searchChatsVal}
-            // onChange={onSearchChatsHandle}
+            value={searchChatsVal}
+            onChange={onSearchChatsHandle}
           />
         </div>
 
@@ -322,46 +348,67 @@ export const Messanger = () => {
             </div>
           )}
           {getAllChatsStatus === 'success' &&
-            (chats?.length ? (
-              chats.map((chat) => {
-                const isActiveChat = chat.participants.some(
-                  (p) => p._id === id,
-                );
-                const selectedInterlocutorId = chat.participants.find(
-                  (p) => p._id !== currentUserId,
-                )?._id;
+          searchChatsVal ? (
+            !isSearchLoading && (
+            searchedUsers.length  ? (
+             searchedUsers.map((user) => {
+               const isUserOnline = getUserOnlineStatus(usersOnline, user._id);
+  
+               return (
+                 <Link to={`/messanger/${user._id}`} key={user._id}>
+                   <ChatItem
+                     user={user}
+                     isUserOnline={isUserOnline}
+                   />
+                 </Link>
+               );
+             })
+           ) 
+            :
+            <div>No found users</div>
+            )
+          )
+          : chats?.length ? (
+            chats.map((chat) => {
+              const isActiveChat = chat.participants.some((p) => p._id === id);
+              const selectedInterlocutor = chat.participants.find(
+                (p) => p._id !== currentUserId
+              );
 
-                const isUserOnline = getUserOnlineStatus(
-                  usersOnline,
-                  selectedInterlocutorId,
-                );
+              const isUserOnline = getUserOnlineStatus(
+                usersOnline,
+                selectedInterlocutor?._id
+              );
 
-                const unreadChatMessagesCount = messages?.filter(
-                  (mess) =>
-                    !mess?.isRead &&
-                    mess.chat?._id === chat?._id &&
-                    mess.sender?._id !== currentUserId,
-                )?.length;
+              const unreadChatMessagesCount = messages?.filter(
+                (mess) =>
+                  !mess?.isRead &&
+                  mess.chat?._id === chat?._id &&
+                  mess.sender?._id !== currentUserId
+              )?.length;
 
-                return (
-                  <Link
-                    to={`/messanger/${selectedInterlocutorId}`}
-                    key={chat._id}
-                  >
-                    <ChatItem
-                      chat={chat}
-                      isActiveChat={isActiveChat}
-                      currentUserId={currentUserId as string}
-                      isUserOnline={isUserOnline}
-                      chatUnreadMessagesCount={unreadChatMessagesCount}
-                      typing={typing}
-                    />
-                  </Link>
-                );
-              })
-            ) : (
-              <div>NO CHATS</div>
-            ))}
+              const creationTime = createTimeSince(new Date(chat.createdAt));
+
+              return (
+                <Link
+                  to={`/messanger/${selectedInterlocutor?._id}`}
+                  key={chat._id}
+                >
+                  <ChatItem
+                    chat={chat}
+                    isActiveChat={isActiveChat}
+                    isUserOnline={isUserOnline}
+                    selectedInterlocutor={selectedInterlocutor as IUser}
+                    chatUnreadMessagesCount={unreadChatMessagesCount}
+                    creationTime={creationTime}
+                    typing={typing}
+                  />
+                </Link>
+              );
+            })
+          ) : (
+            <div>NO CHATS</div>
+          )}
         </div>
       </div>
 

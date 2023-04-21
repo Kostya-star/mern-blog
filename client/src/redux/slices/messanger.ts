@@ -4,6 +4,7 @@ import { IChat } from 'types/IChat';
 import { IEditMessageReq } from 'types/IEditMessageReq';
 import { IMessage } from 'types/IMessage';
 import { INewMessageReq } from 'types/INewMessageReq';
+import { IUser } from 'types/IUser';
 
 export const accessChat = createAsyncThunk(
   'messanger/getChat',
@@ -103,6 +104,14 @@ export const likeMessage = createAsyncThunk(
   },
 );
 
+export const getChatByUserName = createAsyncThunk(
+  'messanger/getChatByUserName',
+  async (userName: string) => {
+    const resp = await instance.get<IUser[]>(`chats/search/${userName}`);
+    return resp.data
+  },
+);
+
 type Status = 'loading' | 'success' | 'error' | '';
 
 export interface MessangerState {
@@ -127,6 +136,10 @@ export const messangerSlice = createSlice({
       const newMessage = action.payload;
 
       state.messages = [...state.messages, newMessage];
+    },
+
+    addChat: (state, action: PayloadAction<IChat>) => {
+      state.chats = [...state.chats, action.payload]
     },
 
     updateLatestMessage: (state, action: PayloadAction<IMessage>) => {
@@ -275,6 +288,7 @@ export const messangerSlice = createSlice({
 
 export const {
   addMessage,
+  addChat,
   clearMessangerState,
   updateLatestMessage,
   readMessage,

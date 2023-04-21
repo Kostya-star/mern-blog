@@ -117,7 +117,7 @@ export const CreatePost = () => {
         <Loader className="loader_big" />
       </div>
     );
-  }
+  } 
 
   return (
     <div className="createPost">
@@ -175,7 +175,7 @@ export const CreatePost = () => {
               ...newPost,
               tags: e.target.value
                 .replace(/[,#.]/g, '')
-                .replace(/\s{2,}/g, ' '),
+                .replace(/\s{2,}/g, ' '), 
             })
           }
         />

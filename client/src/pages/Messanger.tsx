@@ -1,4 +1,3 @@
-import { baseUrl } from 'API/baseUrl';
 import { socket } from 'App';
 import { ReactComponent as SendMessageSVG } from 'assets/send-message.svg';
 import { ChatItem } from 'components/ChatItem/ChatItem';

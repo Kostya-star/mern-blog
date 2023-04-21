@@ -347,24 +347,31 @@ export const Messanger = () => {
           )}
           {getAllChatsStatus === 'success' &&
           searchChatsVal ? (
-            !isSearchLoading && (
-            searchedUsers.length  ? (
-             searchedUsers.map((user) => {
-               const isUserOnline = getUserOnlineStatus(usersOnline, user._id);
-  
-               return (
-                 <Link to={`/messanger/${user._id}`} key={user._id}>
-                   <ChatItem
-                     user={user}
-                     isUserOnline={isUserOnline}
-                   />
-                 </Link>
-               );
-             })
-           ) 
+            !isSearchLoading ?
+            (
+           searchedUsers.length  ? (
+            searchedUsers.map((user) => {
+              const isUserOnline = getUserOnlineStatus(usersOnline, user._id);
+ 
+              return (
+                <Link to={`/messanger/${user._id}`} key={user._id}>
+                  <ChatItem
+                    user={user}
+                    isUserOnline={isUserOnline}
+                  />
+                </Link>
+              );
+            })
+          ) 
+           :
+            <div className='loader_center'>
+              <h2>No users found 😥</h2>
+            </div>
+           )
             :
-            <div>No found users</div>
-            )
+            <div className='loader_center'>
+              <Loader className='loader_big'/>
+            </div>
           )
           : chats?.length ? (
             chats.map((chat) => {
@@ -514,8 +521,7 @@ export const Messanger = () => {
       ) : (
         <div className="chats__emptyBlock">
           <h1>
-            SELECT A CHAT FROM THE EXISTED OR CREATE A NEW CHAT(button for
-            creating a new chat)
+          ↖️SELECT A CHAT FROM THE EXISTED OR SEARCH FOR PEOPLE TO CHAT WITH
           </h1>
         </div>
       )}

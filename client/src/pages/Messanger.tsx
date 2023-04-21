@@ -324,7 +324,6 @@ export const Messanger = () => {
     dispatch(likeSms(messId));
     socket.emit('like message', { messId, recipientId: id });
   };
-console.log(isSearchLoading);
 
   return (
     <div className="messanger">

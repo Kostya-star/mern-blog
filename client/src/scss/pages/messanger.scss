@@ -3,13 +3,14 @@
   grid-template-columns: 1fr 2fr;
   // justify-content: space-between;
   min-height: 50vh;
+  height: 80vh;
   
   // ALL CHATS + SEARCH INPUT
   .chats {
     color: white;
     // background-color: rgb(78, 78, 200);
     background-color: rgb(95, 92, 92);
-
+    
     &__search {
       padding: 20px;
       input {
@@ -18,8 +19,11 @@
         background-color: rgb(211, 211, 211);
       }
     }
-
+    
     &__list {
+      max-height: calc(80vh - 69px);
+      overflow-y: auto;
+      scrollbar-width: auto;
       // display: flex;
       // flex-direction: column;
       // gap: 20px;
@@ -66,7 +70,7 @@
     &__messages {
       height: 100%;
       background-color: white;
-      overflow-y: scroll;
+      overflow-y: auto;
       scrollbar-width: auto;
       padding: 10px;
     }

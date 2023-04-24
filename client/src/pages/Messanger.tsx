@@ -32,6 +32,7 @@ import {
   likeSms,
   getChatByUserName,
   addChat,
+  updateChat,
 } from 'redux/slices/messanger';
 import { IMessage } from 'types/IMessage';
 import { extendTextAreaWhenTyping } from 'utils/extendTextAreaWhenTyping';
@@ -147,6 +148,7 @@ export const Messanger = () => {
   // REAL TIME COOPERATION
   useEffect(() => {
     const sendSms = async (newMessage: IMessage) => {
+      dispatch(updateChat(newMessage.chat._id));
       const isCurrentChat = currentChat?._id === newMessage.chat._id;
 
       if (isCurrentChat) {
@@ -235,6 +237,7 @@ export const Messanger = () => {
       await dispatch(addMessage(sms));
       scrollToBottom(lastChatMessageRef);
       dispatch(updateLatestMessage(sms));
+      dispatch(updateChat(sms.chat._id));
     } else if (message.isEditing && message.id) {
       await dispatch(editMessage(message)).unwrap();
 
@@ -392,7 +395,7 @@ export const Messanger = () => {
                   mess.sender?._id !== currentUserId
               )?.length;
 
-              const creationTime = createTimeSince(new Date(chat.createdAt));
+              const creationTime = createTimeSince(new Date(chat.updatedAt));
 
               return (
                 <Link

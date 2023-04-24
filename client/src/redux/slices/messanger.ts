@@ -46,7 +46,6 @@ export const sendMessage = createAsyncThunk(
   'messanger/sendMessage',
   async (message: INewMessageReq) => {
     const resp = await instance.post<IMessage>(`/chats/message`, message);
-
     return resp.data;
   },
 );
@@ -192,6 +191,12 @@ export const messangerSlice = createSlice({
       );
     },
 
+    updateChat: (state, action: PayloadAction<string>) => {
+      const dateNow = new Date().toISOString()
+      
+      state.chats = state.chats.map(chat => chat._id === action.payload ? { ...chat, updatedAt: dateNow } : chat)
+    },
+
     removeChat: (state, action: PayloadAction<string>) => {
       state.chats = state.chats.filter(chat => chat._id !== action.payload)
     },
@@ -295,7 +300,8 @@ export const {
   removeMessage,
   updateMessage,
   removeChat,
-  likeSms
+  likeSms,
+  updateChat
 } = messangerSlice.actions;
 
 export default messangerSlice.reducer;

@@ -163,6 +163,7 @@ const sendMessage = async (req, res) => {
 
     await ChatModel.findByIdAndUpdate(chat, {
       latestMessage: message._id,
+      
     })
 
     res.json(message)

@@ -4,6 +4,7 @@ import cron from 'node-cron'
 import CommentsModel from '../models/comments-model.js'
 import PostModel from '../models/post-model.js'
 import UserModel from '../models/user-model.js'
+import MessageModel from '../models/message-model.js'
 dotenv.config()
 
 const storage = new Storage({
@@ -33,6 +34,7 @@ async function cleanUpUnusedImages() {
   const postsImagesUrl = await PostModel.find().select('imageUrl');;
   const commentsImagesUrl = await CommentsModel.find().select('imageUrl');;
   const userAvatarsUrl = await UserModel.find().select('avatarUrl')
+  const messageImages = await MessageModel.find().select('imageUrl')
 
   postsImagesUrl.forEach(p => {
     imageUrls.push(p.imageUrl);
@@ -44,6 +46,10 @@ async function cleanUpUnusedImages() {
 
   userAvatarsUrl.forEach(u => {
     imageUrls.push(u.avatarUrl)
+  })
+
+  messageImages.forEach(m => {
+    imageUrls.push(m.imageUrl)
   })
 
   // создаем функцию которая будет вырезать id картинки из file.name
@@ -65,6 +71,6 @@ async function cleanUpUnusedImages() {
 }
 
 // функция будет удалять неиспользуемые файлы каждый час 
-// cron.schedule('0 * * * *', () => {
-//   cleanUpUnusedImages();
-// })
+cron.schedule('0 * * * *', () => {
+  cleanUpUnusedImages();
+})
